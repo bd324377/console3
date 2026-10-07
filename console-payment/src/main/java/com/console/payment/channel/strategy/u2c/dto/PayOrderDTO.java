@@ -1,11 +1,7 @@
-package com.console.payment.channel.strategy.utc.dto;
+package com.console.payment.channel.strategy.u2c.dto;
 
-import com.console.payment.entity.PaymentOrder;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.math.BigDecimal;
-import java.util.TreeMap;
 
 /**
  * 支付订单DTO(用于创建和查询第三方支付订单)

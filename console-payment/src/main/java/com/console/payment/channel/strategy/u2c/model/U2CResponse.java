@@ -1,4 +1,4 @@
-package com.console.payment.channel.strategy.utc.model;
+package com.console.payment.channel.strategy.u2c.model;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -8,7 +8,7 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public class UTCResponse<T> {
+public class U2CResponse<T> {
     private boolean success;//true 成功,false 失败
     private String  errorCode;//错误编码:成功-SUCCESS
     private String  message;//错误信息

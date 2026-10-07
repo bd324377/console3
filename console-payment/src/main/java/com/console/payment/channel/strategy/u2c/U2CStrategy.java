@@ -1,4 +1,4 @@
-package com.console.payment.channel.strategy.utc;
+package com.console.payment.channel.strategy.u2c;
 
 import com.console.framework.utils.TenantUtils;
 import com.console.payment.channel.PaymentStrategy;
@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 @Slf4j
-public class UTCStrategy extends PaymentStrategy {
+public class U2CStrategy extends PaymentStrategy {
 
     public Map<String,Object> buildRequestParam(PaymentOrder paymentOrder, PaymentChannel channel, String serviceCode) {
         TreeMap<String, Object> paramsMap = new TreeMap<>();

@@ -1,4 +1,4 @@
-package com.console.payment.channel.strategy.utc.model;
+package com.console.payment.channel.strategy.u2c.model;
 
 import lombok.Getter;
 import lombok.Setter;

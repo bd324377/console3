@@ -1,4 +1,4 @@
-package com.console.payment.channel.strategy.utc.dto;
+package com.console.payment.channel.strategy.u2c.dto;
 
 import com.console.payment.entity.BankCard;
 import com.console.payment.entity.CashOutOrder;
