@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-dependencies</artifactId>
+        <version>3.5.0</version>
+    </parent>
+    <groupId>com.console</groupId>
+    <artifactId>console-parent</artifactId>
+    <version>0.0.1</version>
+    <packaging>pom</packaging>
+    <name>console</name>
+    <description>console project for Spring Boot</description>
+
+    <properties>
+        <console.version>0.0.1</console.version>
+        <java.version>21</java.version>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <spring-boot.version>3.5.0</spring-boot.version>
+        <layering-cache.version>3.5.0</layering-cache.version>
+        <spring-boot-admin.version>3.1.8</spring-boot-admin.version>
+        <mybatis-plus.version>3.5.7</mybatis-plus.version>
+        <fastjson.version>2.0.62</fastjson.version>
+        <integration-redis.version>6.5.0</integration-redis.version>
+        <kaptcha.version>2.3.3</kaptcha.version>
+        <disruptor.version>4.0.0</disruptor.version>
+        <bitwalker.version>1.21</bitwalker.version>
+        <retrofit.version>4.0.2</retrofit.version>
+        <okhttp.version>4.12.0</okhttp.version>
+        <geoip2.version>4.3.1</geoip2.version>
+        <browscap-java.version>1.4.3</browscap-java.version>
+        <facebook.business.version>8.0.3</facebook.business.version>
+    </properties>
+
+    <!-- 依赖声明 -->
+    <dependencyManagement>
+        <dependencies>
+            <!-- Spring Data Redis -->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-data-redis</artifactId>
+                <version>${spring-boot.version}</version>
+            </dependency>
+
+            <!-- layering-cache -->
+            <dependency>
+                <groupId>com.github.xiaolyuh</groupId>
+                <artifactId>layering-cache-starter</artifactId>
+                <version>${layering-cache.version}</version>
+            </dependency>
+
+            <!-- springboot性能监控相关 -->
+            <dependency>
+                <groupId>de.codecentric</groupId>
+                <artifactId>spring-boot-admin-dependencies</artifactId>
+                <version>${spring-boot-admin.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <!-- Mybatis-plus 依赖配置 -->
+            <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>mybatis-plus-generator</artifactId>
+                <version>${mybatis-plus.version}</version>
+            </dependency>
+            <!-- Mybatis-plus-->
+            <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>mybatis-plus-spring-boot3-starter</artifactId>
+                <version>${mybatis-plus.version}</version>
+            </dependency>
+
+            <!-- JSON 解析器和生成器 -->
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>fastjson</artifactId>
+                <version>${fastjson.version}</version>
+            </dependency>
+
+            <!-- 分布式锁 -->
+            <dependency>
+                <groupId>org.springframework.integration</groupId>
+                <artifactId>spring-integration-redis</artifactId>
+                <version>${integration-redis.version}</version>
+            </dependency>
+
+            <!-- Disruptor -->
+            <dependency>
+                <groupId>com.lmax</groupId>
+                <artifactId>disruptor</artifactId>
+                <version>${disruptor.version}</version>
+            </dependency>
+
+            <!-- retrofit2 http请求转化器 -->
+<!--            <dependency>-->
+<!--                <groupId>com.github.lianjiatech</groupId>-->
+<!--                <artifactId>retrofit-spring-boot-starter</artifactId>-->
+<!--                <version>${retrofit.version}}</version>-->
+<!--            </dependency>-->
+
+            <!-- 验证码 -->
+            <dependency>
+                <groupId>pro.fessional</groupId>
+                <artifactId>kaptcha</artifactId>
+                <version>${kaptcha.version}</version>
+            </dependency>
+
+            <!-- IP2Proxy ip识别和判断是否为代理ip -->
+            <dependency>
+                <groupId>com.ip2proxy</groupId>
+                <artifactId>ip2proxy-java</artifactId>
+                <version>3.5.1</version>
+            </dependency>
+
+            <!-- ip地理位置-->
+            <!-- https://mvnrepository.com/artifact/com.maxmind.geoip2/geoip2 -->
+            <dependency>
+                <groupId>com.maxmind.geoip2</groupId>
+                <artifactId>geoip2</artifactId>
+                <version>${geoip2.version}</version>
+            </dependency>
+
+            <!-- 浏览器信息-->
+            <!-- https://mvnrepository.com/artifact/com.blueconic/browscap-java -->
+            <dependency>
+                <groupId>com.blueconic</groupId>
+                <artifactId>browscap-java</artifactId>
+                <version>${browscap-java.version}</version>
+            </dependency>
+
+            <!-- facebook相关API -->
+            <dependency>
+                <groupId>com.facebook.business.sdk</groupId>
+                <artifactId>facebook-java-business-sdk</artifactId>
+                <version>${facebook.business.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <modules>
+        <module>console-framework</module>
+        <module>console-core</module>
+        <module>console-user</module>
+        <module>console-admin</module>
+        <module>console-api</module>
+<!--        <module>console-social</module>-->
+        <module>console-payment</module>
+<!--        <module>console-activity</module>-->
+<!--        <module>console-quartz</module>-->
+<!--        <module>console-msg</module>-->
+<!--        <module>console-product</module>-->
+        <!--        <module>console-api-sax</module>-->
+        <!--        <module>console-message</module>-->
+        <!--        <module>console-actuator-admin</module>-->
+    </modules>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.12.1</version>
+                <configuration>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                    <encoding>UTF-8</encoding>
+                    <compilerArgs>
+                        <arg>-parameters</arg>
+                    </compilerArgs>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

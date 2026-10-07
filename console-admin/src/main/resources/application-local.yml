@@ -1,0 +1,46 @@
+server:
+  port: 6082
+
+spring:
+  servlet:
+    multipart:
+      max-file-size: 20971520
+      max-request-size: 52428800
+  task:
+    execution:
+      pool:
+        max-size: 1000
+  messages:
+    basename: i18n/messages
+  jackson:
+    default-property-inclusion: non_null
+  datasource:
+    url: jdbc:mysql://192.168.2.12:3306/console?serverTimezone=GMT%2B8&useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true&useSSL=false&rewriteBatchedStatements=true
+    username: root
+    password: root
+    hikari:
+      maximum-pool-size: 32
+  data:
+    redis:
+      port: 6379
+      host: 192.168.2.12
+      database: 1
+      password: 1234569
+      connect-timeout: 2000
+layering-cache:
+  redis:
+    host: 192.168.2.12
+    port: 6379
+    password: 1234569
+    database: 1
+    serializer: com.github.xiaolyuh.redis.serializer.JacksonRedisSerializer
+
+
+mybatis-plus:
+  configuration:
+    #开启控制sql打印
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+console:
+  fileUpload:
+    baseFilePath: D:/console/uploadPath/

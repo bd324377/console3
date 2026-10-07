@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.console.admin.mapper.RoleMenuMapper">
+    <select id="selectMenusByRoleId" resultType="com.console.admin.entity.Menu">
+        SELECT
+            m.id,
+            m.parent_id,
+            m.menu_name,
+            m.sort,
+            m.path,
+            m.component_path,
+            m.type,
+            m.permission,
+            m.icon
+        FROM
+            r_role_menu rm INNER JOIN s_menu m ON m.id = rm.menu_id
+        WHERE
+            rm.role_id = #{roleId}
+    </select>
+</mapper>

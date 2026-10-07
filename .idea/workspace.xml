@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="7de3ddf0-9374-4432-bc40-ef06c86a8d9b" name="Changes" comment="" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Enum" />
+        <option value="package-info" />
+        <option value="Interface" />
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 8
+}</component>
+  <component name="ProjectId" id="3HUL8ScQ9feu4xcyoMneZO6dkCa" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RequestMappingsPanelOrder0": "0",
+    "RequestMappingsPanelOrder1": "1",
+    "RequestMappingsPanelWidth0": "75",
+    "RequestMappingsPanelWidth1": "75",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "git-widget-placeholder": "master",
+    "last_opened_file_path": "D:/workspace/re-develop3/console",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "File.Encoding",
+    "spring.configuration.checksum": "a84632d40a7fc56ecb6959afe23e2f7b",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="ReactorSettings">
+    <option name="notificationShown" value="true" />
+  </component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="D:\workspace\re-develop3\console\console-admin\src\main\resources" />
+      <recent name="D:\workspace\re-develop3\console\console-core\src\main\resources" />
+      <recent name="D:\workspace\re-develop3\console\console-framework" />
+      <recent name="D:\workspace\re-develop3\console\console-payment\src\main\java\com\console\payment\channel\strategy\utc" />
+      <recent name="D:\workspace\re-develop3\console\console-payment\src\main\java\com\console\payment" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\workspace\re-develop3\console\console-admin\src\main" />
+    </key>
+    <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="com.console.admin.service.impl" />
+      <recent name="com.console.admin.service" />
+      <recent name="com.console.admin.mapper" />
+      <recent name="com.console.admin.entity" />
+      <recent name="com.console.core" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Application.TokenUtils">
+    <configuration name="TokenUtils" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="com.console.framework.utils.TokenUtils" />
+      <module name="console-framework" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.console.framework.utils.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="ConsoleAdminApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" temporary="true" nameIsGenerated="true">
+      <module name="console-admin" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.console.admin.ConsoleAdminApplication" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.console.admin.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="ConsoleCoreApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" temporary="true" nameIsGenerated="true">
+      <module name="console-core" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.console.core.ConsoleCoreApplication" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.console.core.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="ConsoleUserApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" temporary="true" nameIsGenerated="true">
+      <module name="console-user" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.console.user.ConsoleUserApplication" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.console.user.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Application.TokenUtils" />
+        <item itemvalue="Spring Boot.ConsoleAdminApplication" />
+        <item itemvalue="Spring Boot.ConsoleUserApplication" />
+        <item itemvalue="Spring Boot.ConsoleCoreApplication" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="7de3ddf0-9374-4432-bc40-ef06c86a8d9b" name="Changes" comment="" />
+      <created>1785917542070</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1785917542070</updated>
+      <workItem from="1785917543425" duration="13957000" />
+      <workItem from="1786007581414" duration="15428000" />
+      <workItem from="1786331740429" duration="28723000" />
+      <workItem from="1787562328909" duration="16443000" />
+      <workItem from="1787992859690" duration="50228000" />
+      <workItem from="1788366341582" duration="365000" />
+      <workItem from="1788366721062" duration="156619000" />
+      <workItem from="1789369803634" duration="3071000" />
+      <workItem from="1789372901136" duration="109037000" />
+      <workItem from="1790992873354" duration="79730000" />
+      <workItem from="1791366257464" duration="397000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/console-core/src/main/java/com/console/core/handler/GlobalExceptionHandler.java</url>
+          <line>44</line>
+          <option name="timeStamp" value="10" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/console-core/src/main/java/com/console/core/handler/GlobalExceptionHandler.java</url>
+          <line>51</line>
+          <option name="timeStamp" value="11" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
+</project>
