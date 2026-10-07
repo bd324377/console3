@@ -1,4 +1,4 @@
-package com.console.payment.channel.strategy.u2c.dto;
+package com.console.payment.channel.strategy.u2c.dto.req;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -8,7 +8,7 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public class PayOrderDTO {
+public class PayOrderReq {
     private String  merchantId;      // 商户ID
     private String  merchantOrderNo; // 商户订单号
     private Integer amount;         // 金额(单位:分)

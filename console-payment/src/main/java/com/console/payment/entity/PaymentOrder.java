@@ -3,6 +3,7 @@ package com.console.payment.entity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.console.framework.constants.ValidationGroup;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -13,6 +14,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
+@TableName("s_payment_order")
 public class PaymentOrder {
     @TableId(type = IdType.AUTO)
     private Long id;
@@ -25,7 +27,7 @@ public class PaymentOrder {
     private Long paymentChannelId;//支付渠道ID
     private String transactionId;//充值渠道订单id
     private String merchantOrderNo;//商户订单号
-    private Integer status;//订单状态，1为待锁定，2为正在入款，3为入款成功，4为入款失败，5为用户取消；6、审核通过；7、审核失败
+    private Integer status;//1待处理，2入款中，3成功，4失败，5取消，6审核通过，7审核失败，8退款
     @NotNull(message = "",groups = ValidationGroup.insert.class)
     private BigDecimal orderAmt;//支付订单金额
     private BigDecimal toBeOrderAmt;//待下单金额
@@ -41,6 +43,10 @@ public class PaymentOrder {
     private Integer rechargeTimes;//充值次数
     private String errorMsg;//错误信息
     private Integer completeState;//完结状态 1、已完结；0、未完结;
-    @TableField(exist = false)
     private Integer errorType;
+
+    @TableField(exist = false)
+    private String payerIdNo;
+    @TableField(exist = false)
+    private String payerName;
 }

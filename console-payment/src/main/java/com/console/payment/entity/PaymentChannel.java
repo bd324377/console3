@@ -3,6 +3,7 @@ package com.console.payment.entity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import com.console.framework.constants.ValidationGroup;
 import jakarta.validation.constraints.NotBlank;
@@ -16,11 +17,13 @@ import java.util.List;
 
 @Getter
 @Setter
+@TableName(value = "s_payment_channel", autoResultMap = true)
 public class PaymentChannel implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
     @TableId(value = "id",type = IdType.AUTO)
     private Long id;                //渠道id
+    private Integer marketSiteId;
     @NotBlank(message = "",groups = ValidationGroup.insert.class)
     private String channelName;     //渠道名称
     private String icon;            //渠道图标

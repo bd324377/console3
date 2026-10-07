@@ -1,4 +1,4 @@
-package com.console.payment.channel.strategy.u2c.model;
+package com.console.payment.channel.strategy.u2c.dto.res;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -7,7 +7,7 @@ import java.math.BigDecimal;
 
 @Getter
 @Setter
-public class Balance {
+public class BalanceRes {
     private BigDecimal balance;         //账户余额
     private BigDecimal unsettledBalance;//待结算金额
     private BigDecimal frozenAmount;    //冻结金额

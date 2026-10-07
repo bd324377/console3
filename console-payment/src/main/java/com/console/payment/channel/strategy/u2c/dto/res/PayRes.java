@@ -1,4 +1,4 @@
-package com.console.payment.channel.strategy.u2c.model;
+package com.console.payment.channel.strategy.u2c.dto.res;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -8,8 +8,8 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public class PayResult {
-    private String amount;//金额(单位:分)
+public class PayRes {
+    private Integer amount;//金额(单位:分)
     private String orderNo;//平台订单号
     private String payType;//代收产品编码
     private String merchantId;//商户 Id

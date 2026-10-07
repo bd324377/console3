@@ -1,4 +1,4 @@
-package com.console.payment.channel.strategy.u2c.model;
+package com.console.payment.channel.strategy.u2c.dto.res;
 
 import lombok.Getter;
 
@@ -6,7 +6,7 @@ import lombok.Getter;
  * 支付/提现订单状态
  */
 @Getter
-public enum OrderState {
+public enum OrderStatus {
     PAID(0,"PAID"),//支付成功
     WAITING_PAY(1,"WAITING_PAY"),//待支付
     PAYING(2,"PAYING"),//支付中
@@ -16,7 +16,7 @@ public enum OrderState {
     private final Integer key;
     private final String  value;
 
-    OrderState(int key, String value) {
+    OrderStatus(int key, String value) {
         this.key   = key;
         this.value = value;
     }
@@ -25,12 +25,12 @@ public enum OrderState {
      * 根据状态值获取订单状态
      * @param value 状态值
      */
-    public static OrderState getOrderStateByValue(String value) {
-        for (OrderState orderState : values()) {
-            if (orderState.getValue().equals(value)) {
-                return orderState;
+    public static OrderStatus getOrderStatusByValue(String value) {
+        for (OrderStatus orderStatus : values()) {
+            if (orderStatus.getValue().equals(value)) {
+                return orderStatus;
             }
         }
-        return OrderState.WAITING_PAY;
+        return OrderStatus.WAITING_PAY;
     }
 }

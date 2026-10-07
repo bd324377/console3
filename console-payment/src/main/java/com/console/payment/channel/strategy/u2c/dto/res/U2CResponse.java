@@ -1,4 +1,4 @@
-package com.console.payment.channel.strategy.u2c.model;
+package com.console.payment.channel.strategy.u2c.dto.res;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -13,4 +13,6 @@ public class U2CResponse<T> {
     private String  errorCode;//错误编码:成功-SUCCESS
     private String  message;//错误信息
     private T data;
+    /** 本地调用元数据，不是 U2C 协议字段。 */
+    private transient boolean retryable;
 }

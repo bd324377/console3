@@ -1,5 +1,8 @@
 package com.console.payment.entity;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -10,11 +13,13 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
+@TableName("s_cash_out_order")
 public class CashOutOrder implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
+    @TableId(type = IdType.AUTO)
     private Long id; // 提现订单id
     private Integer orderType; // 订单类型：1、线上出款；2、人工出款
     private Integer walletType; // 出款钱包类型：1、玩家钱包；2、代理钱包
@@ -23,7 +28,7 @@ public class CashOutOrder implements Serializable {
     private Integer marketSiteId; // 站点ID
     private Integer marketTeamId; // 团队ID
     private Integer marketerId; // 业务员ID
-    private Integer paymentChannelId; // 支付渠道ID
+    private Long paymentChannelId; // 支付渠道ID
     private String transactionId; // 提现渠道订单id
     private String merchantOrderNo; // 商户订单号
     private Integer status; // 状态，1、订单创建成功等待处理；2、审核通过；3、审核拒绝；4、出款中；5、提现成功；6、提现失败；7、订单取消；8、已退款;9、订单超时

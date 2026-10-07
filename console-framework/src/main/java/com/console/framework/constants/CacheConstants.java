@@ -29,6 +29,8 @@ public class CacheConstants {
     public static final String INITIAL_AGENT = "INITIAL_AGENT";
     public static final String VIP = "VIP";
     public static final String INITIAL_VIP = "INITIAL_VIP";
+    public static final String PAYMENT_CHANNEL = "PAYMENT_CHANNEL";
+    public static final String PAYMENT_CHANNEL_MERCHANT_ID = "PAYMENT_CHANNEL:MERCHANT_ID";
 
     //=========业务==========
     public static final String CAPTCHA_CODE = "CAPTCHA_CODE:";

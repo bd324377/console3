@@ -6,7 +6,7 @@ import lombok.Getter;
 public enum ChannelEnum {
     TEST(0,"testPay"),
     U2C(1,"u2cPay"),
-    FOURZ(2,"fourzPay"),
+    FOUR_Z(2,"four_zPay"),
     CASH(3,"cashPay"),
     CE(4,"cePay");
 
