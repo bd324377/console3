@@ -22,6 +22,7 @@ import com.console.payment.service.CashOutOrderService;
 import com.console.payment.service.PaymentApplicationService;
 import com.console.payment.service.PaymentChannelService;
 import com.console.payment.service.PaymentOrderService;
+import com.console.payment.service.OrderCallbackPostProcessor;
 import com.console.payment.utils.PaymentUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -45,6 +46,7 @@ public class PaymentApplicationServiceImpl implements PaymentApplicationService 
     private final PaymentChannelService paymentChannelService;
     private final BankCardService bankCardService;
     private final PaymentFactory paymentFactory;
+    private final List<OrderCallbackPostProcessor> orderPostProcessors;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -143,19 +145,18 @@ public class PaymentApplicationServiceImpl implements PaymentApplicationService 
     @Transactional(rollbackFor = Exception.class)
     public void handlePaymentCallback(Map<String, Object> payload, String clientIp) {
         // 匿名回调没有登录租户上下文，需要先从商户订单号恢复租户表路由。
-        OrderNumber number = setCallbackTenant(payload, "PAY");
+        setCallbackTenant(payload, "PAY");
         try {
             PaymentOrder order = requirePayment(String.valueOf(payload.get("merchantOrderNo")));
             PaymentChannel channel = requireChannel(order.getPaymentChannelId());
             PaymentStrategy strategy = paymentFactory.getStrategy(channel, false);
+            // 必须先完成验签和报文一致性校验，再解析并更新本地订单。
             verifyCallback(payload, clientIp, channel, strategy, order.getOrderAmt(), order.getMerchantOrderNo());
             ChannelResult result = strategy.parsePaymentCallback(payload, channel);
             verifyResultIdentity(result, channel, order.getMerchantOrderNo());
-            if (!PaymentStatus.terminal(order.getStatus())) {
-                boolean changed = applyPaymentCallbackResult(order, result);
-                if (changed && order.getStatus() == PaymentStatus.SUCCESS) {
-                    onPaymentSucceeded(order);
-                }
+            boolean changed = paymentOrderService.handlePaymentOrder(order, result);
+            if (changed && PaymentStatus.terminal(order.getStatus())) {
+                orderPostProcessors.forEach(processor -> processor.afterPaymentCompleted(order));
             }
         } finally {
             DynamicTableNameHandler.removeTenantId();
@@ -170,14 +171,13 @@ public class PaymentApplicationServiceImpl implements PaymentApplicationService 
             CashOutOrder order = requireCashOut(String.valueOf(payload.get("merchantOrderNo")));
             PaymentChannel channel = requireChannel(order.getPaymentChannelId());
             PaymentStrategy strategy = paymentFactory.getStrategy(channel, true);
+            // 签名和业务字段全部可信后，才允许进入订单状态机。
             verifyCallback(payload, clientIp, channel, strategy, order.getOrderAmt(), order.getMerchantOrderNo());
             ChannelResult result = strategy.parseCashOutCallback(payload, channel);
             verifyResultIdentity(result, channel, order.getMerchantOrderNo());
-            if (!CashOutStatus.terminal(order.getStatus())) {
-                boolean changed = applyCashOutCallbackResult(order, result);
-                if (changed && order.getStatus() == CashOutStatus.SUCCESS) {
-                    onCashOutSucceeded(order);
-                }
+            boolean changed = cashOutOrderService.handleCashOutOrder(order, result);
+            if (changed && CashOutStatus.terminal(order.getStatus())) {
+                orderPostProcessors.forEach(processor -> processor.afterCashOutCompleted(order));
             }
         } finally {
             DynamicTableNameHandler.removeTenantId();
@@ -263,46 +263,6 @@ public class PaymentApplicationServiceImpl implements PaymentApplicationService 
         }
         order.setErrorMsg(result.getMessage());
         cashOutOrderService.updateById(order);
-    }
-
-    private boolean applyPaymentCallbackResult(PaymentOrder order, ChannelResult result) {
-        int status = mapPaymentStatus(result.getStatus());
-        boolean complete = PaymentStatus.terminal(status);
-        // 条件更新保证重复/乱序通知无法覆盖成功、失败、取消或退款等终态。
-        boolean changed = paymentOrderService.lambdaUpdate()
-                .eq(PaymentOrder::getId, order.getId())
-                .notIn(PaymentOrder::getStatus, PaymentStatus.SUCCESS, PaymentStatus.FAILED,
-                        PaymentStatus.CANCELLED, PaymentStatus.REFUNDED)
-                .set(PaymentOrder::getStatus, status)
-                .set(PaymentOrder::getCompleteState, complete ? 1 : 0)
-                .set(PaymentOrder::getTransactionId, result.getOrderNo())
-                .set(PaymentOrder::getPayTime, status == PaymentStatus.SUCCESS ? LocalDateTime.now() : order.getPayTime())
-                .set(PaymentOrder::getErrorMsg, result.getMessage())
-                .update();
-        order.setStatus(status);
-        order.setCompleteState(complete ? 1 : 0);
-        order.setTransactionId(result.getOrderNo());
-        return changed;
-    }
-
-    private boolean applyCashOutCallbackResult(CashOutOrder order, ChannelResult result) {
-        int status = mapCashOutStatus(result.getStatus());
-        boolean complete = CashOutStatus.terminal(status);
-        // 提现终态同样不可被后续 PAYING 等旧通知回退。
-        boolean changed = cashOutOrderService.lambdaUpdate()
-                .eq(CashOutOrder::getId, order.getId())
-                .notIn(CashOutOrder::getStatus, CashOutStatus.REJECTED, CashOutStatus.SUCCESS,
-                        CashOutStatus.FAILED, CashOutStatus.CANCELLED, CashOutStatus.REFUNDED, CashOutStatus.TIMEOUT)
-                .set(CashOutOrder::getStatus, status)
-                .set(CashOutOrder::getCompleteState, complete ? 1 : 0)
-                .set(CashOutOrder::getTransactionId, result.getOrderNo())
-                .set(CashOutOrder::getCashOutTime, status == CashOutStatus.SUCCESS ? LocalDateTime.now() : order.getCashOutTime())
-                .set(CashOutOrder::getErrorMsg, result.getMessage())
-                .update();
-        order.setStatus(status);
-        order.setCompleteState(complete ? 1 : 0);
-        order.setTransactionId(result.getOrderNo());
-        return changed;
     }
 
     private int mapPaymentStatus(String status) {

@@ -17,6 +17,4 @@ public interface PaymentApplicationService {
     List<BalanceRes> queryBalance(Long channelId);
     void handlePaymentCallback(Map<String, Object> payload, String clientIp);
     void handleCashOutCallback(Map<String, Object> payload, String clientIp);
-    default void onPaymentSucceeded(PaymentOrder order) { }
-    default void onCashOutSucceeded(CashOutOrder order) { }
 }
