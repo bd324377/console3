@@ -15,7 +15,7 @@ public class RequestUtils {
      **/
     public HttpServletRequest getCurrentRequest() throws IllegalStateException {
         ServletRequestAttributes attrs = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-        return attrs.getRequest();
+        return attrs == null ? null : attrs.getRequest();
     }
 
     public String getRequestIp() {
@@ -50,6 +50,14 @@ public class RequestUtils {
             origin = origin.replaceFirst("^(https?://)?", "");
             origin = origin.replaceFirst("^(http?://)?", "");
             return origin.split("/")[0];
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public String getRequestPrefix() {
+        try {
+            return getRequestDomain() + "/api";
         } catch (Exception e) {
             return null;
         }

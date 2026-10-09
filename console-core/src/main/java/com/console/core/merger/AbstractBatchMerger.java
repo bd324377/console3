@@ -3,6 +3,7 @@ package com.console.core.merger;
 import com.alibaba.fastjson.JSON;
 import com.console.core.entity.ErrorRecord;
 import com.console.core.service.ErrorRecordService;
+import com.console.framework.config.DynamicTableNameHandler;
 import com.console.framework.utils.DateUtils;
 import com.console.framework.utils.RedisUtils;
 import jakarta.annotation.PostConstruct;
@@ -254,6 +255,7 @@ public abstract class AbstractBatchMerger<T> {
 
             int fail = 0;
             for (Map.Entry<Integer, List<T>> entry : groupMap.entrySet()) {
+                DynamicTableNameHandler.setTenantId(entry.getKey());
                 List<T> list = entry.getValue();
                 for (int i = 0; i < list.size(); i += maxBatchSize) {
                     int end = Math.min(i + maxBatchSize, list.size());

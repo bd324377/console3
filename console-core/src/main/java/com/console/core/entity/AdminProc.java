@@ -83,7 +83,9 @@ public class AdminProc implements Serializable {
         MENU(2,"菜单管理"),
         ROLE_MENU(3,"权限管理"),
         USER(4, "用户管理"),
-        AGEMT_LEVEL(5,"代理等级管理");
+        AGEMT_LEVEL(5,"代理等级管理"),
+        PAYMENT(6,"支付管理"),
+        BANK_CARD(7,"收款账户管理");
 
         @JsonValue
         @EnumValue

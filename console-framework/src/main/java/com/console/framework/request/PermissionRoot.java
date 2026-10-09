@@ -1,6 +1,7 @@
 package com.console.framework.request;
 
 import com.console.framework.domain.BusinessException;
+import com.console.framework.config.DynamicTableNameHandler;
 import com.console.framework.utils.I18nUtil;
 import com.console.framework.utils.RedisUtils;
 import com.console.framework.utils.RequestUtils;
@@ -41,6 +42,21 @@ public class PermissionRoot {
         } else {
             throw new BusinessException(401, I18nUtil.getI8nMsg("http.error.401"));
         }
-
+        RequestUser user = RequestUtils.getUser(RequestUser.class);
+        if (user == null || user.getTenantId() == null) throw new BusinessException(401, "登录状态无效");
+        if (preAuthorize != null) {
+            boolean member = Integer.valueOf(1).equals(user.getUserType());
+            boolean backendAccount = List.of(2, 3, 4).contains(user.getUserType() == null ? 0 : user.getUserType());
+            if ((preAuthorize.accountType() == 1 && !backendAccount) || (preAuthorize.accountType() == 2 && !member))
+                throw new BusinessException(403, "账号类型无权限");
+            if (preAuthorize.loginAccount().length > 0 && !Arrays.asList(preAuthorize.loginAccount()).contains(user.getAccount()))
+                throw new BusinessException(403, "账号无权限");
+            if (!preAuthorize.value().isBlank()) {
+                RequestBackendUser backend = RequestUtils.getRequestBackendUser();
+                if (member || backend == null || backend.getPermissionList() == null || !backend.getPermissionList().contains(preAuthorize.value()))
+                    throw new BusinessException(403, "没有操作权限");
+            }
+        }
+        DynamicTableNameHandler.setTenantId(user.getTenantId());
     }
 }

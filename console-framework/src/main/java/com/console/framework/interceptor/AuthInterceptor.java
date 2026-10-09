@@ -24,11 +24,18 @@ public class AuthInterceptor implements HandlerInterceptor {
         Method method = handlerMethod.getMethod();
         // 获取注解内容，判断是否有权限访问接口
         PreAuthorize preAuthorize = method.getAnnotation(PreAuthorize.class);
+        if (preAuthorize == null) preAuthorize = handlerMethod.getBeanType().getAnnotation(PreAuthorize.class);
         if (preAuthorize != null && preAuthorize.ignore()) {
             //无需验证权限接口直接通过
             return true;
         }
         PermissionRoot.isHasPermission(preAuthorize);
         return true;
+    }
+    @Override
+    public void afterCompletion(@NotNull HttpServletRequest request,
+                                @NotNull jakarta.servlet.http.HttpServletResponse response,
+                                @NotNull Object handler, Exception ex) {
+        DynamicTableNameHandler.removeTenantId();
     }
 }

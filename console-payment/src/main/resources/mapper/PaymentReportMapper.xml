@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.console.payment.mapper.PaymentReportMapper">
+  <insert id="rebuild">
+    INSERT INTO s_payment_report (report_date,user_id,start_online_times,start_online_amt,online_success_times,online_success_amt,manual_success_times,manual_success_amt,resupply_success_times,resupply_success_amt,fee,channel_fee,marketer_fee)
+    SELECT #{date}, user_id, SUM(start_times),SUM(start_amt),SUM(online_times),SUM(online_amt),SUM(manual_times),SUM(manual_amt),SUM(resupply_times),SUM(resupply_amt),SUM(fee),SUM(channel_fee),SUM(marketer_fee)
+    FROM (
+      SELECT user_id,1 start_times,order_amt start_amt,0 online_times,0 online_amt,0 manual_times,0 manual_amt,0 resupply_times,0 resupply_amt,0 fee,0 channel_fee,0 marketer_fee
+      FROM s_payment_order WHERE order_type=1 AND order_time &gt;= #{date} AND order_time &lt; DATE_ADD(#{date},INTERVAL 1 DAY)
+      UNION ALL
+      SELECT user_id,0,0,IF(order_type=1 AND resupply=0,1,0),IF(order_type=1 AND resupply=0,order_amt,0),IF(order_type=2,1,0),IF(order_type=2,order_amt,0),IF(resupply=1,1,0),IF(resupply=1,order_amt,0),COALESCE(fee,0),COALESCE(channel_fee,0),COALESCE(marketer_fee,0)
+      FROM s_payment_order WHERE status=3 AND pay_time &gt;= #{date} AND pay_time &lt; DATE_ADD(#{date},INTERVAL 1 DAY)
+    ) facts GROUP BY user_id
+  </insert>
+</mapper>

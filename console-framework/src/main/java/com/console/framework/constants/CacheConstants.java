@@ -36,4 +36,11 @@ public class CacheConstants {
     public static final String CAPTCHA_CODE = "CAPTCHA_CODE:";
     public static final String SAME_REG_IP_COUNT = "SAME_REG_IP_COUNT:";
     public static final String SAME_REG_DEVICE_COUNT = "SAME_REG_DEVICE_COUNT:";
+    //=========分布式锁=========
+    public static final String ACQUIRE_LOCK_CREATE_PAY_ORDER = "ACQUIRE_LOCK:CREATE_PAY_ORDER:";//创建支付订单
+    public static final String ACQUIRE_LOCK_UPDATE_PAYMENT_ORDER_STATE = "ACQUIRE_LOCK:UPDATE_PAYMENT_ORDER_STATE:";//修改支付订单状态
+    public static final String ACQUIRE_LOCK_HANDLE_PAYMENT_ORDER_STATE = "ACQUIRE_LOCK:HANDLE_PAYMENT_ORDER_STATE:";//修改支付订单状态
+    public static final String ACQUIRE_LOCK_PAYMENT_ORDER_CALL_BACK = "ACQUIRE_LOCK:PAYMENT_ORDER_CALL_BACK:";//支付订单回调处理
+    public static final String ACQUIRE_LOCK_CREATE_CASH_OUT_ORDER = "ACQUIRE_LOCK:CREATE_CASH_OUT_ORDER:";//创建提现订单
+    public static final String ACQUIRE_LOCK_CASH_OUT_ORDER_CALL_BACK = "ACQUIRE_LOCK:CASH_OUT_ORDER_CALL_BACK:";//提现订单回调处理
 }
