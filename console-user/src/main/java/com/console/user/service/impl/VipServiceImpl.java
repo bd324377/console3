@@ -14,13 +14,17 @@ import org.springframework.stereotype.Service;
 @Service
 public class VipServiceImpl extends BaseServiceImpl<VipMapper, Vip> implements VipService {
     @Override
-    @Cacheable(
-            value = CacheConstants.INITIAL_VIP,key = "T(com.console.framework.utils.TenantUtils).getTenantId()",
-            firstCache = @FirstCache(expireTime = 5),secondaryCache = @SecondaryCache(expireTime = 1))
+    @Cacheable(value = CacheConstants.INITIAL_VIP,key = "T(com.console.framework.utils.TenantUtils).getTenantId()")
     public Integer getInitialVipId() {
         QueryWrapper<Vip> queryWrapper = new QueryWrapper<>();
         queryWrapper.select("id").lambda().orderByAsc(Vip::getLevel).last("LIMIT 1");
         Vip vip = this.getOne(queryWrapper);
         return vip == null ? null : vip.getId();
+    }
+
+    @Override
+    @Cacheable(value = CacheConstants.VIP,key = "T(com.console.framework.utils.TenantUtils).getTenantId() + ':' + #vipId")
+    public Vip getVipById(Integer vipId) {
+        return this.getById(vipId);
     }
 }

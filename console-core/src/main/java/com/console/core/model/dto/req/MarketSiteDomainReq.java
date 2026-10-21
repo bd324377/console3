@@ -29,8 +29,7 @@ public class MarketSiteDomainReq {
     public static class UpdateMarketSiteDomainReq {
         @NotNull
         private Integer id;//站点与域名关系ID
-        @NotNull
-        private Integer siteId;//站点ID
+//        private Integer siteId;//站点ID
         private String  siteDomain;//站点域名
         private Integer status;//域名使用状态
 

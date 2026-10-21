@@ -27,20 +27,6 @@ public class PaymentDTO {
         private String     payerIdNo;   //充值人实名ID（）
         private String     payerName;   //充值人姓名
         private Integer    userId;      //用户ID
-
-        public PaymentOrder buildPaymentOrder() {
-            PaymentOrder paymentOrder = new PaymentOrder();
-            paymentOrder.setId(IdWorker.getId());
-            paymentOrder.setOrderType(1);
-            paymentOrder.setChannelId(channelId);
-            paymentOrder.setOrderAmt(amount);
-            paymentOrder.setActivityId(activityId);
-            paymentOrder.setUserId(userId);
-            paymentOrder.setOrderTime(LocalDateTime.now());
-            paymentOrder.setStatus(PaymentOrder.PaymentStatus.PAYING);
-            paymentOrder.setIp(RequestUtils.getRequestIp());                    //设置充值ip
-            return paymentOrder;
-        }
     }
 
     /**

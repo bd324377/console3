@@ -15,7 +15,7 @@ public class WrapperUtils {
         if (value == null) {
             updateWrapper.lambda().set(propertyGetter, null);
         } else {
-            if (value instanceof String || value instanceof Integer) {
+            if (value instanceof String || value instanceof Integer || value instanceof Enum<?>) {
                 updateWrapper.lambda().set(propertyGetter, value);
             } else {
                 updateWrapper.lambda().set(propertyGetter, JSON.toJSONString(value));

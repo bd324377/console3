@@ -4,16 +4,17 @@ import com.console.framework.constants.CacheConstants;
 import com.console.framework.domain.LoginResult;
 import com.console.framework.request.RequestBackendUser;
 import com.console.framework.request.RequestMember;
+import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
-import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.util.Base64;
+import java.util.List;
 
 public class TokenUtils {
     private static final String USER_ACCESS_TOKEN_PREFIX = "USER_ACCESS_TOKEN:";
     private static final String USER_REFRESH_TOKEN_PREFIX = "USER_REFRESH_TOKEN:";
-    private static final Integer ACCESS_TOKEN_EXPIRE = CacheConstants.MINUTE * 180;
+    private static final Integer ACCESS_TOKEN_EXPIRE = CacheConstants.MINUTE * 1440;
     private static final Integer REFRESH_TOKEN_EXPIRE = CacheConstants.DAY * 7;
 
     private static final String BACKEND_USER_ACCESS_TOKEN_PREFIX = "BACKEND_USER_ACCESS_TOKEN:";
@@ -44,7 +45,6 @@ public class TokenUtils {
                 .refreshToken(EncryptUtils.encodeToBase64Str(refreshTokenKey))
                 .userId(requestMember.getId())
                 .build();
-
     }
 
     public static LoginResult createBackendUserToken(RequestBackendUser requestBackendUser) {
@@ -108,6 +108,18 @@ public class TokenUtils {
         return userInfoStr;
     }
 
+    public static void updateUserToken(RequestMember requestMember) {
+        String acTokenKey = requestMember.getTokenKey();
+        RedisUtils.setValue(acTokenKey,requestMember,ACCESS_TOKEN_EXPIRE);
+    }
+
+    public static RequestMember getRequestMember(Integer tenantId,Integer siteId,Integer marketerId,Integer userId) {
+        String accessTokenKey = USER_ACCESS_TOKEN_PREFIX + tenantId + ":" + siteId + ":" +
+                marketerId + ":" + userId + generateRandomString() + "*";
+        List<String> keys = RedisUtils.scanKeys(accessTokenKey);
+        if (ObjectUtils.isEmpty(keys)) return null;
+        return RedisUtils.get(keys.get(0), RequestMember.class);
+    }
     public static void main(String[] args) {
         String encode = EncryptUtils.encodeToBase64Str("1_50238288");
         System.out.println(encode);

@@ -7,6 +7,7 @@ import com.console.payment.mapper.PaymentProcMapper;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Component;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -51,8 +52,8 @@ public class PaymentProcMerger extends AbstractBatchMerger<PaymentProc> {
     }
 
     @Override
-    protected String getBusinessKey(PaymentProc entity) {
-        return entity.getId().toString();
+    protected Serializable getBusinessKey(PaymentProc entity) {
+        return entity.getId();
     }
 
     @Override

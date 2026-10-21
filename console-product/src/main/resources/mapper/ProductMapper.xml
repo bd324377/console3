@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.console.product.mapper.ProductMapper">
+    <insert id="batchInsertOrUpdate">
+        REPLACE INTO s_product (id, platform_id, category, product_code, official_product_code, product_name, status )
+        VALUES
+        <foreach collection="productList" item="item" separator=",">
+            (#{item.id}, #{item.platformId}, #{item.category}, #{item.productCode}, #{item.officialProductCode}, #{item.productName}, #{item.status})
+        </foreach>
+    </insert>
+</mapper>

@@ -1,6 +1,10 @@
 package com.console.payment.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
+import com.baomidou.mybatisplus.core.toolkit.IdWorker;
+import com.console.core.entity.Wallet;
+import com.console.framework.utils.DateUtils;
+import com.console.framework.utils.TenantUtils;
 import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Getter;
 import lombok.Setter;
@@ -24,11 +28,11 @@ public class CashOutProc implements Serializable {
     private Long orderId; // 订单id
     private Integer userId; // 用户id
     private Integer channelId; // 渠道id
-    private Integer walletType; // 钱包类型
+    private Wallet.WalletType walletType; // 钱包类型
     private BigDecimal orderAmt; // 订单金额
     private BigDecimal fee; // 提现手续费
-    private BigDecimal marketerFee; // 渠道服务费
-    private Integer procType; // 操作类型
+    private BigDecimal channelFee;//渠道手续费
+    private ProcType procType; // 操作类型
     private LocalDate procDate; // 过程发生日期
     private LocalDateTime procTime; // 过程发生时间
     private Integer operatorId; // 管理员(操作人)id
@@ -40,6 +44,21 @@ public class CashOutProc implements Serializable {
     @TableField(exist = false)
     private Boolean fromRecovery;
 
+    public CashOutProc() {}
+
+    public CashOutProc(CashOutOrder cashOutOrder, ProcType procType) {
+        this.setOrderId(cashOutOrder.getId());
+        this.setUserId(cashOutOrder.getUserId());
+        this.setChannelId(cashOutOrder.getChannelId());
+        this.setWalletType(cashOutOrder.getWalletType());
+        this.setOrderAmt(cashOutOrder.getOrderAmt());
+        this.setFee(cashOutOrder.getFee());
+        this.setChannelFee(cashOutOrder.getChannelFee());
+        this.setProcType(procType);
+        this.setProcTime(LocalDateTime.now());
+        this.setProcDate(LocalDate.now());
+        this.setTenantId(TenantUtils.getTenantId());
+    }
     @Getter
     public enum ProcType {
         // 操作类型：1、线上发起出款；2、后台人工发起出款；3.线上出款成功；4、线上出款失败"；5、线上出款成功但只减账户金额不出款；6、人工出款成功；

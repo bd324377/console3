@@ -31,6 +31,12 @@ public class CacheConstants {
     public static final String INITIAL_VIP = "INITIAL_VIP";
     public static final String PAYMENT_CHANNEL = "PAYMENT_CHANNEL";
     public static final String PAYMENT_CHANNEL_MERCHANT_ID = "PAYMENT_CHANNEL:MERCHANT_ID";
+    public static final String CASH_OUT_RULE = "CASH_OUT_RULE";//提现规则
+    public static final String PRODUCT_PLATFORM = "PRODUCT_PLATFORM";//产品信息
+    public static final String PRODUCT = "PRODUCT";//产品信息
+    public static final String PLATFORM_RULE_ITEM = "PLATFORM_RULE_ITEM";//产商规则
+    public static final String ORDER_MODE = "ORDER_MODE";
+    public static final String SYS_ORDER_MODE = "SYS_ORDER_MODE";
 
     //=========业务==========
     public static final String CAPTCHA_CODE = "CAPTCHA_CODE:";
@@ -43,4 +49,8 @@ public class CacheConstants {
     public static final String ACQUIRE_LOCK_PAYMENT_ORDER_CALL_BACK = "ACQUIRE_LOCK:PAYMENT_ORDER_CALL_BACK:";//支付订单回调处理
     public static final String ACQUIRE_LOCK_CREATE_CASH_OUT_ORDER = "ACQUIRE_LOCK:CREATE_CASH_OUT_ORDER:";//创建提现订单
     public static final String ACQUIRE_LOCK_CASH_OUT_ORDER_CALL_BACK = "ACQUIRE_LOCK:CASH_OUT_ORDER_CALL_BACK:";//提现订单回调处理
+    public static final String ACQUIRE_LOCK_UPDATE_CASH_OUT_ORDER_STATE = "ACQUIRE_LOCK:UPDATE_CASHOUT_ORDER_STATE:";//修改支付订单状态
+    public static final String ACQUIRE_LOCK_SYNC_PRODUCT = "ACQUIRE_LOCK:SYNC_PRODUCT";//同步中转平台产品分布式锁前缀
+    public static final String ACQUIRE_LOCK_SYNC_PRODUCT_ORDER = "ACQUIRE_LOCK:SYNC_PRODUCT_ORDER";//同步中转平台产品订单分布式锁前缀
+    public static final String ACQUIRE_LOCK_PRODUCT_TRANSFER = "ACQUIRE_LOCK:PRODUCT_TRANSFER:";//进出产品中转分布式锁前缀
 }

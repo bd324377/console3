@@ -1,9 +1,6 @@
 package com.console.core.entity;
 
-import com.baomidou.mybatisplus.annotation.EnumValue;
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 import com.console.framework.request.RequestBackendUser;
 import com.console.framework.utils.EnumValueUtils;
 import com.fasterxml.jackson.annotation.JsonValue;
@@ -28,7 +25,7 @@ public class AdminProc implements Serializable {
     private Integer backendUserId;          //后台用户ID
     private String backendUserName;         //后台用户名称
     private Integer backendUserTenantId;    //后台用户所属租户编码
-    private Long objectId;                  //操作对象ID
+    private Serializable objectId;                  //操作对象ID
     private String objectBeforeValue;       //操作前的对象值（JSON格式）
     private String objectValue;             //操作后的对象值（JSON格式）
     private Integer objectTenantId;         //操作对象租户编码
@@ -41,11 +38,18 @@ public class AdminProc implements Serializable {
     private String browser;                 //浏览器
     private String description;             //信息说明描述
 
+    @TableField(exist = false)
+    private Integer tenantId;
+    @TableField(exist = false)
+    private Integer retryTimes;
+    @TableField(exist = false)
+    private Boolean fromRecovery;
+
     public AdminProc() {}
     public AdminProc(RequestBackendUser backendUser,
                      ProcBelong procBelong,
                      ProcType procType,
-                     Long objectId,
+                     Serializable objectId,
                      Object objectBeforeValue,
                      Object objectValue) {
         this.procBelong = procBelong;
@@ -58,6 +62,7 @@ public class AdminProc implements Serializable {
         this.procDate = LocalDate.now();
         this.procTime = LocalDateTime.now();
 
+        this.tenantId = backendUser.getTenantId();
         if (objectValue != null) {
             if (objectValue instanceof Enum<?> e) {
                 this.objectValue = EnumValueUtils.getEnumValue(e).toString();
@@ -80,9 +85,11 @@ public class AdminProc implements Serializable {
         TENANT(1,"租户管理"),
         MARKET_SITE(2,"站点管理"),
         MARKET_SITE_DOMAIN(3,"站点域名"),
+        MARKET_TEAM(4,"团队管理"),
+        MARKETER(5,"业务员管理"),
+        USER(6,"用户管理"),
         MENU(2,"菜单管理"),
         ROLE_MENU(3,"权限管理"),
-        USER(4, "用户管理"),
         AGEMT_LEVEL(5,"代理等级管理"),
         PAYMENT(6,"支付管理"),
         BANK_CARD(7,"收款账户管理");

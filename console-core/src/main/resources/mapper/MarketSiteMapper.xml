@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.console.core.mapper.MarketSiteMapper">
+    <!--查询直属下级钱包报告（充值和下单）-->
+    <select id="selectMarketSitePage" resultType="com.console.core.entity.MarketSite">
+        SELECT
+            t.id,t.site_name,m.order_mode,m.recharge_rate,m.manual_deposit_limit,m.manual_deposited_amt,m.manual_withdrawn_amt,
+            m.withdrawal_limit,m.recharge_amt,m.recharge_fee,m.withdraw_amt,m.order_amt,m.order_result_amt,m.order_fee,m.profit_amt
+        FROM
+            s_market_site t
+                INNER JOIN s_marketer m ON m.market_site_id = t.id
+        WHERE m.marketer_id = #{param.marketerId}
+        <if test="param.siteName != null">
+            AND t.site_name LIKE concat(#{param.siteName},'%')
+        </if>
+        <if test="param.status != null">
+            AND t.status = #{param.status}
+        </if>
+        ORDER BY ${param.sortField} ${param.sortType}
+
+    </select>
+</mapper>

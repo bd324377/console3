@@ -20,16 +20,15 @@ public class BankCard implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @TableId(type = IdType.AUTO)
-    private Long id;
+    private Integer id;
     private Integer userId;
     private BankCardType type;
     private String bankCardCode;
+    private String phone;//手机号码
     private BankCardStatus status;//状态0、待使用；1、首次出款中；2、正常；3、禁用
     private String userName;//用户名
     private LocalDateTime bindTime;//添加时间
     private LocalDateTime activateTime;//激活时间（首次使用）
-    private String bankCode; // 通用银行编码
-    private String branchBankNo; // 通用支行编码
     private String remarks;//备注
 
     @Getter

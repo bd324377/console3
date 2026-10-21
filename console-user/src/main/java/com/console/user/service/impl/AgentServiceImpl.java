@@ -54,7 +54,7 @@ public class AgentServiceImpl extends ServiceImpl<AgentMapper, Agent> implements
      * @param agentId   代理等级ID
      */
     @Override
-    public boolean delAgentById(Long agentId) {
+    public boolean delAgentById(Integer agentId) {
         Agent agent = getAgentById(agentId);
         if (agent == null) {
             throw new BusinessException(500, I18nUtil.getI8nMsg("agent.error.absent",RequestUtils.getLang()));
@@ -122,7 +122,7 @@ public class AgentServiceImpl extends ServiceImpl<AgentMapper, Agent> implements
      */
     @Override
     @Cacheable(value = CacheConstants.AGENT,key = "T(com.console.framework.utils.TenantUtils).getTenantId() + ':' + #agentId")
-    public Agent getAgentById(Long agentId) {
+    public Agent getAgentById(Integer agentId) {
         Agent agent = this.getById(agentId);
         QueryWrapper<Agent> queryWrapper = new QueryWrapper<>();
         queryWrapper.select("id").lambda().gt(Agent::getLevel,agent.getLevel()).orderByAsc(Agent::getLevel).last("limit 1");

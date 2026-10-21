@@ -96,7 +96,7 @@ public abstract class AbstractBatchMerger<T> {
     protected abstract void incrementRetryTimes(T entity);
     protected abstract boolean isFromRecovery(T entity);
     protected abstract void setFromRecovery(T entity, boolean fromRecovery);
-    protected abstract String getBusinessKey(T entity);
+    protected abstract Serializable getBusinessKey(T entity);
     protected abstract Map<Integer,List<T>> getGroupMap(List<T> records);
 
     // ----- 初始化 -----
@@ -267,7 +267,7 @@ public abstract class AbstractBatchMerger<T> {
                         fail += sub.size();
                         failedCount.addAndGet(sub.size());
                         for (T entity : sub) {
-                            String bizKey = getBusinessKey(entity);
+                            Serializable bizKey = getBusinessKey(entity);
                             recordError(bizKey, "BATCH_INSERT", JSON.toJSONString(entity), e);
                             incrementRetryTimes(entity);
                             routeFailedEntity(entity);
@@ -624,7 +624,7 @@ public abstract class AbstractBatchMerger<T> {
     }
 
     // ----- 异常记录 -----
-    protected void recordError(String businessKey, String operation, String dataSnapshot, Throwable ex) {
+    protected void recordError(Serializable businessKey, String operation, String dataSnapshot, Throwable ex) {
         if (errorRecordService == null) {
             log.warn("ErrorRecordService 未注入，无法记录异常: {}", ex.getMessage());
             return;

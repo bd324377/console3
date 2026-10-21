@@ -2,14 +2,21 @@ package com.console.framework.utils;
 
 import lombok.experimental.UtilityClass;
 
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
+import java.time.*;
 import java.time.temporal.ChronoUnit;
 
 @UtilityClass
 public class DateUtils {
+    /** 闭区间 [start, end]，支持跨天 */
+    public static boolean isBetween(LocalTime time, LocalTime start, LocalTime end) {
+        if (time == null || start == null || end == null) return false;
+        if (start.equals(end)) return true; // 起止相同视为全天
+        if (start.isAfter(end)) {
+            return !time.isBefore(start) || !time.isAfter(end);
+        }
+        return !time.isBefore(start) && !time.isAfter(end);
+    }
+
     /**
      * 获取当前时间戳
      */

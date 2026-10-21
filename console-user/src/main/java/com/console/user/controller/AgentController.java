@@ -32,7 +32,7 @@ public class AgentController {
      * @param agentId 代理等级主键ID
      */
     @DeleteMapping("/{agentId}")
-    public Result delAgentById(@PathVariable(value = "agentId") Long agentId) {
+    public Result delAgentById(@PathVariable(value = "agentId") Integer agentId) {
         return agentService.delAgentById(agentId) ? Result.success() : Result.failed();
     }
 

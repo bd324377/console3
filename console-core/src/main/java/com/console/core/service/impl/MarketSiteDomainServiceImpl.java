@@ -9,7 +9,6 @@ import com.console.core.entity.MarketSiteDomain;
 import com.console.core.mapper.MarketSiteDomainMapper;
 import com.console.core.service.MarketSiteDomainService;
 import com.console.core.entity.Tenant;
-import com.console.core.service.TenantService;
 import com.console.framework.config.DynamicTableNameHandler;
 import com.console.framework.constants.CacheConstants;
 import com.console.framework.domain.BusinessException;
@@ -18,8 +17,8 @@ import com.console.framework.utils.FieldUtils;
 import com.console.framework.utils.RequestUtils;
 import com.github.xiaolyuh.annotation.CacheEvict;
 import com.github.xiaolyuh.annotation.Cacheable;
-import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
@@ -33,23 +32,27 @@ import java.util.List;
 @Slf4j
 @Service
 public class MarketSiteDomainServiceImpl extends BaseServiceImpl<MarketSiteDomainMapper, MarketSiteDomain> implements MarketSiteDomainService {
-    @Resource
-    private TenantService tenantService;
 
     @Override
     @CacheEvict(value = CacheConstants.MARKET_SITE_DOMAIN_LIST)
     public boolean createMarketSiteDomain(MarketSiteDomainReq.CreateMarketSiteDomainReq createMarketSiteDomainReq) {
-        Tenant tenant = getTenantByDomain();
+        RequestBackendUser requestBackendUser = RequestUtils.getRequestBackendUser();
+        Tenant tenant = tenantService.getTenantById(requestBackendUser.getTenantId());
         if (tenant == null) {
             throw new BusinessException(500,"当前域名未绑定租户，请确认后重试");
         }
         if (ObjectUtils.isEmpty(tenant.getDomains()) || !tenant.getDomains().contains(createMarketSiteDomainReq.getSiteDomain())) {
             throw new BusinessException(500,"添加域名未绑定到当前租户中");
         }
-        MarketSiteDomain marketSiteDomain = new MarketSiteDomain();
-        marketSiteDomain.setMarketSiteId(createMarketSiteDomainReq.getSiteId());
-        marketSiteDomain.setSiteDomain(createMarketSiteDomainReq.getSiteDomain());
-        return this.save(marketSiteDomain);
+        try {
+            MarketSiteDomain marketSiteDomain = new MarketSiteDomain();
+            marketSiteDomain.setMarketSiteId(createMarketSiteDomainReq.getSiteId());
+            marketSiteDomain.setTenantId(tenant.getId());
+            marketSiteDomain.setSiteDomain(createMarketSiteDomainReq.getSiteDomain());
+            return this.save(marketSiteDomain);
+        } catch (DuplicateKeyException e) {
+            throw new BusinessException(500,"绑定域名失败，该域名已绑定其它站点");
+        }
     }
 
     @Override

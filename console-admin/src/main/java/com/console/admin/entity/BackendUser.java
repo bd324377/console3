@@ -69,6 +69,7 @@ public class BackendUser implements Serializable {
         requestBackendUser.setTenantId(targetTenantId);
         requestBackendUser.setBelongTenantId(belongTenantId);
         requestBackendUser.setRole(this.getRole().getValue());
+        requestBackendUser.setAccountType(this.getAccountType().getValue() + 2);
         return requestBackendUser;
     }
 

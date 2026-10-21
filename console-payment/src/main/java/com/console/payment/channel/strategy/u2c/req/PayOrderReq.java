@@ -30,9 +30,9 @@ public class PayOrderReq {
     private String  redirect;        // 支付完成跳转地址（可选）
     private String  sign;            // 签名
 
-    public PayOrderReq(PaymentOrder paymentOrder, Channel channel, String serviceCode) {
+    public PayOrderReq(PaymentOrder paymentOrder, Channel channel) {
         this.merchantId      = channel.getAppKey();
-        this.merchantOrderNo = serviceCode + "_" + TenantUtils.getTenantId() + "_" + paymentOrder.getMarketSiteId() + "_" + paymentOrder.getId().toString();
+        this.merchantOrderNo = paymentOrder.getMerchantOrderNo();
         this.amount          = paymentOrder.getOrderAmt().multiply(new BigDecimal("100")).intValue();
         this.payType         = channel.getPayType();
         this.currency        = channel.getCurType();

@@ -2,7 +2,7 @@ package com.console.api.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.console.api.dto.req.LoginReq;
-import com.console.api.service.LoginApiService;
+import com.console.api.service.LoginAPIService;
 import com.console.core.entity.Parameter;
 import com.console.core.entity.UserProc;
 import com.console.core.model.bo.MarketSiteBo;
@@ -23,7 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 @Service
-public class LoginApiServiceImpl extends BaseServiceImpl implements LoginApiService {
+public class LoginAPIServiceImpl extends BaseServiceImpl implements LoginAPIService {
     @Resource
     private UserService userService;
 
@@ -38,7 +38,7 @@ public class LoginApiServiceImpl extends BaseServiceImpl implements LoginApiServ
         DynamicTableNameHandler.setTenantId(marketSite.getTenantId());
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.select("id,account,tenant_id,market_site_id,market_team_id,marketer_id,avatar," +
-                "email,email_status,phone,phone_status,agent_id,vip_id,status").lambda().eq(User::getAccount,loginReq.getAccount());
+                "email,email_status,phone,phone_status,agent_id,vip_id,status,invite_reward_status").lambda().eq(User::getAccount,loginReq.getAccount());
         User user = userService.getOne(queryWrapper);
         if (user == null) throw new BusinessException(500, I18nUtil.getI8nMsg("login.error.account.unRegister"));
         checkLoginUser(user, loginReq.getPassword(), marketSite.getMarketTeamId());
@@ -68,9 +68,9 @@ public class LoginApiServiceImpl extends BaseServiceImpl implements LoginApiServ
             DynamicTableNameHandler.setTenantId(tenantId);
             QueryWrapper<User> queryWrapper = new QueryWrapper<>();
             queryWrapper.select("id,account,tenant_id,market_site_id,market_team_id,marketer_id,avatar," +
-                            "email,email_status,phone,phone_status,agent_id,vip_id").lambda().eq(User::getId,userId);
+                            "email,email_status,phone,phone_status,agent_id,vip_id,invite_reward_status").lambda().eq(User::getId,userId);
             User user = userService.getOne(queryWrapper);
-            if (user != null) {
+            if (user != null && user.getStatus() == 1) {
                 RequestMember requestMember = user.buildRequestUser();
                 return TokenUtils.refreshUserAccessToken(requestMember);
             } else {

@@ -7,9 +7,11 @@ import lombok.Getter;
 @Getter
 public enum RecordType {
     USER_PROC("USER_PROC"),
+    ADMIN_PROC("ADMIN_PROC"),
     USER_ID("USER_ID"),
     PAYMENT_PROC("PAYMENT_PROC"),
-    CASH_OUT_PROC("CASH_OUT_PROC");
+    CASH_OUT_PROC("CASH_OUT_PROC"),
+    WALLET_PROC("WALLET_PROC");
     @JsonValue
     private final String code;
 

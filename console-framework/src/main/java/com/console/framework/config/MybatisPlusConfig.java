@@ -3,6 +3,7 @@ package com.console.framework.config;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.DynamicTableNameInnerInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.OptimisticLockerInnerInterceptor;
+import com.console.framework.utils.TenantUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,7 +15,7 @@ public class MybatisPlusConfig {
     @Value("${database.prefix:console}")
     private String dbPrefix;
     private final List<String> baseTables = List.of(//基础表（总租户表）
-            "s_tenant","s_tenant_profile",
+            "s_tenant","s_tenant_profile","s_user_id",
             "s_transfer",
             "s_product_platform",
             "s_product",
@@ -46,7 +47,7 @@ public class MybatisPlusConfig {
             }
 
             // 获取当前上下文中的租户编码
-            Integer tenantId = DynamicTableNameHandler.getTenantId();
+            Integer tenantId = TenantUtils.getTenantId();
 
             // 检查serverId是否有效
             if (tenantId == null || tenantId == 0) {

@@ -2,10 +2,13 @@ package com.console.api.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.console.api.dto.PaymentDTO;
-import com.console.api.service.PaymentApiService;
+import com.console.api.service.PaymentAPIService;
 import com.console.core.entity.Parameter;
+import com.console.core.model.bo.MarketerBo;
+import com.console.core.service.MarketerService;
 import com.console.framework.constants.CacheConstants;
 import com.console.framework.constants.ParameterConstants;
 import com.console.framework.domain.BusinessException;
@@ -23,6 +26,7 @@ import com.console.payment.service.ChannelService;
 import com.console.payment.service.PaymentOrderService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.integration.redis.util.RedisLockRegistry;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -31,27 +35,30 @@ import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDateTime;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 
 @Slf4j
 @Service
-public class PaymentApiServiceImpl extends BaseServiceImpl implements PaymentApiService {
+public class PaymentAPIServiceImpl extends BaseServiceImpl implements PaymentAPIService {
+    @Value("${console.serviceCode}")
+    protected String serviceCode;
     @Resource
     private PaymentOrderService paymentOrderService;
     @Resource
     private ChannelService channelService;
     @Resource
+    private MarketerService marketerService;
+    @Resource
     private RedisLockRegistry lockRegistry;
     @Resource
     private PaymentProcMerger paymentProcMerger;
 
-
-
     @Override
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public String createPaymentOrder(PaymentDTO.CreatePayOrderReq createPayOrderReq) {
-        RequestMember member = RequestUtils.getUser(RequestMember.class);
+        RequestMember member = RequestUtils.getRequestMember();
         if (member == null) {
             throw new BusinessException(ResultCode.AUTHENTICATION_FAILED);
         }
@@ -63,6 +70,8 @@ public class PaymentApiServiceImpl extends BaseServiceImpl implements PaymentApi
             checkFirstRechargeParam(createPayOrderReq,member);//校验首充翻倍参数
             Channel channel = channelService.getChannelById(createPayOrderReq.getChannelId());
             PaymentOrder  paymentOrder  = buildPaymentOrder(createPayOrderReq,channel);//组装支付订单信息
+            settlemetPaymentFee(paymentOrder,channel,member.getTeamId());
+            paymentOrder.setMerchantOrderNo(serviceCode + "_" + member.getTenantId() + "_" + member.getSiteId() + "_" + paymentOrder.getId());
             ChannelResult channelResult = ChannelContext.createPayOrder(paymentOrder,channel);//向第三方支付渠道发起创建订单请求
             if (channelResult.isSuccess()) {//支付渠道创建订单成功
                 paymentOrder.setPayUrl(channelResult.getPayUrl());
@@ -139,11 +148,29 @@ public class PaymentApiServiceImpl extends BaseServiceImpl implements PaymentApi
         if (createPayOrderReq.getAmount().compareTo(channel.getMaxPayAmt()) > 0) {//最大支付金额限制
             throw new BusinessException(500, I18nUtil.getI8nMsg("paymentOrder.error.create.channel.greaterMaxPayAmt"));
         }
-        PaymentOrder paymentOrder = createPayOrderReq.buildPaymentOrder();
-        if (channel.getPayFeeRate() != null) {
-            paymentOrder.setChannelFee(paymentOrder.getOrderAmt().multiply(channel.getPayFeeRate()).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP));
-        }
+
+        PaymentOrder paymentOrder = new PaymentOrder();
+        paymentOrder.setId(IdWorker.getId());
+        paymentOrder.setOrderType(1);
+        paymentOrder.setChannelId(createPayOrderReq.getChannelId());
+        paymentOrder.setOrderAmt(createPayOrderReq.getAmount());
+        paymentOrder.setActivityId(createPayOrderReq.getActivityId());
+        paymentOrder.setUserId(createPayOrderReq.getUserId());
+        paymentOrder.setOrderTime(LocalDateTime.now());
+        paymentOrder.setStatus(PaymentOrder.PaymentStatus.PAYING);
+        paymentOrder.setIp(RequestUtils.getRequestIp());                    //设置充值ip
         paymentOrder.setToBeOrderAmt(paymentOrder.getOrderAmt().multiply(channel.getToBeOrderRate()).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP));
         return paymentOrder;
+    }
+
+    private void settlemetPaymentFee(PaymentOrder paymentOrder,Channel channel,Integer marketerId) {
+        MarketerBo marketerBo = marketerService.getMarketer(marketerId);
+        if (marketerBo.getRechargeRate() != null && marketerBo.getRechargeRate().compareTo(BigDecimal.ZERO) > 0) {
+            BigDecimal platFee = paymentOrder.getOrderAmt().multiply(marketerBo.getRechargeRate().divide(new BigDecimal(100),2,RoundingMode.HALF_UP));
+            paymentOrder.setFee(platFee);
+        }
+        if (channel.getPayFeeRate() != null && channel.getPayFeeRate().compareTo(BigDecimal.ZERO) > 0) {
+            paymentOrder.setChannelFee(paymentOrder.getOrderAmt().multiply(channel.getPayFeeRate()).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP));
+        }
     }
 }

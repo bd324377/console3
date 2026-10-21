@@ -30,7 +30,7 @@ public class FourZStrategy extends ChannelStrategy {
 
     @Override
     public ChannelResult createPayOrder(PaymentOrder order, Channel channel) {
-        PayOrderReq request = new PayOrderReq(order, channel,serviceCode);
+        PayOrderReq request = new PayOrderReq(order, channel);
         FourZResponse<PayRes> response = execute(paymentApi.createPayment(channel.getPayUrl(), request));
         if (response.isSuccess()) {
             return response.getData().buildPaymentResult();
@@ -50,7 +50,7 @@ public class FourZStrategy extends ChannelStrategy {
 
     @Override
     public ChannelResult createCashOutOrder(CashOutOrder cashOutOrder, Channel channel, BankCard bankCard) {
-        CashOutOrderReq cashOutOrderReq = new CashOutOrderReq(cashOutOrder, channel, bankCard, serviceCode);
+        CashOutOrderReq cashOutOrderReq = new CashOutOrderReq(cashOutOrder, channel, bankCard);
         FourZResponse<CashOutRes> response = execute(paymentApi.createCashOut(channel.getCashOutUrl(),cashOutOrderReq));
         return response.isSuccess() && response.getData() != null ? response.getData().buildCashOutResult() : ChannelResult.failed(response.getMessage());
     }

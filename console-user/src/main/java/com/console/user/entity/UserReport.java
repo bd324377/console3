@@ -4,7 +4,6 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -22,8 +21,8 @@ import java.math.BigDecimal;
  */
 @Getter
 @Setter
-@TableName("s_user_proc_report")
-public class UserProcReport implements Serializable {
+@TableName("s_user_report")
+public class UserReport implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;

@@ -10,6 +10,7 @@ import lombok.Setter;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.time.LocalTime;
 
 @Getter
 @Setter
@@ -30,7 +31,7 @@ public class Parameter implements Serializable {
 
     @Getter
     @Setter
-    public static class RegLimitParameter {
+    public static class RegLimitParam {//注册限制参数
         private Integer regLimitStatus;//是否允许注册开关
         private Integer regThreshold;//注册阈值，同IP/设备注册数达到阈值后不允许注册
         private Integer shuntStatus;//是否允许分流开关
@@ -38,5 +39,13 @@ public class Parameter implements Serializable {
         private Integer modifyOrderModeStatus;//是否修改下单模式
         private Integer modifyModeThreshold;//修改下单模式阈值
         private Integer orderModeId;//下单模式id
+    }
+
+    @Getter
+    @Setter
+    public static class TimeSlotOrderRuleParam {//时间段下单规则
+        private LocalTime startTime;
+        private LocalTime endTime;
+        private Integer ruleId;
     }
 }

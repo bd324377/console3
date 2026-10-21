@@ -1,7 +1,7 @@
 package com.console.api.controller;
 
 import com.console.api.dto.PaymentDTO;
-import com.console.api.service.PaymentApiService;
+import com.console.api.service.PaymentAPIService;
 import com.console.framework.domain.Result;
 import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.*;
@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 public class PaymentAPI {
     @Resource
-    private PaymentApiService paymentAPIService;
+    private PaymentAPIService paymentAPIService;
 
     /**
      * 线上充值申请接口

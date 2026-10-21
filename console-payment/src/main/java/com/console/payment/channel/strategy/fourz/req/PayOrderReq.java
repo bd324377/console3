@@ -24,9 +24,9 @@ public class PayOrderReq {
     private String  redirect;        // 支付完成跳转地址（可选）
     private String  sign;            // 签名
 
-    public PayOrderReq(PaymentOrder paymentOrder, Channel channel, String serviceCode) {
+    public PayOrderReq(PaymentOrder paymentOrder, Channel channel) {
         merchantNo = channel.getAppKey();
-        merchantOrderNo = serviceCode + "_" + TenantUtils.getTenantId() + "_" + paymentOrder.getMarketSiteId() + "_" + paymentOrder.getId().toString();
+        merchantOrderNo = paymentOrder.getMerchantOrderNo();
         amount = PaymentUtils.toCents(paymentOrder.getOrderAmt());
         code = channel.getPayType();
         currency = channel.getCurType();

@@ -7,7 +7,6 @@ import com.console.framework.utils.RedisUtils;
 import com.console.framework.utils.RequestUtils;
 import com.console.framework.utils.TokenUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 import java.util.Arrays;
@@ -45,8 +44,9 @@ public class PermissionRoot {
         RequestUser user = RequestUtils.getUser(RequestUser.class);
         if (user == null || user.getTenantId() == null) throw new BusinessException(401, "登录状态无效");
         if (preAuthorize != null) {
-            boolean member = Integer.valueOf(1).equals(user.getUserType());
-            boolean backendAccount = List.of(2, 3, 4).contains(user.getUserType() == null ? 0 : user.getUserType());
+            boolean member = Integer.valueOf(1).equals(user.getAccountType());
+            boolean backendAccount = List.of(2, 3, 4).contains(user.getAccountType() == null ? 0 : user.getAccountType());
+
             if ((preAuthorize.accountType() == 1 && !backendAccount) || (preAuthorize.accountType() == 2 && !member))
                 throw new BusinessException(403, "账号类型无权限");
             if (preAuthorize.loginAccount().length > 0 && !Arrays.asList(preAuthorize.loginAccount()).contains(user.getAccount()))

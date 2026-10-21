@@ -3,9 +3,11 @@ package com.console.admin.controller;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.console.core.entity.MarketTeam;
+import com.console.core.model.dto.req.MarketTeamReq;
 import com.console.core.service.MarketTeamService;
 import com.console.framework.domain.Result;
 import lombok.RequiredArgsConstructor;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,15 +22,10 @@ public class MarketTeamController {
 
     private final MarketTeamService marketTeamService;
 
-    /**
-     * 创建营销团队
-     * @param marketTeam 营销团队信息
-     * @return 结果
-     */
+    /** 建营销团队 **/
     @PostMapping
-    public Result create(@RequestBody MarketTeam marketTeam) {
-        boolean result = marketTeamService.createMarketTeam(marketTeam);
-        return result ? Result.success() : Result.failed();
+    public Result createMarketTeam(@RequestBody @Validated MarketTeamReq.CreateMarketTeamReq createMarketTeamReq) {
+        return marketTeamService.createMarketTeam(createMarketTeamReq) ? Result.success() : Result.failed();
     }
 
     /**
@@ -81,7 +78,7 @@ public class MarketTeamController {
      * @param marketTeam 查询条件
      * @return 分页结果
      */
-    @GetMapping("/page")
+    @GetMapping
     public Result page(@RequestParam(defaultValue = "1") Long current,
                        @RequestParam(defaultValue = "10") Long size,
                        MarketTeam marketTeam) {

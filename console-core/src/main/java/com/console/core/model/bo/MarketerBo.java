@@ -33,6 +33,8 @@ public class MarketerBo implements Serializable {//业务员信息
     private Integer shuntStatus;//分流状态
     private BigDecimal shuntRate;//分流率
     private Integer shuntThreshold;//分流阈值
+    //平台收取费率
+    private BigDecimal rechargeRate;//充值手续费百分比
 
     public MarketerBo() {}
 

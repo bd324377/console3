@@ -4,4 +4,5 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.console.core.entity.Wallet;
 
 public interface WalletService extends IService<Wallet> {
+    Wallet getSubUserWalletReport(Integer parentId);
 }

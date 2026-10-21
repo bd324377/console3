@@ -4,13 +4,23 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.console.core.entity.AdminProc;
 import com.console.core.entity.MarketTeam;
+import com.console.core.entity.Marketer;
 import com.console.core.mapper.MarketTeamMapper;
+import com.console.core.mapper.MarketerMapper;
+import com.console.core.merger.AdminProcMerger;
+import com.console.core.model.dto.req.MarketTeamReq;
 import com.console.core.service.MarketTeamService;
-import com.console.core.service.impl.BaseServiceImpl;
 import com.console.framework.constants.CacheConstants;
+import com.console.framework.domain.BusinessException;
+import com.console.framework.request.RequestBackendUser;
+import com.console.framework.utils.RequestUtils;
 import com.github.xiaolyuh.annotation.Cacheable;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,11 +32,39 @@ import java.util.List;
 @Slf4j
 @Service
 public class MarketTeamServiceImpl extends BaseServiceImpl<MarketTeamMapper, MarketTeam> implements MarketTeamService {
-
+    @Resource
+    private MarketerMapper marketerMapper;
+    @Resource
+    private AdminProcMerger adminProcMerger;
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public boolean createMarketTeam(MarketTeam marketTeam) {
-        return this.save(marketTeam);
+    public boolean createMarketTeam(MarketTeamReq.CreateMarketTeamReq createMarketTeamReq) {
+        RequestBackendUser requestBackendUser = RequestUtils.getRequestBackendUser();
+        MarketTeam marketTeam = new MarketTeam();
+        BeanUtils.copyProperties(createMarketTeamReq,marketTeam);
+        try {
+            if (this.save(marketTeam)) {
+                Marketer marketer = new Marketer();//创建默认营业员
+                BeanUtils.copyProperties(marketTeam, marketer);
+                marketer.setMarketTeamId(marketTeam.getId());
+                marketer.setMarketSiteId(marketTeam.getMarketSiteId());
+                marketer.setMarketerId(marketTeam.getLeaderMarketerId());
+                marketer.setIsLeader(1);
+                marketer.setOrderMode(marketTeam.getOrderMode());
+                marketerMapper.insert(marketer);
+
+                AdminProc createTeamAdminProc = new AdminProc(requestBackendUser, AdminProc.ProcBelong.MARKET_TEAM,
+                        AdminProc.ProcType.ADD, marketTeam.getId(), null, marketTeam);
+                adminProcMerger.submit(createTeamAdminProc);
+                AdminProc createMarketerAdminProc = new AdminProc(requestBackendUser, AdminProc.ProcBelong.MARKETER,
+                        AdminProc.ProcType.ADD, marketer.getId(), null, marketer);
+                adminProcMerger.submit(createMarketerAdminProc);
+                return true;
+            }
+        } catch (DuplicateKeyException e) {
+            throw new BusinessException(500,"运营团队创建失败，该业务员已加入该站点其它运营团队");
+        }
+        return false;
     }
 
     @Override

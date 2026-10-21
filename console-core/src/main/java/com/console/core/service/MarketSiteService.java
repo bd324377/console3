@@ -43,18 +43,9 @@ public interface MarketSiteService extends IService<MarketSite> {
     MarketSite getMarketSiteById(Integer siteId);
     MarketSiteBo getMarketSiteByDomain(String domain);
 
-    /**
-     * 获取所有站点列表（带缓存）
-     * @return 站点列表
-     */
+    /**获取所有站点列表（带缓存）**/
     List<MarketSite> getMarketSiteList(Integer tenantId);
-
-    /**
-     * 分页查询站点列表
-     * @param page 分页参数
-     * @param marketSite 查询条件
-     * @return 分页结果
-     */
-    IPage<MarketSite> getMarketSitePage(Page<MarketSite> page, MarketSite marketSite);
+    /**分页获取站点列表**/
+    IPage<MarketSite> getMarketSitePage(Page<MarketSite> page, MarketSiteReq.SearchMarketSiteReq searchMarketSiteReq);
 
 }

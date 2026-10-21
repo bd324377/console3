@@ -6,6 +6,7 @@ import com.console.user.mapper.UserIdMapper;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Component;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -50,8 +51,8 @@ public class UserIdMerger extends AbstractBatchMerger<UserId> {
     }
 
     @Override
-    protected String getBusinessKey(UserId entity) {
-        return entity.getUserId().toString();
+    protected Serializable getBusinessKey(UserId entity) {
+        return entity.getUserId();
     }
 
     @Override

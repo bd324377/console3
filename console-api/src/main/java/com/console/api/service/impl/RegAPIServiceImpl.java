@@ -4,7 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.console.api.dto.req.RegReq;
-import com.console.api.service.RegApiService;
+import com.console.api.service.RegAPIService;
 import com.console.core.entity.Parameter;
 import com.console.core.entity.Tenant;
 import com.console.core.entity.UserProc;
@@ -18,7 +18,6 @@ import com.console.framework.config.DynamicTableNameHandler;
 import com.console.framework.constants.CacheConstants;
 import com.console.framework.constants.ParameterConstants;
 import com.console.framework.domain.BusinessException;
-import com.console.framework.domain.ResultCode;
 import com.console.framework.request.RequestMember;
 import com.console.framework.utils.*;
 import com.console.user.entity.User;
@@ -36,7 +35,7 @@ import java.math.RoundingMode;
 import java.security.SecureRandom;
 
 @Service
-public class RegApiServiceImpl implements RegApiService {
+public class RegAPIServiceImpl implements RegAPIService {
     @Resource
     private TenantService tenantService;
     @Resource
@@ -92,14 +91,18 @@ public class RegApiServiceImpl implements RegApiService {
         user.setId(userIdService.initUserId());
         user.setVipId(vipService.getInitialVipId());
         user.setAgentId(agentService.getInitialAgentId());
-        Wallet wallet = new Wallet();
-        wallet.setId(user.getId());
-        wallet.setOrderMode(inviteNewConfig.getSubUserOrderMode());
-        wallet.setSubUserOrderMode(inviteNewConfig.getSubUserOrderMode());
+        Wallet userWallet = new Wallet();
+        userWallet.setUserId(user.getId());
+        userWallet.setWalletType(Wallet.WalletType.USER_WALLET);
+        userWallet.setOrderMode(inviteNewConfig.getSubUserOrderMode());
+        userWallet.setSubUserOrderMode(inviteNewConfig.getSubUserOrderMode());
+        Wallet agentWallet = new Wallet();
+        agentWallet.setUserId(user.getId());
+        userWallet.setWalletType(Wallet.WalletType.AGENT_WALLET);
         UserProc regProc = new UserProc(user.getId(), tenant.getId(), UserProc.ProcType.REGISTER);
         regProc.setLoginChannel(regReq.getRegChannel());
         try {
-            if (userService.save(user) && walletService.save(wallet) && userProcService.save(regProc)) {//异步处理后续事项
+            if (userService.save(user) && walletService.save(userWallet) && walletService.save(agentWallet) && userProcService.save(regProc)) {//异步处理后续事项
                 userService.syncNewUserConfig(user,inviteNewConfig);
             }
         } catch (DuplicateKeyException e) {
@@ -155,31 +158,31 @@ public class RegApiServiceImpl implements RegApiService {
         Parameter sameIpLimitParameter = parameterService.getParameterByCode(inviteNewConfig.getMarketTeamId(), ParameterConstants.P1018);
         if (sameIpLimitParameter != null && sameIpLimitParameter.getIsEnable() == 1) {
             long sameIpUserCount = queryUserCount(1, inviteNewConfig.getMarketSiteId(), RequestUtils.getRequestIp());//同IP注册人数
-            Parameter.RegLimitParameter ipRegLimitParameter = JSON.parseObject(sameIpLimitParameter.getValue(),Parameter.RegLimitParameter.class);
-            if (ipRegLimitParameter.getRegLimitStatus() == 1 && sameIpUserCount > ipRegLimitParameter.getRegThreshold()) {//开启注册限制
+            Parameter.RegLimitParam ipRegLimitParam = JSON.parseObject(sameIpLimitParameter.getValue(), Parameter.RegLimitParam.class);
+            if (ipRegLimitParam.getRegLimitStatus() == 1 && sameIpUserCount > ipRegLimitParam.getRegThreshold()) {//开启注册限制
                 throw new BusinessException(500,I18nUtil.getI8nMsg("reg.error.IP.outLimit"));
             }
-            if (ipRegLimitParameter.getShuntStatus() == 1 && sameIpUserCount > ipRegLimitParameter.getShuntThreshold()) {//开启分流处理
+            if (ipRegLimitParam.getShuntStatus() == 1 && sameIpUserCount > ipRegLimitParam.getShuntThreshold()) {//开启分流处理
                 inviteNewConfig.setShuntStatus(true);
                 inviteNewConfig.setShuntReason("reg.shunt.reason.ipOutLimit");
             }
-            if (ipRegLimitParameter.getModifyOrderModeStatus() == 1 && sameIpUserCount > ipRegLimitParameter.getModifyModeThreshold()) {//开启修改下单模式处理
-                inviteNewConfig.setSubUserOrderMode(ipRegLimitParameter.getOrderModeId());
+            if (ipRegLimitParam.getModifyOrderModeStatus() == 1 && sameIpUserCount > ipRegLimitParam.getModifyModeThreshold()) {//开启修改下单模式处理
+                inviteNewConfig.setSubUserOrderMode(ipRegLimitParam.getOrderModeId());
             }
         }
         Parameter sameDevLimitParameter = parameterService.getParameterByCode(inviteNewConfig.getMarketTeamId(), ParameterConstants.P1019);
         if (sameDevLimitParameter != null && sameDevLimitParameter.getIsEnable() == 1) {
             long sameDevUserCount = queryUserCount(2, inviteNewConfig.getMarketSiteId(), regDeviceId);//同设备注册人数
-            Parameter.RegLimitParameter devRegLimitParameter = JSON.parseObject(sameDevLimitParameter.getValue(),Parameter.RegLimitParameter.class);
-            if (devRegLimitParameter.getRegLimitStatus() == 1 && sameDevUserCount > devRegLimitParameter.getRegThreshold()) {//开启注册限制
+            Parameter.RegLimitParam devRegLimitParam = JSON.parseObject(sameDevLimitParameter.getValue(), Parameter.RegLimitParam.class);
+            if (devRegLimitParam.getRegLimitStatus() == 1 && sameDevUserCount > devRegLimitParam.getRegThreshold()) {//开启注册限制
                 throw new BusinessException(500,I18nUtil.getI8nMsg("reg.error.device.outLimit"));
             }
-            if (devRegLimitParameter.getShuntStatus() == 1 && sameDevUserCount > devRegLimitParameter.getShuntThreshold()) {//开启分流处理
+            if (devRegLimitParam.getShuntStatus() == 1 && sameDevUserCount > devRegLimitParam.getShuntThreshold()) {//开启分流处理
                 inviteNewConfig.setShuntStatus(true);
                 inviteNewConfig.setShuntReason("reg.shunt.reason.devOutLimit");
             }
-            if (devRegLimitParameter.getModifyOrderModeStatus() == 1 && sameDevUserCount > devRegLimitParameter.getModifyModeThreshold()) {//开启修改下单模式处理
-                inviteNewConfig.setSubUserOrderMode(devRegLimitParameter.getOrderModeId());
+            if (devRegLimitParam.getModifyOrderModeStatus() == 1 && sameDevUserCount > devRegLimitParam.getModifyModeThreshold()) {//开启修改下单模式处理
+                inviteNewConfig.setSubUserOrderMode(devRegLimitParam.getOrderModeId());
             }
         }
     }

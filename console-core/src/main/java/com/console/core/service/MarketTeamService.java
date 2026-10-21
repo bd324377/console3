@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.console.core.entity.MarketTeam;
+import com.console.core.model.dto.req.MarketTeamReq;
 
 import java.util.List;
 
@@ -14,10 +15,10 @@ public interface MarketTeamService extends IService<MarketTeam> {
 
     /**
      * 创建营销团队
-     * @param marketTeam 营销团队信息
+     * @param createMarketTeamReq 营销团队信息
      * @return 是否成功
      */
-    boolean createMarketTeam(MarketTeam marketTeam);
+    boolean createMarketTeam(MarketTeamReq.CreateMarketTeamReq createMarketTeamReq);
 
     /**
      * 更新营销团队

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.console.user.mapper.UserReportMapper">
+    <!--插入或更新用户报表-->
+    <insert id="insertOrUpdateUserReport">
+        INSERT INTO s_user_report (
+            user_id,
+            report_date,
+            login_times,
+            register_state,
+            recharge_times,
+            recharge_amt,
+            activate_state,
+            first_recharge_state,
+            first_recharge_amt,
+            placeorder_times,
+            order_amt,
+            order_result_amt,
+            user_cash_out_amt,
+            user_cash_out_times,
+            agent_cash_out_amt,
+            agent_cash_out_times)
+        SELECT p.user_id AS user_id,
+               IFNULL( p.proc_date, 0 ) , -- 日期
+               IFNULL(sum( p.proc_type = 0 ),0),-- 登录次数
+               IFNULL(sum( p.proc_type = 1 ),0),-- 注册状态
+               IFNULL(sum( p.proc_type = 2 ),0),-- 充值次数
+               IFNULL(sum( IF ( p.proc_type = 2, p.proc_value, 0 ) ),0),-- 充值金额
+               IFNULL(sum( p.proc_type = 5 ),0),-- 激活状态
+               IFNULL(sum( p.proc_type = 3 ),0),-- 首充状态
+               IFNULL(sum( IF ( p.proc_type = 3, p.proc_value, 0 ) ),0),-- 首充金额
+               IFNULL(sum( p.proc_type = 4 ),0),-- 下单单数
+               IFNULL(sum( IF ( p.proc_type = 4, p.proc_value, 0 ) ),0),-- 下单金额
+               IFNULL(sum( IF ( p.proc_type = 4, p.order_result_amt, 0 ) ),0),-- 下单结果金额
+               IFNULL(sum( IF ( p.proc_type = 6, p.proc_value, 0 ) ),0),-- 用户提现金额
+               IFNULL(sum( p.proc_type = 6 ),0),-- 用户提现次数
+               IFNULL(sum( IF ( p.proc_type = 7, p.proc_value, 0 ) ),0),-- 代理提现金额
+               IFNULL(sum( p.proc_type = 7 ),0)-- 代理提现次数
+        FROM
+            p_user_proc p INNER JOIN s_user u ON p.user_id = u.id AND u.user_type != 1
+        WHERE p.id BETWEEN #{sProcId} AND #{eProcId}
+        GROUP BY
+            p.user_id,
+            p.proc_date
+        ON DUPLICATE KEY UPDATE
+             login_times = login_times + VALUES(login_times),
+             register_state = register_state + VALUES(register_state),
+             recharge_times = recharge_times + VALUES(recharge_times),
+             recharge_amt = recharge_amt + VALUES(recharge_amt),
+             activate_state = activate_state + VALUES(activate_state),
+             first_recharge_state = first_recharge_state + VALUES(first_recharge_state),
+             first_recharge_amt = first_recharge_amt + VALUES(first_recharge_amt),
+             placeorder_times = placeorder_times + VALUES(placeorder_times),
+             order_amt = IFNULL(order_amt,0) + VALUES(order_amt),
+             order_result_amt = IFNULL(order_result_amt,0) + VALUES(order_result_amt),
+             user_cash_out_amt = user_cash_out_amt + VALUES(user_cash_out_amt),
+             user_cash_out_times = user_cash_out_times + VALUES(user_cash_out_times),
+             agent_cash_out_amt = agent_cash_out_amt + VALUES(agent_cash_out_amt),
+             agent_cash_out_times = agent_cash_out_times + VALUES(agent_cash_out_times)
+    </insert>
+    <!--查询直属下级充值和下单报告-->
+</mapper>

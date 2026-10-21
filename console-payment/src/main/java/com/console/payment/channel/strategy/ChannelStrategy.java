@@ -5,22 +5,16 @@ import com.console.framework.domain.BusinessException;
 import com.console.framework.domain.ResultCode;
 import com.console.framework.utils.TenantUtils;
 import com.console.payment.channel.model.ChannelResult;
-import com.console.payment.channel.strategy.fourz.res.BalanceRes;
-import com.console.payment.entity.BankCard;
-import com.console.payment.entity.CashOutOrder;
-import com.console.payment.entity.Channel;
-import com.console.payment.entity.PaymentOrder;
+import com.console.payment.entity.*;
 import com.console.payment.service.CashOutOrderService;
 import com.console.payment.service.ChannelService;
 import com.console.payment.service.PaymentOrderService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.integration.redis.util.RedisLockRegistry;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 
@@ -30,14 +24,14 @@ import java.util.concurrent.locks.Lock;
  */
 @Slf4j
 public class ChannelStrategy {
-    @Value("${console.serviceCode}")
-    protected String serviceCode;
     @Resource
     private PaymentOrderService paymentOrderService;
     @Resource
     private CashOutOrderService cashOutOrderService;
     @Resource
     private ChannelService channelService;
+    @Resource
+    private OrderCallBackHandler orderCallBackHandler;
     @Resource
     private RedisLockRegistry redisLockRegistry;
 
@@ -90,11 +84,10 @@ public class ChannelStrategy {
             if (locked) {
                 PaymentOrder paymentOrder = paymentOrderService.getById(channelResult.extractOrderIdByMerchantOrderNo());
                 if (paymentOrder == null || paymentOrder.getStatus() != PaymentOrder.PaymentStatus.PAYING) return false;//订单不存在或者订单状态不是待支付则直接返回失败，不做处理
-                BigDecimal callBackAmt = channelResult.getAmtUnit() == Channel.AmtUnit.FEN ? (new BigDecimal(channelResult.getAmount()).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP)) : new BigDecimal(channelResult.getAmount());
-                if (paymentOrder.getOrderAmt().compareTo(callBackAmt) != 0) {
+                if (!checkOrderAmt(paymentOrder.getOrderAmt(),channelResult)) {
                     return false;//金额不一致
                 }
-                paymentOrderService.handlePaymentOrder(paymentOrder, channelResult);
+                orderCallBackHandler.handlePaymentOrderByCallBack(paymentOrder, channelResult);
                 return true;
             }
         } catch (InterruptedException e) {
@@ -106,6 +99,7 @@ public class ChannelStrategy {
         }
         throw new BusinessException(ResultCode.LOCK_NOT_RELEASED);
     }
+
     /**
      * 提现回调处理
      * @param channelResult 回调结果
@@ -119,11 +113,10 @@ public class ChannelStrategy {
             if (locked) {
                 CashOutOrder cashOutOrder = cashOutOrderService.getById(channelResult.extractOrderIdByMerchantOrderNo());
                 if (cashOutOrder == null || cashOutOrder.getStatus() != CashOutOrder.CashOutStatus.CASHOUTING) return false;//订单不存在或者订单状态不是待支付则直接返回失败，不做处理
-                BigDecimal callBackAmt = channelResult.getAmtUnit() == Channel.AmtUnit.FEN ? (new BigDecimal(channelResult.getAmount()).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP)) : new BigDecimal(channelResult.getAmount());
-                if (cashOutOrder.getOrderAmt().compareTo(callBackAmt) != 0) {
+                if (!checkOrderAmt(cashOutOrder.getOrderAmt(),channelResult)) {
                     return false;//金额不一致
                 }
-                cashOutOrderService.handleCashOutOrder(cashOutOrder, channelResult);
+                orderCallBackHandler.handlePaymentOrderByCallBack(cashOutOrder, channelResult);
                 return true;
             }
         } catch (InterruptedException e) {
@@ -134,5 +127,11 @@ public class ChannelStrategy {
             }
         }
         throw new BusinessException(ResultCode.LOCK_NOT_RELEASED);
+    }
+
+    /** 订单金额和回调金额校验 **/
+    private boolean checkOrderAmt(BigDecimal orderAmt, ChannelResult channelResult) {
+        BigDecimal callBackAmt = channelResult.getAmtUnit() == Channel.AmtUnit.FEN ? (new BigDecimal(channelResult.getAmount()).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP)) : new BigDecimal(channelResult.getAmount());
+        return orderAmt.compareTo(callBackAmt) == 0;
     }
 }

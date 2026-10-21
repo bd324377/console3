@@ -56,15 +56,15 @@ public class MarketSiteController {
      * 分页查询站点
      * @param current 当前页
      * @param size 每页大小
-     * @param marketSite 查询条件
+     * @param searchMarketSiteReq 查询条件
      * @return 分页结果
      */
     @GetMapping("/page")
     public Result page(@RequestParam(defaultValue = "1") Long current,
                        @RequestParam(defaultValue = "10") Long size,
-                       MarketSite marketSite) {
+                       MarketSiteReq.SearchMarketSiteReq searchMarketSiteReq) {
         Page<MarketSite> page = new Page<>(current, size);
-        IPage<MarketSite> result = marketSiteService.getMarketSitePage(page, marketSite);
+        IPage<MarketSite> result = marketSiteService.getMarketSitePage(page, searchMarketSiteReq);
         return Result.success(result);
     }
 }

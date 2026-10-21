@@ -6,11 +6,11 @@ import com.console.core.model.dto.req.TenantReq;
 import com.console.core.entity.Tenant;
 import com.console.core.service.TenantService;
 import com.console.framework.domain.Result;
+import com.console.framework.request.PreAuthorize;
+import com.console.framework.utils.RequestUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 /**
  * 租户管理Controller
@@ -19,7 +19,6 @@ import java.util.List;
 @RequestMapping("/tenant")
 @RequiredArgsConstructor
 public class TenantController {
-
     private final TenantService tenantService;
 
     /**
@@ -56,10 +55,10 @@ public class TenantController {
      * 查询所有租户列表
      * @return 租户列表
      */
-    @GetMapping("/list")
-    public Result list() {
-        List<Tenant> list = tenantService.getTenantList();
-        return Result.success(list);
+    @GetMapping
+    @PreAuthorize(ignore = true)
+    public Result getTenantListByBackendDomain() {
+        return Result.success(tenantService.getTenantListByBackendDomain(RequestUtils.getRequestDomain()));
     }
 
     /**
@@ -69,7 +68,7 @@ public class TenantController {
      * @param tenant 查询条件
      * @return 分页结果
      */
-    @GetMapping
+    @GetMapping("/page")
     public Result page(@RequestParam(defaultValue = "1") Long current,
                        @RequestParam(defaultValue = "10") Long size,
                        Tenant tenant) {

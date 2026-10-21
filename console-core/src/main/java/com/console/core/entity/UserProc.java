@@ -61,13 +61,9 @@ public class UserProc implements Serializable {
         ACTIVATE(5,"激活", "userProc.activate"),
         USER_CASH_OUT(6,"用户钱包提现","userProc.userCashOut"),
         AGENT_CASH_OUT(7,"代理钱包提现","userProc.agentCashOut"),
-        RESUPPLY_RECHARGE(8,"补单充值","userProc.resupplyRecharge"),
-        BIND_PHONE(9,"绑定手机","userProc.bindPhone"),
-        BIND_BANK_CARD(10,"绑定银行卡","userProc.bindBankCard"),
-        BIND_EMAIL(11,"绑定电子邮箱","userProc.bindEmail"),
-        INITIATE_RECHARGE(12,"发起充值","userProc.initiateRecharge"),
-        INITIATE_CASH_OUT(13,"发起提现","userProc.initiateCashOut"),
-        CASH_OUT(14,"提现成功","userProc.cashOut");
+        BIND_PHONE(8,"绑定手机","userProc.bindPhone"),
+        BIND_BANK_CARD(9,"绑定银行卡","userProc.bindBankCard"),
+        BIND_EMAIL(10,"绑定电子邮箱","userProc.bindEmail");
 
         @EnumValue
         private final Integer key;

@@ -17,15 +17,14 @@
     </description>
 
     <dependencies>
-        <!--framework 工具类-->
         <dependency>
             <groupId>com.console</groupId>
-            <artifactId>console-core</artifactId>
+            <artifactId>console-user</artifactId>
             <version>0.0.1</version>
         </dependency>
         <dependency>
             <groupId>com.console</groupId>
-            <artifactId>console-user</artifactId>
+            <artifactId>console-product</artifactId>
             <version>0.0.1</version>
             <exclusions>
                 <exclusion>

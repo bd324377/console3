@@ -37,7 +37,7 @@ public class U2CStrategy extends ChannelStrategy {
     /** 组装 U2C 充值请求并发起下单。 */
     @Override
     public ChannelResult createPayOrder(PaymentOrder order, Channel channel) {
-        PayOrderReq request = new PayOrderReq(order,channel,serviceCode);
+        PayOrderReq request = new PayOrderReq(order,channel);
         U2CResponse<PayRes> response = execute(paymentApi.createPayment(channel.getPayUrl(), request));
         return response.isSuccess() && response.getData() != null ? response.getData().buildPaymentResult() : toFailureResult(response);
     }
@@ -54,7 +54,7 @@ public class U2CStrategy extends ChannelStrategy {
     /** 组装 PIX 收款信息并发起提现。 */
     @Override
     public ChannelResult createCashOutOrder(CashOutOrder order, Channel channel, BankCard bankCard) {
-        CashOutOrderReq cashOutOrderReq = new CashOutOrderReq(order, channel, bankCard, serviceCode);
+        CashOutOrderReq cashOutOrderReq = new CashOutOrderReq(order, channel, bankCard);
         U2CResponse<CashOutRes> response = execute(paymentApi.createCashOut(channel.getCashOutUrl(),cashOutOrderReq));
         return response.isSuccess() && response.getData() != null ? response.getData().buildCashOutResult() : toFailureResult(response);
     }

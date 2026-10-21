@@ -34,13 +34,14 @@ public class CashOutOrderReq {
     private String  callback;        // 回调地址
     private String  sign;            // 签名
 
-    public CashOutOrderReq(CashOutOrder cashOutOrder, Channel channel, BankCard bankCard, String serviceCode) {
+    public CashOutOrderReq(CashOutOrder cashOutOrder, Channel channel, BankCard bankCard) {
         BigDecimal cashOutAmt = cashOutOrder.getOrderAmt();
         if (cashOutOrder.getFee() != null && cashOutOrder.getFee().compareTo(BigDecimal.ZERO) > 0) {
             cashOutAmt = cashOutAmt.subtract(cashOutOrder.getFee());
         }
         this.merchantId      = channel.getAppKey();
-        this.merchantOrderNo = serviceCode + "_" + TenantUtils.getTenantId() + "_" + cashOutOrder.getMarketSiteId() + "_" + cashOutOrder.getId().toString();
+        this.merchantOrderNo = cashOutOrder.getMerchantOrderNo();
+        //serviceCode + "_" + TenantUtils.getTenantId() + "_" + cashOutOrder.getMarketSiteId() + "_" + cashOutOrder.getId().toString();
         this.amount          = cashOutAmt.multiply(new BigDecimal("100")).intValue();
         this.currency        = channel.getCurType();
         this.accountType     = bankCard.getType().getValue();

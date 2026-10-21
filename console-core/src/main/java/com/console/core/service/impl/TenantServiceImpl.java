@@ -47,7 +47,7 @@ public class TenantServiceImpl extends ServiceImpl<TenantMapper, Tenant> impleme
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    @CacheEvict(value = CacheConstants.TENANT,key = "#updateTenantReq.id")
+    @CacheEvict(value = {CacheConstants.TENANT,CacheConstants.TENANT_LIST})
     public boolean updateTenant(String part, TenantReq.UpdateTenantReq updateTenantReq) {
         RequestBackendUser requestBackendUser = RequestUtils.getUser(RequestBackendUser.class);
         DynamicTableNameHandler.setTenantId(0);
@@ -103,24 +103,12 @@ public class TenantServiceImpl extends ServiceImpl<TenantMapper, Tenant> impleme
     }
 
     @Override
+    @Cacheable(value = CacheConstants.TENANT,key = "#id")
     public Tenant getTenantDetailsById(Integer id) {
         return this.getById(id);
     }
 
-    @Override
-    @Cacheable(value = CacheConstants.TENANT_LIST)
-    public List<Tenant> getTenantList() {
-        QueryWrapper<Tenant> queryWrapper = new QueryWrapper<>();
-        queryWrapper.select("id,tenant_name,layout_id,domains,backend_domains,status,time_zone,white_ips,backend_limit_ips," +
-                "pwa_down_load_domain,web_push_config,web_version,backend_web_version,order_mode,recharge_rate,manual_deposit_limit," +
-                "withdrawal_limit,order_rate").lambda().orderByDesc(Tenant::getId);
-        return this.list(queryWrapper);
-    }
-
-    /**
-     * 根据管理后台域名获取租户信息列表（总租户获取全部租户，子租户只获取当前租户信息）
-     * @param domain    待查询域名
-     */
+    /**根据后端访问域名获取租户列表**/
     @Override
     public List<Tenant> getTenantListByBackendDomain(String domain) {
         List<Tenant> tenantList = new ArrayList<>();
@@ -128,7 +116,7 @@ public class TenantServiceImpl extends ServiceImpl<TenantMapper, Tenant> impleme
         if (tenant == null) {
             return null;
         }
-        if (tenant.getId() == 0) {//总租户，返回
+        if (tenant.getId() == 0) {//总租户，返回所有租户列表
             tenantList = getTenantList().stream().map(item -> {
                 Tenant newTenant = new Tenant();
                 newTenant.setId(item.getId());
@@ -144,6 +132,16 @@ public class TenantServiceImpl extends ServiceImpl<TenantMapper, Tenant> impleme
             tenantList.add(newTenant);
         }
         return tenantList;
+    }
+
+    @Override
+    @Cacheable(value = CacheConstants.TENANT_LIST)
+    public List<Tenant> getTenantList() {
+        QueryWrapper<Tenant> queryWrapper = new QueryWrapper<>();
+        queryWrapper.select("id,tenant_name,layout_id,domains,backend_domains,status,time_zone,white_ips,backend_limit_ips," +
+                "pwa_down_load_domain,web_push_config,web_version,backend_web_version,order_mode,recharge_rate,manual_deposit_limit," +
+                "withdrawal_limit,order_rate").lambda().orderByDesc(Tenant::getId);
+        return this.list(queryWrapper);
     }
 
     @Override

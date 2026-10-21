@@ -1,19 +1,14 @@
 package com.console.framework.utils;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson2.JSONWriter;
 import lombok.extern.slf4j.Slf4j;
 
-import javax.crypto.Cipher;
-import javax.crypto.KeyGenerator;
 import javax.crypto.Mac;
-import javax.crypto.SecretKey;
-import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
-import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
 import java.util.Base64;
 import java.util.HexFormat;
 
@@ -73,8 +68,13 @@ public class EncryptUtils {
      */
     public static String hmacSHA256Encrypt(Object param, String secretKey, String salt) {
         try {
-            String str = salt + JSON.toJSONString(param);
-            log.debug("加密进行中，加密明文：" + str + ";加密秘钥：" + secretKey);
+            String str;
+            if (param instanceof String paramJson) {
+                str = salt + paramJson;
+            } else {
+                str = salt + JSON.toJSONString(param, JSONWriter.Feature.WriteNulls.ordinal());
+            }
+            log.info("加密进行中，加密明文：" + str + ";加密秘钥：" + secretKey);
             Mac mac = Mac.getInstance("HmacSHA256");
             SecretKeySpec secretKeySpec = new SecretKeySpec(secretKey.getBytes(), "HmacSHA256");
             mac.init(secretKeySpec);
@@ -83,6 +83,7 @@ public class EncryptUtils {
             System.out.println(e.getMessage());
             return null;
         }
+        //加密进行中，加密明文：abc17918287210181{"startId":0,"limit":5000,"table":"product"};加密秘钥：$2a$10$9nOv9i9BeGf/EFlUDYOZFef7xryuGXqDZgOv0L1rzzyBnAAo6Tvk6
     }
 
 }

@@ -7,4 +7,8 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class WalletServiceImpl extends BaseServiceImpl<WalletMapper, Wallet> implements WalletService {
+    @Override
+    public Wallet getSubUserWalletReport(Integer parentId) {
+        return this.baseMapper.selectSubUserWalletReport(parentId);
+    }
 }

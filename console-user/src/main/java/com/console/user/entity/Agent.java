@@ -43,7 +43,7 @@ public class Agent implements Serializable {
     private Integer level;
     private BigDecimal upgradeAmt;
     private BigDecimal upgradeOrderAmt;
-    private Integer cashOutStatus;//是否能提现：0、禁止提现1、自动提现；2、审核提现
+    private Integer cashOutStatus;//是否能提现：0、自动提现；1、审核提现
     private BigDecimal cashOutRate;//提现手续费率
     private BigDecimal dayCashOutLimit;//日提现限额
     private BigDecimal transferOrderRate;//转账到用户钱包需下单比例，负数则不允许转账

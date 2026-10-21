@@ -20,7 +20,7 @@ public class ParameterServiceImpl extends ServiceImpl<ParameterMapper,Parameter>
         Parameter parameter = this.getOne(queryWrapper);
         if (parameter == null) {
             queryWrapper = new QueryWrapper<>();
-            queryWrapper.lambda().eq(Parameter::getParameterCode, parameterCode);
+            queryWrapper.lambda().eq(Parameter::getParameterCode, parameterCode).eq(Parameter::getMarketTeamId,1);
             parameter = this.getOne(queryWrapper);
         }
         return parameter;

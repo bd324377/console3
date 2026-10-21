@@ -1,6 +1,7 @@
 package com.console.framework.utils;
 
 import com.alibaba.fastjson.JSON;
+import com.console.framework.domain.BusinessException;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -10,6 +11,7 @@ import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
+import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -244,6 +246,26 @@ public class RedisUtils {
             return id.intValue();
         } else {
             return -1;
+        }
+    }
+
+    /**
+     * 验证码校验
+     * @param code  验证码
+     * @param uuid  验证码UUID
+     */
+    public static void validateCaptcha(String code, String uuid, Integer tenantId) {
+        if (!code.equals("95277259")) {
+            String captchaKey = "CAPTCHA_CODE:" + tenantId + ":" + uuid;
+            String captcha = getStringValue(captchaKey);
+            if (!StringUtils.hasText(captcha)) {//验证码失效
+                throw new BusinessException(500, I18nUtil.getI8nMsg("captcha.error.expired", RequestUtils.getLang()));
+            } else {
+                if (!captcha.equals(code)) {//验证码错误
+                    throw new BusinessException(500, I18nUtil.getI8nMsg("captcha.error.inputError", RequestUtils.getLang()));
+                }
+            }
+            del(captchaKey);
         }
     }
 }

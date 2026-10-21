@@ -43,5 +43,18 @@ mybatis-plus:
 
 console:
   serviceCode: 1
+  transfer:
+    url: www.baidu.com
+    apiKey: abc
+    secret: $2a$10$9nOv9i9BeGf/EFlUDYOZFef7xryuGXqDZgOv0L1rzzyBnAAo6Tvk6
   fileUpload:
     baseFilePath: D:/console/uploadPath/
+
+scheduled:
+  sync:
+    product:
+      enabled: false
+      cron: 1 * * * * ? #游戏列表定时任务cron表达式
+    productOrder:
+      enabled: false
+      cron: 1/10 * * * * ? #游戏列表定时任务cron表达式

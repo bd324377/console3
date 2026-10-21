@@ -83,10 +83,11 @@ public class RequestUtils {
     public Integer getRequestTenantId() {
         String tokenKey = getTokenKey();
         if (StringUtils.hasText(tokenKey)) {
+            tokenKey = EncryptUtils.decodeFromBase64Str(tokenKey);
             String[] tokenInfos = tokenKey.split(":");
             if (tokenInfos.length > 2) {
-                String tokenIdStr = tokenInfos[1];
-                return Integer.valueOf(tokenIdStr);
+                String tenantIdStr = tokenInfos[1];
+                return Integer.valueOf(tenantIdStr);
             }
         }
         return null;

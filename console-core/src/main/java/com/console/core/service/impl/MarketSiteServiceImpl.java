@@ -3,12 +3,11 @@ package com.console.core.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.console.core.entity.MarketTeam;
+import com.console.core.entity.*;
+import com.console.core.mapper.MarketerMapper;
+import com.console.core.merger.AdminProcMerger;
 import com.console.core.model.bo.MarketSiteBo;
 import com.console.core.model.dto.req.MarketSiteReq;
-import com.console.core.entity.MarketSite;
-import com.console.core.entity.MarketSiteDomain;
-import com.console.core.entity.Tenant;
 import com.console.core.mapper.MarketSiteMapper;
 import com.console.core.service.MarketSiteDomainService;
 import com.console.core.service.MarketSiteService;
@@ -37,17 +36,51 @@ import java.util.List;
 @Service
 public class MarketSiteServiceImpl extends BaseServiceImpl<MarketSiteMapper, MarketSite> implements MarketSiteService {
     @Resource
+    private AdminProcMerger adminProcMerger;
+    @Resource
     private MarketSiteDomainService marketSiteDomainService;
     @Resource
     private MarketTeamService marketTeamService;
+    @Resource
+    private MarketerMapper marketerMapper;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     @CacheEvict(value = CacheConstants.MARKET_SITE_LIST, allEntries = true)
     public boolean createMarketSite(MarketSiteReq.CreateMarketSiteReq createMarketSiteReq) {
+        RequestBackendUser requestBackendUser = RequestUtils.getRequestBackendUser();
         MarketSite marketSite = new MarketSite();
         BeanUtils.copyProperties(createMarketSiteReq,marketSite);
-        return this.save(marketSite);
+        if (this.save(marketSite)) {//新建站点
+            //创建该站点官方（默认）渠道
+            MarketTeam marketTeam = new MarketTeam();
+            marketTeam.setMarketSiteId(marketSite.getId());
+            marketTeam.setTeamName("官方渠道");
+            marketTeam.setIdDefaultTeam(1);
+            marketTeam.setLeaderMarketerId(2);
+            marketTeam.setOrderMode(marketSite.getOrderMode());
+            marketTeamService.save(marketTeam);
+
+            Marketer marketer = new Marketer();//创建默认营业员
+            marketer.setMarketTeamId(marketTeam.getId());
+            marketer.setMarketSiteId(marketSite.getId());
+            marketer.setMarketerId(2);
+            marketer.setIsLeader(1);
+            marketer.setOrderMode(marketTeam.getOrderMode());
+            marketerMapper.insert(marketer);
+
+            AdminProc createSiteAdminProc = new AdminProc(requestBackendUser, AdminProc.ProcBelong.MARKET_SITE,
+                    AdminProc.ProcType.ADD,marketSite.getId(),null,marketSite);
+            AdminProc createTeamAdminProc = new AdminProc(requestBackendUser, AdminProc.ProcBelong.MARKET_TEAM,
+                    AdminProc.ProcType.ADD, marketTeam.getId(),null,marketTeam);
+            AdminProc createMarketerAdminProc = new AdminProc(requestBackendUser, AdminProc.ProcBelong.MARKETER,
+                    AdminProc.ProcType.ADD, marketer.getId(),null,marketer);
+            adminProcMerger.submit(createSiteAdminProc);
+            adminProcMerger.submit(createTeamAdminProc);
+            adminProcMerger.submit(createMarketerAdminProc);
+            return true;
+        }
+        return false;
     }
 
     @Override
@@ -118,14 +151,20 @@ public class MarketSiteServiceImpl extends BaseServiceImpl<MarketSiteMapper, Mar
     }
 
     @Override
-    public IPage<MarketSite> getMarketSitePage(Page<MarketSite> page, MarketSite marketSite) {
-        QueryWrapper<MarketSite> queryWrapper = new QueryWrapper<>();
-        queryWrapper.lambda().eq(marketSite.getTenantId() != null, MarketSite::getTenantId, marketSite.getTenantId())
-                .like(StringUtils.hasText(marketSite.getSiteName()), MarketSite::getSiteName, marketSite.getSiteName())
-                .eq(marketSite.getStatus() != null, MarketSite::getStatus, marketSite.getStatus())
-                .eq(marketSite.getLayoutId() != null, MarketSite::getLayoutId, marketSite.getLayoutId())
-                .orderByDesc(MarketSite::getCreateTime);
-        return this.page(page, queryWrapper);
+    public IPage<MarketSite> getMarketSitePage(Page<MarketSite> page, MarketSiteReq.SearchMarketSiteReq searchMarketSiteReq) {
+        RequestBackendUser requestBackendUser = RequestUtils.getRequestBackendUser();
+        if (requestBackendUser.getAccountType() == 0) {//管理员用户
+            QueryWrapper<MarketSite> queryWrapper = new QueryWrapper<>();
+            queryWrapper.lambda()
+                    .like(StringUtils.hasText(searchMarketSiteReq.getSiteName()), MarketSite::getSiteName, searchMarketSiteReq.getSiteName())
+                    .eq(searchMarketSiteReq.getStatus() != null, MarketSite::getStatus, searchMarketSiteReq.getStatus())
+                    .eq(searchMarketSiteReq.getLayoutId() != null, MarketSite::getLayoutId, searchMarketSiteReq.getLayoutId())
+                    .orderByDesc(MarketSite::getCreateTime);
+            return this.page(page, queryWrapper);
+        } else {//分销用户
+            searchMarketSiteReq.setMarketerId(requestBackendUser.getId());
+            return this.baseMapper.selectMarketSitePage(page, searchMarketSiteReq);
+        }
     }
 
 //    @Override

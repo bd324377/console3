@@ -41,7 +41,7 @@ public class MarketSiteReq {
     @Setter
     public static class UpdateMarketSiteReq {
         @NotNull
-        private Integer siteId;//站点ID
+        private Integer    siteId;//站点ID
         private String     siteName;            //站点名称
         private Integer    layoutId;            //站点布局类型ID
         private Integer    orderMode;           //下单模型
@@ -75,7 +75,7 @@ public class MarketSiteReq {
             }
             WrapperUtils.setPropertyValue(updateWrapper, function, newValue);
             adminProc = new AdminProc(backendUser, AdminProc.ProcBelong.MARKET_SITE,
-                    AdminProc.ProcType.UPDATE, Long.valueOf(marketSite.getId()), oldValue,newValue);
+                    AdminProc.ProcType.UPDATE, marketSite.getId(), oldValue,newValue);
         }
 
         @Getter
@@ -108,5 +108,22 @@ public class MarketSiteReq {
                 throw new IllegalArgumentException("不支持的更新字段: " + fieldName);
             }
         }
+    }
+
+    @Getter
+    @Setter
+    public static class SearchMarketSiteReq {
+        private String     siteName;   //站点名称
+        private Integer    layoutId;            //站点布局类型ID
+        private Integer    orderMode;  //下单模式
+        private BigDecimal rechargeAmt;         //充值金额
+        private BigDecimal withdrawAmt;         //出款金额
+        private BigDecimal orderAmt;//下单金额
+        private BigDecimal orderResultAmt;      //订单盈亏金额
+        private Integer    status;     //站点状态 0-关闭，1-开启，3-维护中
+        private Integer    marketerId; //业务员id
+
+        private String  sortField = "create_time";  //排序字段（reg_user_count，channel_reg_user_count，fission_reg_user_count）
+        private String  sortType = "DESC";   //排序类型 1、降序；2、升序
     }
 }

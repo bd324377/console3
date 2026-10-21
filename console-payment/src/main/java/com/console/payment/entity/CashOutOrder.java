@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.EnumValue;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.console.core.entity.Wallet;
 import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Getter;
 import lombok.Setter;
@@ -24,7 +25,7 @@ public class CashOutOrder implements Serializable {
     @TableId(type = IdType.AUTO)
     private Long id; // 提现订单id
     private Integer orderType; // 订单类型：1、线上出款；2、人工出款
-    private Integer walletType; // 出款钱包类型：1、玩家钱包；2、代理钱包
+    private Wallet.WalletType walletType; // 出款钱包类型：1、玩家钱包；2、代理钱包
     private String bankCardCode; // 提现卡编码
     private Integer userId; // 提现用户id
     private Integer marketSiteId; // 站点ID
@@ -37,15 +38,16 @@ public class CashOutOrder implements Serializable {
     private BigDecimal orderAmt; // 订单金额
     private BigDecimal fee; // 用户提现手续费
     private BigDecimal channelFee;//渠道手续费
-    private BigDecimal marketerFee; // 业务服务费
-    private BigDecimal surpAmt; // 钱包剩余金额
+    private BigDecimal balance; // 钱包剩余金额
     private Integer initiatorId; // 人工出款时管理员id
     private LocalDateTime orderTime; // 订单创建时间
     private Integer operatorId; // 审核员id
     private LocalDateTime operatorTime; // 审核时间
     private LocalDateTime cashOutTime; // 渠道商家提现时间
     private Integer cashOutTimes; // 提现次数
-    private Integer completeState; // 完结状态 1、已完结；0、未完结
+    private Integer completeStatus; // 完结状态 1、已完结；0、未完结
+    private Integer riskValue;//风险值
+    private String checkReasons;//进入审核状态原因
     private String remarks; // 备注信息
     private String errorMsg; // 错误信息
     private Integer errorType; // 错误信息类型 1-可展示给手机端的信息 2-不可展示给手机端的信息
@@ -57,7 +59,7 @@ public class CashOutOrder implements Serializable {
         PENDING(1, "待处理"),
         APPROVED(2,"审核通过"),
         REJECTED(3,"审核失败"),
-        CASHOUTING(4, "入款中"),
+        CASHOUTING(4, "出款中"),
         SUCCESS(5,"成功"),
         FAILED(6,"提现失败"),
         CANCEL(7,"订单取消"),
@@ -69,6 +71,22 @@ public class CashOutOrder implements Serializable {
         private final Integer key;
         private final String desc;
         CashOutStatus(int value, String desc) {
+            this.key = value;
+            this.desc = desc;
+        }
+    }
+
+    @Getter
+    public enum CheckReason {//订单进入审核的原因
+        UNCHECK(0,"无需审核"),
+        PERSONLIMIT(1,"个人设置限制提现"),
+        LEVELLIMIT(2,"等级限制"),
+        PLATAMTLIMIT(3,"平台额度限制");
+        @JsonValue
+        @EnumValue
+        private final Integer key;
+        private final String desc;
+        CheckReason(int value, String desc) {
             this.key = value;
             this.desc = desc;
         }
