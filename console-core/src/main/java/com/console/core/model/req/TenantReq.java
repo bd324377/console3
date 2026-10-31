@@ -103,7 +103,6 @@ public class TenantReq {
         public enum UpdateField {
             TENANT_NAME("tenantName",Tenant::getTenantName, "tenant.proc.update.tenantName"),
             LAYOUT_ID("layoutId",Tenant::getLayoutId,"tenant.proc.update.layoutId"),
-            DOMAINS("domains", Tenant::getDomains, "tenant.proc.update.domains"),
             BACKEND_DOMAINS("backendDomains", Tenant::getBackendDomains, "tenant.proc.update.backendDomains"),
             PWA_DOWNLOAD_DOMAIN("pwaDownLoadDomain", Tenant::getPwaDownLoadDomain, "tenant.proc.update.pwaDownLoadDomain"),
             WEB_PUSH_CONFIG("webPushConfig", Tenant::getWebPushConfig, "tenant.proc.update.webPushConfig"),

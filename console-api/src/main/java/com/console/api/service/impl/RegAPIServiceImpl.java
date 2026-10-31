@@ -10,10 +10,7 @@ import com.console.core.entity.Tenant;
 import com.console.core.entity.UserProc;
 import com.console.core.entity.Wallet;
 import com.console.core.model.bo.MarketerBo;
-import com.console.core.service.MarketerService;
-import com.console.core.service.ParameterService;
-import com.console.core.service.TenantService;
-import com.console.core.service.WalletService;
+import com.console.core.service.*;
 import com.console.framework.config.DynamicTableNameHandler;
 import com.console.framework.constants.CacheConstants;
 import com.console.framework.constants.ParameterConstants;
@@ -39,7 +36,7 @@ import java.util.List;
 @Service
 public class RegAPIServiceImpl implements RegAPIService {
     @Resource
-    private TenantService tenantService;
+    private TenantDomainService tenantDomainService;
     @Resource
     private MarketerService marketerService;
     @Resource
@@ -62,7 +59,7 @@ public class RegAPIServiceImpl implements RegAPIService {
     @Transactional(rollbackFor = Exception.class)
     public Object register(RegReq regReq) {
         //判断租户和站点情况
-        Tenant tenant = tenantService.getTenantByDomain(RequestUtils.getRequestDomain());
+        Tenant tenant = tenantDomainService.getTenantByDomain(RequestUtils.getRequestDomain());
         verifyValidityTenant(tenant);
         DynamicTableNameHandler.setTenantId(tenant.getId());
         //判断邀请人情况

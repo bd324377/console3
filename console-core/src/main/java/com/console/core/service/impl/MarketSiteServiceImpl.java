@@ -124,7 +124,7 @@ public class MarketSiteServiceImpl extends BaseServiceImpl<MarketSiteMapper, Mar
 
     @Cacheable( value = CacheConstants.MARKET_SITE, key = "#domain")
     public MarketSiteBo getMarketSiteByDomain(String domain) {
-        Tenant tenant = tenantService.getTenantByDomain(domain);
+        Tenant tenant = getTenantByDomain(domain);
         if (tenant != null) {
             DynamicTableNameHandler.setTenantId(tenant.getId());
             MarketSiteDomain marketSiteDomain = marketSiteDomainService.getMarketSiteByDomain(domain);

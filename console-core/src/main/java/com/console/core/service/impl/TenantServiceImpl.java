@@ -79,18 +79,6 @@ public class TenantServiceImpl extends ServiceImpl<TenantMapper, Tenant> impleme
     }
 
     @Override
-    @Cacheable(value = CacheConstants.TENANT_DOMAIN,key = "#domain")
-    public Tenant getTenantByDomain(String domain) {
-        List<Tenant> tenantList = getTenantList();
-        for (Tenant item : tenantList) {
-            if (!ObjectUtils.isEmpty(item.getDomains()) && item.getDomains().contains(domain)) {
-                return item;
-            }
-        }
-        return null;
-    }
-
-    @Override
     @Cacheable(value = CacheConstants.TENANT_BACKEND_DOMAIN,key = "#domain")
     public Tenant getTenantByBackendDomain(String domain) {
         List<Tenant> tenantList = getTenantList();

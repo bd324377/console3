@@ -28,7 +28,7 @@ public class Tenant implements Serializable {
     private Integer id;                      //租户ID
     private String tenantName;              //租户名称
     private Integer layoutId;                //默认布局配置ID
-    private String domains;                 //前端绑定域名（JSON数组格式）
+//    private String domains;                 //前端绑定域名（JSON数组格式）
     private String backendDomains;          //后端绑定域名（JSON数组格式）
     private String timeZone;                //时区
     private String whiteIps;                //IP白名单列表（JSON数组格式）
@@ -77,12 +77,6 @@ public class Tenant implements Serializable {
         }
     }
 
-    public List<String> getDomains() {
-        if (StringUtils.hasText(this.domains)) {
-            return JSON.parseArray(this.domains,String.class);
-        }
-        return null;
-    }
     public List<String> getBackendDomains() {
         if (StringUtils.hasText(this.backendDomains)) {
             return JSON.parseArray(this.backendDomains,String.class);

@@ -37,11 +37,11 @@ public class MarketSiteDomainServiceImpl extends BaseServiceImpl<MarketSiteDomai
     @CacheEvict(value = CacheConstants.MARKET_SITE_DOMAIN_LIST)
     public boolean createMarketSiteDomain(MarketSiteDomainReq.CreateMarketSiteDomainReq createMarketSiteDomainReq) {
         RequestBackendUser requestBackendUser = RequestUtils.getRequestBackendUser();
-        Tenant tenant = tenantService.getTenantById(requestBackendUser.getTenantId());
+        Tenant tenant = getTenantByDomain(createMarketSiteDomainReq.getSiteDomain());
         if (tenant == null) {
             throw new BusinessException(500,"当前域名未绑定租户，请确认后重试");
         }
-        if (ObjectUtils.isEmpty(tenant.getDomains()) || !tenant.getDomains().contains(createMarketSiteDomainReq.getSiteDomain())) {
+        if (!tenant.getId().equals(requestBackendUser.getTenantId())) {
             throw new BusinessException(500,"添加域名未绑定到当前租户中");
         }
         try {
