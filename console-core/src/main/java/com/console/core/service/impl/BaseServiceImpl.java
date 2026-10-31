@@ -11,6 +11,8 @@ import jakarta.annotation.Resource;
 
 public class BaseServiceImpl<M extends BaseMapper<T>, T> extends ServiceImpl<M, T> {
     @Resource
+    protected TenantService tenantService;
+    @Resource
     protected TenantDomainService tenantDomainService;
     @Resource
     protected AdminProcMapper adminProcMapper;
