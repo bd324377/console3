@@ -15,6 +15,7 @@ import com.console.framework.domain.BusinessException;
 import com.console.framework.request.RequestBackendUser;
 import com.console.framework.request.RequestMember;
 import com.console.framework.utils.*;
+import com.console.user.entity.MarketSiteUser;
 import com.console.user.entity.User;
 import com.console.user.entity.UserRakeBackConfig;
 import com.console.user.entity.UserShuntConfig;
@@ -48,7 +49,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
     @Resource
     private AgentLayerService agentLayerService;
     @Resource
-    private UserIdService userIdService;
+    private MarketSiteUserService marketSiteUserService;
     @Resource
     private VipService vipService;
     @Resource
@@ -62,8 +63,9 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
     @Transactional(rollbackFor = Exception.class)
     public List<JSONObject> batchCreateUsers(UserReq.CreateUserReq createUserReq) {
         List<User> userList = generateUsers(createUserReq);
+        List<MarketSiteUser> siteUserList = generateSiteUsers(userList);
         List<Wallet> walletList = generateWallets(userList,createUserReq.getUserAmt());
-        if (this.saveBatch(userList) && walletService.saveBatch(walletList)) {
+        if (this.saveBatch(userList) && walletService.saveBatch(walletList) && marketSiteUserService.saveBatch(siteUserList)) {
             List<JSONObject> resultList = new ArrayList<>();
             for (User user : userList) {
                 JSONObject jsonObject = new JSONObject();
@@ -201,12 +203,20 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
             user.setTenantId(tenantId);
             user.setVipId(initialVipId);
             user.setAgentId(initialAgentId);
-            user.setId(userIdService.initUserId());
             user.setAccount(createUserReq.generateAccount());
             user.setLoginPwd(EncryptUtils.md5Encrypt(createUserReq.getLoginPwd()));
             userList.add(user);
         }
         return userList;
+    }
+
+    /** 根据信息创建新用户信息 **/
+    private List<MarketSiteUser> generateSiteUsers(List<User> userList) {
+        List<MarketSiteUser> siteUserList = new ArrayList<>();
+        for (User user : userList) {
+            siteUserList.add(marketSiteUserService.initUserId(user));
+        }
+        return siteUserList;
     }
 
     /** 根据信息创建新用户钱包信息 **/

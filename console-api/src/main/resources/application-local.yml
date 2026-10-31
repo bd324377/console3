@@ -44,17 +44,26 @@ mybatis-plus:
 console:
   serviceCode: 1
   transfer:
-    url: www.baidu.com
+    url: http://127.0.0.1:8080
     apiKey: abc
-    secret: $2a$10$9nOv9i9BeGf/EFlUDYOZFef7xryuGXqDZgOv0L1rzzyBnAAo6Tvk6
+    secret: abcdefg
+#    secret: $2a$10$9nOv9i9BeGf/EFlUDYOZFef7xryuGXqDZgOv0L1rzzyBnAAo6Tvk6
   fileUpload:
     baseFilePath: D:/console/uploadPath/
 
 scheduled:
+  settlementCron:
+    userProc: 1/15 * * * * ?
+    paymentProc: 3 * * * * ?
+    cashOutProc: 9 * * * * ?
+    productOrder: 4/10 * * * * ?
+    walletProc: 5/15 * * * * ?
+  dataPush:
+    phone: 1 1/3 * * * ?
   sync:
     product:
       enabled: false
       cron: 1 * * * * ? #游戏列表定时任务cron表达式
     productOrder:
-      enabled: false
+      enabled: true
       cron: 1/10 * * * * ? #游戏列表定时任务cron表达式

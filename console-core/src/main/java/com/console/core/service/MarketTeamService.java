@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.console.core.entity.MarketTeam;
-import com.console.core.model.dto.req.MarketTeamReq;
+import com.console.core.model.req.MarketTeamReq;
 
 import java.util.List;
 

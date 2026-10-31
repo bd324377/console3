@@ -48,24 +48,24 @@ public class OrderMode implements Serializable {
         private Integer platformBelongRuleId;//产商归属ID
     }
 //    private String
-@Getter
-public enum OrderModeType {
-    UNKNOWN(0,"未知"),
-    DEFAULT(1,"默认"),
-    WHITELIST(2,"白名单"),
-    BLACKLIST(3,"黑名单"),
-    TRIAL(4,"试玩模式"),
-    TEST(5,"测试模式"),
-    CUSTOM(6,"自定义");
+    @Getter
+    public enum OrderModeType {
+        UNKNOWN(0,"未知"),
+        DEFAULT(1,"默认"),
+        WHITELIST(2,"白名单"),
+        BLACKLIST(3,"黑名单"),
+        TRIAL(4,"试玩模式"),
+        TEST(5,"测试模式"),
+        CUSTOM(6,"自定义");
 
-    @JsonValue
-    @EnumValue
-    private final Integer key;
-    private final String value;
+        @JsonValue
+        @EnumValue
+        private final Integer key;
+        private final String value;
 
-    OrderModeType(int key, String value) {
-        this.key = key;
-        this.value = value;
+        OrderModeType(int key, String value) {
+            this.key = key;
+            this.value = value;
+        }
     }
-}
 }

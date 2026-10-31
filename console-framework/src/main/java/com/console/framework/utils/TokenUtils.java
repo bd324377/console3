@@ -37,6 +37,7 @@ public class TokenUtils {
                 requestMember.getMarketerId() + ":" + requestMember.getId() + generateRandomString();
         String refreshTokenKey = USER_REFRESH_TOKEN_PREFIX + requestMember.getTenantId() + ":" + requestMember.getSiteId() + ":" +
                 requestMember.getMarketerId() + ":" + requestMember.getId() + generateRandomString();
+        requestMember.setTokenKey(accessTokenKey);
         RedisUtils.setValue(accessTokenKey,requestMember,ACCESS_TOKEN_EXPIRE);
         String refreshTokenData = requestMember.getTenantId() + ";" + requestMember.getId();
         RedisUtils.setValue(refreshTokenKey,refreshTokenData,REFRESH_TOKEN_EXPIRE);
@@ -50,6 +51,7 @@ public class TokenUtils {
     public static LoginResult createBackendUserToken(RequestBackendUser requestBackendUser) {
         String accessTokenKey = BACKEND_USER_ACCESS_TOKEN_PREFIX + requestBackendUser.getBelongTenantId() + ":" + requestBackendUser.getId() + generateRandomString();
         String refreshTokenKey = BACKEND_USER_REFRESH_TOKEN_PREFIX + requestBackendUser.getBelongTenantId() + ":" + requestBackendUser.getId() + generateRandomString();
+
         RedisUtils.setValue(accessTokenKey,requestBackendUser,ACCESS_TOKEN_EXPIRE);
         String refreshTokenData = requestBackendUser.getTenantId() + ";" + requestBackendUser.getBelongTenantId() + ";" + requestBackendUser.getId();
                 RedisUtils.setValue(refreshTokenKey,refreshTokenData,REFRESH_TOKEN_EXPIRE);
@@ -84,6 +86,7 @@ public class TokenUtils {
                 requestMember.getMarketerId() + ":" + requestMember.getId();
         RedisUtils.delKeysByPattern(accessTokenKeyPrefix + "*");
         String accessTokenKey = accessTokenKeyPrefix + generateRandomString();
+        requestMember.setTokenKey(accessTokenKey);
         RedisUtils.setValue(accessTokenKey,requestMember,ACCESS_TOKEN_EXPIRE);
         return EncryptUtils.encodeToBase64Str(accessTokenKey);
     }

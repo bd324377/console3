@@ -24,7 +24,7 @@ public class CashOutProc implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @TableId(type = IdType.AUTO)
-    private Integer id; // 管理员(操作人id)id
+    private Long id; // 管理员(操作人id)id
     private Long orderId; // 订单id
     private Integer userId; // 用户id
     private Integer channelId; // 渠道id
@@ -32,11 +32,14 @@ public class CashOutProc implements Serializable {
     private BigDecimal orderAmt; // 订单金额
     private BigDecimal fee; // 提现手续费
     private BigDecimal channelFee;//渠道手续费
+    private BigDecimal marketerFee;//渠道手续费
     private ProcType procType; // 操作类型
     private LocalDate procDate; // 过程发生日期
     private LocalDateTime procTime; // 过程发生时间
     private Integer operatorId; // 管理员(操作人)id
 
+    @TableField(exist = false)
+    private Integer procCount;
     @TableField(exist = false)
     private Integer tenantId;
     @TableField(exist = false)
@@ -61,8 +64,8 @@ public class CashOutProc implements Serializable {
     }
     @Getter
     public enum ProcType {
-        // 操作类型：1、线上发起出款；2、后台人工发起出款；3.线上出款成功；4、线上出款失败"；5、线上出款成功但只减账户金额不出款；6、人工出款成功；
-        // 7、人工出款失败；8、人工出款成功但只减账户金额不出款；9、线上发起出款失败；10、后台人工发起出款失败；11、用户取消
+        // 操作类型：1、线上发起出款；2、后台人工发起出款；3.线上出款成功；4、线上出款失败"；5、假出款成功；6、人工出款成功；
+        // 7、人工出款失败；8、线上发起出款失败；9、后台人工发起出款失败；10、用户取消；11、审核通过；12、审核不通过；13、取消审核；14、订单挂起
         UNDEFINED(0, "未定义操作状态"),
         START_ONLINE_CASH_OUT(1, "线上发起出款"),
         START_MANUAL_CASH_OUT(2, "后台人工发起出款"),

@@ -3,7 +3,7 @@ package com.console.core.service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.console.core.model.dto.req.MarketSiteDomainReq;
+import com.console.core.model.req.MarketSiteDomainReq;
 import com.console.core.entity.MarketSiteDomain;
 
 import java.util.List;

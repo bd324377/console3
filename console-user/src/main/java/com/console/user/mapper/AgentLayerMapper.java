@@ -2,6 +2,7 @@ package com.console.user.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.console.user.entity.AgentLayer;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * <p>
@@ -12,5 +13,6 @@ import com.console.user.entity.AgentLayer;
  * @since 2024-09-24
  */
 public interface AgentLayerMapper extends BaseMapper<AgentLayer> {
-
+    AgentLayer selectNewestRecord(@Param("syncedId") Long syncedId, @Param("limitSize") Integer limitSize);
+    void syncUserLayer(@Param("fromId") Long fromId,@Param("toId") Long toId);
 }

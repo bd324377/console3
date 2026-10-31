@@ -124,6 +124,6 @@ public class RequestUtils {
         if (httpServletRequest == null) {
             return "pt";
         }
-        return httpServletRequest.getHeader("Accept-Language") == null ? "en" : httpServletRequest.getHeader("Accept-Language");
+        return httpServletRequest.getHeader("Accept-Language") == null ? "en-US" : httpServletRequest.getHeader("Accept-Language");
     }
 }

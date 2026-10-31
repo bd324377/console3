@@ -25,7 +25,7 @@ public class AdminProc implements Serializable {
     private Integer backendUserId;          //后台用户ID
     private String backendUserName;         //后台用户名称
     private Integer backendUserTenantId;    //后台用户所属租户编码
-    private Serializable objectId;                  //操作对象ID
+    private Long objectId;                  //操作对象ID
     private String objectBeforeValue;       //操作前的对象值（JSON格式）
     private String objectValue;             //操作后的对象值（JSON格式）
     private Integer objectTenantId;         //操作对象租户编码
@@ -58,7 +58,7 @@ public class AdminProc implements Serializable {
         this.backendUserName = backendUser.getUserName();
         this.backendUserTenantId = backendUser.getBelongTenantId();
         this.objectTenantId = backendUser.getTenantId();
-        this.objectId = objectId;
+        this.objectId = objectId == null ? null : Long.valueOf(objectId.toString());
         this.procDate = LocalDate.now();
         this.procTime = LocalDateTime.now();
 
@@ -88,6 +88,9 @@ public class AdminProc implements Serializable {
         MARKET_TEAM(4,"团队管理"),
         MARKETER(5,"业务员管理"),
         USER(6,"用户管理"),
+        PRODUCT_PLATFORM(7,"产商管理"),
+        PRODUCT_ORDER_MODE(8,"下单模式"),
+
         MENU(2,"菜单管理"),
         ROLE_MENU(3,"权限管理"),
         AGEMT_LEVEL(5,"代理等级管理"),

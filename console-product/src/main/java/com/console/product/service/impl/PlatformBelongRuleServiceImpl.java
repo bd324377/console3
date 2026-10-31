@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class PlatformBelongRuleServiceImpl extends BaseServiceImpl<PlatformBelongRuleMapper, PlatformBelongRule> implements PlatformBelongRuleService {
     @Override
-    @Cacheable(value = CacheConstants.PLATFORM_RULE_ITEM,key = "T(com.console.framework.utils.TenantUtils).getTenantId() + ':' + #ruleId")
+    @Cacheable(value = CacheConstants.PLATFORM_BELONG_RULE,key = "T(com.console.framework.utils.TenantUtils).getTenantId() + ':' + #ruleId")
     public PlatformBelongRule getPlatformBelongRuleById(Integer ruleId) {
         return this.getById(ruleId);
     }

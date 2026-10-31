@@ -48,14 +48,14 @@ public class Wallet implements Serializable {
     private Integer subUserOrderMode; // 下级用户下单模式
 
     @TableField(exist = false)
-    private boolean isSwitchOrderModelIndex = false;//是否切换下单模式
+    private boolean isSwitchOrderModelIndex;//是否切换下单模式
     @Getter
     public enum WalletType {
-        UNFIND_WALLET(0,"未知钱包"),
-        USER_WALLET(1,"用户钱包"),
+        USER_WALLET(0,"用户钱包"),
+        TRIAL_WALLET(1,"试玩钱包"),
         AGENT_WALLET(2,"代理钱包"),
-        TRIAL_WALLET(3,"试玩钱包"),
-        POINTS_WALLET(4,"积分钱包");
+        POINTS_WALLET(3,"积分钱包"),
+        OTHER_WALLET(4,"其他钱包");
 
         @JsonValue
         @EnumValue

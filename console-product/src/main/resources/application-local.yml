@@ -52,10 +52,12 @@ console:
 
 
 scheduled:
+  settlementCron:
+    productOrder: 5/10 * * * * ? #产品订单结算定时任务cron表达式
   sync:
     product:
       enabled: true
-      cron: 1 * * * * ? #游戏列表定时任务cron表达式
+      cron: 1 * * * * ? #产品列表定时任务cron表达式
     productOrder:
       enabled: false
-      cron: 1/10 * * * * ? #游戏列表定时任务cron表达式
+      cron: 1/10 * * * * ? #产品订单同步定时任务cron表达式

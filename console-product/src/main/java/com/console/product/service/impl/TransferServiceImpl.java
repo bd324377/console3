@@ -12,7 +12,7 @@ import com.console.framework.utils.DateUtils;
 import com.console.framework.utils.EncryptUtils;
 import com.console.product.api.TransferApi;
 import com.console.product.entity.Product;
-import com.console.product.entity.TempProductOrder;
+import com.console.product.entity.ProductOrder;
 import com.console.product.entity.Transfer;
 import com.console.product.mapper.*;
 import com.console.product.service.TransferService;
@@ -48,7 +48,7 @@ public class TransferServiceImpl extends BaseServiceImpl<TransferMapper,Transfer
     @Resource
     private ProductMapper productMapper;
     @Resource
-    private TempProductOrderMapper tempProductOrderMapper;
+    private ProductOrderMapper productOrderMapper;
 
     public void forceRefreshProductData() {
         JSONObject jsonObject = new JSONObject();
@@ -106,7 +106,7 @@ public class TransferServiceImpl extends BaseServiceImpl<TransferMapper,Transfer
 
     @Override
     public void fetchProductOrderData() {
-        List<TempProductOrder> orderList = new ArrayList<>();
+        List<ProductOrder> orderList = new ArrayList<>();
         while (true) {
             Long startId = null;
             if (!orderList.isEmpty()) {
@@ -127,7 +127,7 @@ public class TransferServiceImpl extends BaseServiceImpl<TransferMapper,Transfer
                 Result result = transferApi.syncTransferData(transferUrl + "/api/serverData/pull",apiKey,timestamp,sign,jsonObject).execute().body();
                 if (result != null && result.getCode() == 0) {
                     if (!ObjectUtils.isEmpty(result.getData())) {
-                        List<TempProductOrder> fetchDataList = JSON.parseArray(JSON.toJSONString(result.getData()), TempProductOrder.class);
+                        List<ProductOrder> fetchDataList = JSON.parseArray(JSON.toJSONString(result.getData()), ProductOrder.class);
                         if (ObjectUtils.isEmpty(fetchDataList)) {
                             break;
                         }
@@ -139,16 +139,18 @@ public class TransferServiceImpl extends BaseServiceImpl<TransferMapper,Transfer
                             log.info("结束订单拉取，待拉取订单超过5W条，将分批拉取");
                             break;
                         }
+                    } else {
+                        break;
                     }
                 }
             } catch (Exception e) {
-                log.info("结束订单拉取，拉取订单失败");
+                log.info("结束订单拉取，拉取订单失败" + e);
                 break;
             }
         }
         if (!orderList.isEmpty()) {
             List<Tenant> tenantList = tenantService.getTenantList();
-            Map<Integer,List<TempProductOrder>> tenantProductOrderMap = orderList.stream().collect(Collectors.groupingBy(TempProductOrder::getTenantId));
+            Map<Integer,List<ProductOrder>> tenantProductOrderMap = orderList.stream().collect(Collectors.groupingBy(ProductOrder::getTenantId));
             for (Integer tenantId : tenantProductOrderMap.keySet()) {
                 Tenant tenant = tenantList.stream().filter(item -> item.getId().equals(tenantId)).findFirst().orElse(null);
                 if (tenant == null) {
@@ -156,8 +158,8 @@ public class TransferServiceImpl extends BaseServiceImpl<TransferMapper,Transfer
                 }
                 ZoneId targetZone = ZoneId.of(tenant.getTimeZone());
                 DynamicTableNameHandler.setTenantId(tenantId);
-                List<TempProductOrder> teanatOrderList = tenantProductOrderMap.get(tenantId);
-                for (TempProductOrder productOrder : teanatOrderList) {
+                List<ProductOrder> teanatOrderList = tenantProductOrderMap.get(tenantId);
+                for (ProductOrder productOrder : teanatOrderList) {
                     LocalDateTime targetLocal = productOrder.getOrderTime()
                             .atZone(ZoneOffset.UTC)          // 先视为 UTC 时间
                             .withZoneSameInstant(targetZone) // 同一时刻切换到目标时区
@@ -166,9 +168,9 @@ public class TransferServiceImpl extends BaseServiceImpl<TransferMapper,Transfer
                     productOrder.setOrderDate(targetLocal.toLocalDate());
                     productOrder.setResultStatus(productOrder.getResultAmt().compareTo(BigDecimal.ZERO) > 0 ? 1 : (productOrder.getResultAmt().compareTo(BigDecimal.ZERO) < 0 ? 2 : 3));
                 }
-                tempProductOrderMapper.insert(teanatOrderList);
+                productOrderMapper.insert(teanatOrderList);
             }
-            TempProductOrder lastOrder = orderList.get(orderList.size() - 1);
+            ProductOrder lastOrder = orderList.get(orderList.size() - 1);
             UpdateWrapper<Transfer> updateWrapper = new UpdateWrapper<>();
             updateWrapper.lambda().set(Transfer::getProductOrderMaxId, lastOrder.getId()).eq(Transfer::getId, 1);
             this.update(updateWrapper);

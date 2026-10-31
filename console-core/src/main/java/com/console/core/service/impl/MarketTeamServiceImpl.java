@@ -10,7 +10,7 @@ import com.console.core.entity.Marketer;
 import com.console.core.mapper.MarketTeamMapper;
 import com.console.core.mapper.MarketerMapper;
 import com.console.core.merger.AdminProcMerger;
-import com.console.core.model.dto.req.MarketTeamReq;
+import com.console.core.model.req.MarketTeamReq;
 import com.console.core.service.MarketTeamService;
 import com.console.framework.constants.CacheConstants;
 import com.console.framework.domain.BusinessException;

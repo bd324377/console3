@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.console.user.mapper.UserProcSettlementMapper">
+    <!--获取未结算用户活动信息-->
+    <select id="selectNewestUserProc" resultType="com.console.core.entity.UserProc">
+        SELECT MAX(t.id) AS id, COUNT(1) AS proc_count FROM (
+             SELECT id FROM s_product_order WHERE id > #{settledProcId} ORDER BY id LIMIT #{limitSize}
+         ) t
+    </select>
+
+    <!--用户行为汇总-->
+    <insert id="insertOrUpdateUserReport">
+        INSERT INTO s_user_report (
+            user_id,
+            report_date,
+            login_times,
+            register_status,
+            recharge_times,
+            recharge_amt,
+            first_recharge_status,
+            first_recharge_amt,
+            placeorder_times,
+            order_amt,
+            order_result_amt,
+            activate_status,
+            user_cash_out_times,
+            user_cash_out_amt,
+            agent_cash_out_times,
+            agent_cash_out_amt,
+            receive_user_reward_times,
+            receive_user_reward_amt,
+            receive_agent_reward_times,
+            receive_agent_reward_amt
+        )
+        SELECT
+            p.user_id,
+            p.proc_date,
+            -- 0 登录
+            COUNT( CASE WHEN p.proc_type = 0 THEN 1 END ) AS login_cnt,
+            -- 1 注册
+            COUNT( CASE WHEN p.proc_type = 1 THEN 1 END ) AS register_cnt,
+            -- 2 充值
+            COUNT( CASE WHEN p.proc_type = 2 THEN 1 END ) AS recharge_cnt,
+            COALESCE ( SUM( CASE WHEN p.proc_type = 2 THEN p.proc_value END ), 0 ) AS recharge_amout,
+            -- 3 首充
+            COUNT( CASE WHEN p.proc_type = 3 THEN 1 END ) AS first_recharge_cnt,
+            COALESCE ( SUM( CASE WHEN p.proc_type = 3 THEN p.proc_value END ), 0 ) AS first_recharge_amout,
+            -- 4 下单
+            COALESCE ( SUM( CASE WHEN p.proc_type = 4 THEN p.order_times END ), 0 ) AS order_times,
+            COALESCE ( SUM( CASE WHEN p.proc_type = 4 THEN p.proc_value END ), 0 ) AS order_amout,
+            COALESCE ( SUM( CASE WHEN p.proc_type = 4 THEN p.order_result_amt END ), 0 ) AS order_result_amout,
+            -- 5 激活
+            COUNT( CASE WHEN p.proc_type = 5 THEN 1 END ) AS activate_cnt,
+            -- 6 用户钱包提现
+            COUNT( CASE WHEN p.proc_type = 6 THEN 1 END ) AS user_withdraw_cnt,
+            COALESCE ( SUM( CASE WHEN p.proc_type = 6 THEN p.proc_value END ), 0 ) AS user_withdraw_amt,
+            -- 7 代理钱包提现
+            COUNT( CASE WHEN p.proc_type = 7 THEN 1 END ) AS agent_withdraw_cnt,
+            COALESCE ( SUM( CASE WHEN p.proc_type = 7 THEN p.proc_value END ), 0 ) AS agent_withdraw_amt,
+            -- 8 领取用户活动奖励
+            COUNT( CASE WHEN p.proc_type = 8 THEN 1 END ) AS receive_user_reward_cnt,
+            COALESCE ( SUM( CASE WHEN p.proc_type = 8 THEN p.proc_value END ), 0 ) AS receive_user_reward_amout,
+            -- 9 领取代理活动奖励
+            COUNT( CASE WHEN p.proc_type = 9 THEN 1 END ) AS receive_agent_reward_cnt,
+            COALESCE ( SUM( CASE WHEN p.proc_type = 9 THEN p.proc_value END ), 0 ) AS receive_agent_reward_amout
+        FROM
+            p_user_proc p
+        WHERE p.id BETWEEN #{fromId} AND #{toId}
+        GROUP BY
+            p.user_id,
+            p.proc_date
+            ON DUPLICATE KEY UPDATE
+             login_times                = login_times + VALUES(login_times),
+             register_status            = GREATEST(register_status, VALUES(register_status)),
+             recharge_times             = recharge_times + VALUES(recharge_times),
+             recharge_amt               = recharge_amt + VALUES(recharge_amt),
+             first_recharge_status      = GREATEST(first_recharge_status, VALUES(first_recharge_status)),
+             first_recharge_amt         = first_recharge_amt + VALUES(first_recharge_amt),
+             placeorder_times           = placeorder_times + VALUES(placeorder_times),
+             order_amt                  = order_amt + VALUES(order_amt),
+             order_result_amt           = order_result_amt + VALUES(order_result_amt),
+             activate_status            = GREATEST(activate_status, VALUES(activate_status)),
+             user_cash_out_times        = user_cash_out_times + VALUES(user_cash_out_times),
+             user_cash_out_amt          = user_cash_out_amt + VALUES(user_cash_out_amt),
+             agent_cash_out_times       = agent_cash_out_times + VALUES(agent_cash_out_times),
+             agent_cash_out_amt         = agent_cash_out_amt + VALUES(agent_cash_out_amt),
+             receive_user_reward_times  = receive_user_reward_times + VALUES(receive_user_reward_times),
+             receive_user_reward_amt    = receive_user_reward_amt + VALUES(receive_user_reward_amt),
+             receive_agent_reward_times = receive_agent_reward_times + VALUES(receive_agent_reward_times),
+             receive_agent_reward_amt   = receive_agent_reward_amt + VALUES(receive_agent_reward_amt)
+    </insert>
+
+    <!-- 创建待处理(VIP升级，代理升级，用户激活)用户临时表 -->
+    <insert id="createTempPendingUserData">
+        INSERT IGNORE INTO t_pending_user (user_id,market_team_id,parent_id,vip_id,activate_status,agent_id)
+        SELECT
+            p.user_id,
+            u.market_team_id,
+            u.parent_id,
+            u.vip_id,
+            u.activate_status,
+            u.agent_id
+        FROM
+            p_user_proc p
+                INNER JOIN s_user u ON u.id = p.user_id
+        WHERE
+            p.id BETWEEN #{fromId} AND #{toId} AND p.proc_type IN ( 2, 4 )
+        GROUP BY
+            p.user_id
+    </insert>
+
+    <!-- 更新结算期间有充值/下单用户的充值和下单情况 -->
+    <update id="updatePendingUserData">
+        UPDATE t_pending_user p
+            INNER JOIN s_wallet w ON w.user_id = p.user_id AND w.wallet_type = 0
+            SET p.recharge_amt = w.recharge_amt,
+                p.order_amt  = w.order_amt
+    </update>
+
+    <!-- 更新用户激活规则 -->
+    <update id="updateUserActivateRule">
+        UPDATE t_pending_user p INNER JOIN s_market_team t ON t.id = p.market_team_id
+        WHERE p.activate_status = 0
+        SET p.activation_recharge_amt  t.activation_recharge_amt,p.activation_order_amt = t.activation_order_amt;
+    </update>
+
+    <!-- 用户激活 -->
+    <update id="updateUserActivateStatus">
+        UPDATE s_user u
+        INNER JOIN t_pending_user t ON t.user_id = u.id
+            AND t.activate_status = 0
+            AND t.recharge_amt >= activation_recharge_amt AND t.order_amt >= activation_order_amt
+        SET u.activate_status = 1,u.activate_time = NOW()
+    </update>
+
+    <!-- 添加激活过程 -->
+    <insert id="insertActivateUserProc">
+        INSERT INTO p_user_proc (user_id,proc_type,proc_date,proc_time)
+        SELECT
+            t.user_id,
+            5,
+            curdate(),
+            NOW()
+        FROM
+            t_user_activate t
+    </insert>
+
+    <!-- 更新待处理用户可升级VIP信息 -->
+    <update id="updatePendingUserVipData">
+        UPDATE t_pending_user u
+        JOIN (
+            SELECT
+                t.user_id,
+                MAX( v.id ) target_vip_id
+            FROM
+                t_pending_user t
+            INNER JOIN s_vip v ON v.id > t.vip_id
+                AND t.recharge_amt >= v.upgrade_amt
+                AND t.order_amt >= v.upgrade_order_amt
+            GROUP BY
+            t.user_id
+        ) x ON x.user_id = u.user_id
+        SET u.target_vip_id = x.target_vip_id
+    </update>
+
+    <!--VIP等级升级-->
+    <update id="vipUpgrade">
+        UPDATE s_user u
+        INNER JOIN t_pending_user t ON t.user_id = u.id AND t.target_vip_id IS NOT NULL
+        SET u.vip_id = t.target_vip_id, u.chg_vip_time = NOW()
+    </update>
+
+    <!--添加用户升级记录-->
+    <insert id="insertVipUpgradeUserProc">
+        INSERT INTO p_user_proc (user_id, proc_type, proc_value, proc_date, proc_time)
+        SELECT
+            t.user_id,
+            10 proc_type,
+            v.id,
+            CURDATE(),
+            NOW()
+        FROM
+            t_pending_user t
+                INNER JOIN s_vip v ON v.id > t.vip_id
+                AND t.recharge_amt >= v.upgrade_amt
+                AND t.order_amt >= v.upgrade_order_amt
+    </insert>
+
+    <!-- 创建临时代理升级表 -->
+    <insert id="createTempAgentUpgradeData">
+        INSERT INTO t_agent_upgrade(user_id,agent_id)
+        SELECT t.parent_id,u.agent_id FROM t_pending_user t INNER JOIN s_user u ON u.id = t.parent_id GROUP BY t.parent_id
+    </insert>
+
+    <!-- 更新临时升级表中的直属下级充值和下单情况 -->
+    <update id="updateAgentSubUserData">
+        UPDATE t_agent_upgrade a INNER JOIN (
+        SELECT
+            t.user_id,
+            SUM( w.recharge_amt ) sub_user_recharge_amt,
+            SUM( w.order_amt ) sub_user_order_amt
+        FROM
+            t_agent_upgrade t
+        INNER JOIN s_user u ON u.parent_id = t.user_id
+        INNER JOIN s_wallet w ON w.user_id = u.id AND w.wallet_type = 0
+        GROUP BY
+        t.user_id ) x ON x.user_id = a.user_id
+        SET a.sub_user_recharge_amt = x.sub_user_recharge_amt,
+            a.sub_user_order_amt = x.sub_user_order_amt
+    </update>
+
+    <!--更新可升级代理等级-->
+    <update id="updatePendingUserAgentData">
+        UPDATE t_agent_upgrade au JOIN (
+        SELECT
+            t.user_id,
+            MAX( a.id ) target_agent_id
+        FROM
+            t_agent_upgrade t
+        INNER JOIN s_agent a ON a.id > t.agent_id
+            AND t.sub_user_recharge_amt >= a.upgrade_amt
+            AND t.sub_user_order_amt >= a.upgrade_order_amt
+        GROUP BY
+            t.user_id
+        ) x ON x.user_id = au.user_id
+        SET au.target_agent_id = x.target_agent_id
+    </update>
+
+    <!--代理等级升级-->
+    <update id="agentUpgrade">
+        UPDATE s_user u
+        INNER JOIN t_agent_upgrade t ON t.user_id = u.id AND t.target_agent_id IS NOT NULL
+        SET u.agent_id = t.target_agent_id, u.chg_agent_time = NOW()
+    </update>
+
+    <!--添加用户代理等级升级记录-->
+    <insert id="insertAgentUpgradeUserProc">
+        INSERT INTO p_user_proc (user_id, proc_type, proc_value, proc_date, proc_time)
+        SELECT
+            t.user_id,
+            11 proc_type,
+            a.id,
+            CURDATE(),
+            NOW()
+        FROM t_agent_upgrade t
+        INNER JOIN s_agent a ON a.id > t.agent_id
+        AND t.sub_user_recharge_amt >= a.upgrade_amt
+        AND t.sub_user_order_amt >= a.upgrade_order_amt
+    </insert>
+
+    <!--清空待处理用户临时表-->
+    <delete id="truncateTempPendingUserData">
+        TRUNCATE TABLE t_pending_user
+    </delete>
+    <!--清空代理升级临时表-->
+    <delete id="truncateTempAgentUpgradeData">
+        TRUNCATE TABLE t_agent_upgrade
+    </delete>
+</mapper>

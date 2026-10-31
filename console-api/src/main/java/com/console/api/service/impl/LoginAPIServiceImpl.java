@@ -19,9 +19,11 @@ import com.console.framework.utils.TokenUtils;
 import com.console.user.entity.User;
 import com.console.user.service.UserService;
 import jakarta.annotation.Resource;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+@Slf4j
 @Service
 public class LoginAPIServiceImpl extends BaseServiceImpl implements LoginAPIService {
     @Resource
@@ -37,7 +39,7 @@ public class LoginAPIServiceImpl extends BaseServiceImpl implements LoginAPIServ
         verifySiteValidity(marketSite);//校验租户，站点情况
         DynamicTableNameHandler.setTenantId(marketSite.getTenantId());
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-        queryWrapper.select("id,account,tenant_id,market_site_id,market_team_id,marketer_id,avatar," +
+        queryWrapper.select("id,account,login_pwd,user_type,tenant_id,market_site_id,market_team_id,marketer_id,avatar," +
                 "email,email_status,phone,phone_status,agent_id,vip_id,status,invite_reward_status").lambda().eq(User::getAccount,loginReq.getAccount());
         User user = userService.getOne(queryWrapper);
         if (user == null) throw new BusinessException(500, I18nUtil.getI8nMsg("login.error.account.unRegister"));
@@ -67,8 +69,9 @@ public class LoginAPIServiceImpl extends BaseServiceImpl implements LoginAPIServ
             Integer userId = Integer.valueOf(userInfos[1]);
             DynamicTableNameHandler.setTenantId(tenantId);
             QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-            queryWrapper.select("id,account,tenant_id,market_site_id,market_team_id,marketer_id,avatar," +
-                            "email,email_status,phone,phone_status,agent_id,vip_id,invite_reward_status").lambda().eq(User::getId,userId);
+            queryWrapper.select("id,account,user_type,tenant_id,market_site_id,market_team_id,marketer_id,avatar," +
+                            "email,email_status,phone,phone_status,agent_id,vip_id,status,invite_reward_status")
+                    .lambda().eq(User::getId,userId);
             User user = userService.getOne(queryWrapper);
             if (user != null && user.getStatus() == 1) {
                 RequestMember requestMember = user.buildRequestUser();
@@ -77,6 +80,7 @@ public class LoginAPIServiceImpl extends BaseServiceImpl implements LoginAPIServ
                 throw new BusinessException(ResultCode.AUTHENTICATION_FAILED);
             }
         } catch (Exception e) {
+            log.info("刷新token报错" + e);
             throw new BusinessException(ResultCode.AUTHENTICATION_FAILED);
         } finally {
             DynamicTableNameHandler.removeTenantId();

@@ -33,7 +33,9 @@ public class CacheConstants {
     public static final String PAYMENT_CHANNEL_MERCHANT_ID = "PAYMENT_CHANNEL:MERCHANT_ID";
     public static final String CASH_OUT_RULE = "CASH_OUT_RULE";//提现规则
     public static final String PRODUCT_PLATFORM = "PRODUCT_PLATFORM";//产品信息
+    public static final String PRODUCT_PLATFORM_LIST = "PRODUCT_PLATFORM_LIST";//产品信息
     public static final String PRODUCT = "PRODUCT";//产品信息
+    public static final String PLATFORM_BELONG_RULE = "PLATFORM_BELONG_RULE";//产商归属规则
     public static final String PLATFORM_RULE_ITEM = "PLATFORM_RULE_ITEM";//产商规则
     public static final String ORDER_MODE = "ORDER_MODE";
     public static final String SYS_ORDER_MODE = "SYS_ORDER_MODE";
@@ -53,4 +55,12 @@ public class CacheConstants {
     public static final String ACQUIRE_LOCK_SYNC_PRODUCT = "ACQUIRE_LOCK:SYNC_PRODUCT";//同步中转平台产品分布式锁前缀
     public static final String ACQUIRE_LOCK_SYNC_PRODUCT_ORDER = "ACQUIRE_LOCK:SYNC_PRODUCT_ORDER";//同步中转平台产品订单分布式锁前缀
     public static final String ACQUIRE_LOCK_PRODUCT_TRANSFER = "ACQUIRE_LOCK:PRODUCT_TRANSFER:";//进出产品中转分布式锁前缀
+    public static final String ACQUIRE_LOCK_PRODUCT_ORDER_SETTLEMENT = "ACQUIRE_LOCK:PRODUCT_ORDER_SETTLEMENT";//产品订单结算
+    public static final String ACQUIRE_LOCK_USER_PROC_SETTLEMENT = "ACQUIRE_LOCK:USER_PROC_SETTLEMENT";//用户行为结算
+    public static final String ACQUIRE_LOCK_PAYMENT_PROC_SETTLEMENT = "ACQUIRE_LOCK:PAYMENT_PROC_SETTLEMENT";//支付行为结算
+    public static final String ACQUIRE_LOCK_CASH_OUT_PROC_SETTLEMENT = "ACQUIRE_LOCK:CASH_OUT_PROC_SETTLEMENT";//提现行为结算
+    public static final String ACQUIRE_LOCK_WALLET_PROC_SETTLEMENT = "ACQUIRE_LOCK:WALLET_PROC_SETTLEMENT";//钱包行为结算
+    public static final String ACQUIRE_LOCK_PHONE_SYNC_PUSH = "ACQUIRE_LOCK:PHONE_SYNC_PUSH";//手机上传同步行为推送
+    public static final String ACQUIRE_LOCK_AGENT_LAYER_SYNC_PUSH = "ACQUIRE_LOCK:AGENT_LAYER_SYNC_PUSH";//代理层级关系同步给总租户推送
+    public static final String ACQUIRE_LOCK_USER_REPORT_SYNC_PUSH = "ACQUIRE_LOCK:USER_REPORT_SYNC_PUSH";//代理层级关系同步给总租户推送
 }

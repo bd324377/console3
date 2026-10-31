@@ -7,7 +7,7 @@ import com.console.core.entity.*;
 import com.console.core.mapper.MarketerMapper;
 import com.console.core.merger.AdminProcMerger;
 import com.console.core.model.bo.MarketSiteBo;
-import com.console.core.model.dto.req.MarketSiteReq;
+import com.console.core.model.req.MarketSiteReq;
 import com.console.core.mapper.MarketSiteMapper;
 import com.console.core.service.MarketSiteDomainService;
 import com.console.core.service.MarketSiteService;

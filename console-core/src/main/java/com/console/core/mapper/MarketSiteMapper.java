@@ -4,10 +4,8 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.console.core.entity.MarketSite;
-import com.console.core.model.dto.req.MarketSiteReq;
+import com.console.core.model.req.MarketSiteReq;
 import org.apache.ibatis.annotations.Mapper;
-
-import java.util.List;
 
 /**
  * 站点Mapper接口

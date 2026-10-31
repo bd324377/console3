@@ -10,6 +10,8 @@ import lombok.extern.slf4j.Slf4j;
 import java.io.Serial;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Slf4j
 @Getter
@@ -29,9 +31,13 @@ public class UserProc implements Serializable {
     private String browser;
     private BigDecimal procValue;
     private BigDecimal orderResultAmt;
+    private Integer orderTimes;
     private String  description;
-    private Integer procDate;
-    private Integer procTime;
+    private LocalDate procDate;
+    private LocalDateTime procTime;
+    @TableField(exist = false)
+    private Integer procCount;
+
     @TableField(exist = false)
     private Integer retryTimes;
     @TableField(exist = false)
@@ -45,8 +51,8 @@ public class UserProc implements Serializable {
         this.userId      = userId;
         this.tenantId    = tenantId;
         this.procType    = procType;
-        this.procTime    = DateUtils.getCurrentTimestamp();
-        this.procDate    = DateUtils.getTodayTimestamp();
+        this.procTime    = LocalDateTime.now();
+        this.procDate    = LocalDate.now();
         this.description = procType.getValue();
     }
 
@@ -61,9 +67,13 @@ public class UserProc implements Serializable {
         ACTIVATE(5,"激活", "userProc.activate"),
         USER_CASH_OUT(6,"用户钱包提现","userProc.userCashOut"),
         AGENT_CASH_OUT(7,"代理钱包提现","userProc.agentCashOut"),
-        BIND_PHONE(8,"绑定手机","userProc.bindPhone"),
-        BIND_BANK_CARD(9,"绑定银行卡","userProc.bindBankCard"),
-        BIND_EMAIL(10,"绑定电子邮箱","userProc.bindEmail");
+        RECEIVE_USER_REWARD(8,"领取用户活动奖励",""),
+        RECEIVE_AGENT_REWARD(9,"领取用户活动奖励",""),
+        VIP_UPDRADE(10,"VIP升级",""),
+        AGENT_UPDRADE(11,"代理升级",""),
+        BIND_PHONE(12,"绑定手机","userProc.bindPhone"),
+        BIND_BANK_CARD(13,"绑定银行卡","userProc.bindBankCard"),
+        BIND_EMAIL(14,"绑定电子邮箱","userProc.bindEmail");
 
         @EnumValue
         private final Integer key;

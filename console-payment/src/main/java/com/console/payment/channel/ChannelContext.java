@@ -27,7 +27,11 @@ public class ChannelContext {
      * @return 创建支付订单结果
      */
     public static ChannelResult createPayOrder(PaymentOrder paymentOrder, Channel channel) {
-        return factory.getStrategy(channel,false).createPayOrder(paymentOrder,channel);
+        try {
+            return factory.getStrategy(channel,false).createPayOrder(paymentOrder,channel);
+        } catch (Exception e) {
+            return ChannelResult.failed(e.getMessage());
+        }
     }
 
     /**
@@ -48,7 +52,11 @@ public class ChannelContext {
      * @return 创建提现订单结果
      */
     public static ChannelResult createCashOutOrder(CashOutOrder cashOutOrder, Channel channel, BankCard bankCard) {
-        return factory.getStrategy(channel,true).createCashOutOrder(cashOutOrder,channel,bankCard);
+        try {
+            return factory.getStrategy(channel,true).createCashOutOrder(cashOutOrder,channel,bankCard);
+        } catch (Exception e) {
+            return ChannelResult.failed(e.getMessage());
+        }
     }
 
     /**

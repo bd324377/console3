@@ -72,7 +72,7 @@ public class EncryptUtils {
             if (param instanceof String paramJson) {
                 str = salt + paramJson;
             } else {
-                str = salt + JSON.toJSONString(param, JSONWriter.Feature.WriteNulls.ordinal());
+                str = salt + JSON.toJSONString(param);
             }
             log.info("加密进行中，加密明文：" + str + ";加密秘钥：" + secretKey);
             Mac mac = Mac.getInstance("HmacSHA256");

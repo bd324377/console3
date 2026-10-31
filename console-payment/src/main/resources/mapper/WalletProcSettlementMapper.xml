@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.console.payment.mapper.WalletProcSettlementMapper">
+    <!--查询未结算最新账变信息-->
+    <select id="selectNewestProc" resultType="com.console.core.entity.WalletProc">
+        SELECT MAX(t.id) AS id, COUNT(1) AS proc_count FROM (
+            SELECT id FROM p_wallet_proc WHERE id > #{settledProcId} ORDER BY id LIMIT #{limitSize}
+        ) t
+    </select>
+
+    <!--插入或更新钱包汇总表-->
+    <insert id="insertOrUpdateWalletReport">
+        INSERT INTO s_wallet_report (
+            report_date,
+            user_id,
+            wallet_type,
+            recharge_amt,
+            manual_recharge_amt,
+            activity_reward_amt,
+            agent_wallet_transfer_amt,
+            cash_out_amt,
+            manual_cash_out_amt,
+            cash_out_failed_back_amt,
+            transfer_to_third_party,
+            transfer_from_third_party,
+            user_expend_amt
+        )
+        SELECT
+            p.proc_date,
+            p.user_id,
+            p.wallet_type,
+            SUM(CASE WHEN p.proc_type = 0 THEN p.amt ELSE 0 END) AS recharge_amt,
+            SUM(CASE WHEN p.proc_type = 1 THEN p.amt ELSE 0 END) AS manual_recharge_amt,
+            SUM(CASE WHEN p.proc_type = 2 THEN p.amt ELSE 0 END) AS activity_reward_amt,
+            SUM(CASE WHEN p.proc_type = 3 THEN p.amt ELSE 0 END) AS agent_wallet_transfer_amt,
+            SUM(CASE WHEN p.proc_type = 4 THEN p.amt ELSE 0 END) AS cash_out_amt,
+            SUM(CASE WHEN p.proc_type = 5 THEN p.amt ELSE 0 END) AS manual_cash_out_amt,
+            SUM(CASE WHEN p.proc_type = 6 THEN p.amt ELSE 0 END) AS cash_out_failed_back_amt,
+            SUM(CASE WHEN p.proc_type = 7 THEN p.amt ELSE 0 END) AS transfer_to_third_party,
+            SUM(CASE WHEN p.proc_type = 8 THEN p.amt ELSE 0 END) AS transfer_from_third_party,
+            SUM(CASE WHEN p.proc_type = 9 THEN p.amt ELSE 0 END) AS user_expend_amt
+        FROM p_wallet_proc p
+        WHERE p.id BETWEEN #{fromId} AND #{toId}
+        GROUP BY p.proc_date, p.user_id, p.wallet_type
+        ON DUPLICATE KEY UPDATE
+            recharge_amt                = IFNULL(recharge_amt,0)                + VALUES(recharge_amt),
+            manual_recharge_amt         = IFNULL(manual_recharge_amt,0)         + VALUES(manual_recharge_amt),
+            activity_reward_amt         = IFNULL(activity_reward_amt,0)         + VALUES(activity_reward_amt),
+            agent_wallet_transfer_amt   = IFNULL(agent_wallet_transfer_amt,0)   + VALUES(agent_wallet_transfer_amt),
+            cash_out_amt                = IFNULL(cash_out_amt,0)                + VALUES(cash_out_amt),
+            manual_cash_out_amt         = IFNULL(manual_cash_out_amt,0)         + VALUES(manual_cash_out_amt),
+            cash_out_failed_back_amt    = IFNULL(cash_out_failed_back_amt,0)    + VALUES(cash_out_failed_back_amt),
+            transfer_to_third_party     = IFNULL(transfer_to_third_party,0)     + VALUES(transfer_to_third_party),
+            transfer_from_third_party   = IFNULL(transfer_from_third_party,0)   + VALUES(transfer_from_third_party),
+            user_expend_amt             = IFNULL(user_expend_amt,0)             + VALUES(user_expend_amt)
+    </insert>
+
+    <!--更新系统余额报表-->
+    <insert id="updateSysBalanceReport">
+        REPLACE INTO s_balance_report (report_date,market_site_id,market_team_id,marketer_id,user_sys_balance,agent_sys_balance)
+        SELECT
+            curdate(),
+            u.market_site_id,
+            u.market_team_id,
+            u.marketer_id,
+            SUM(CASE WHEN w.wallet_type = 0 THEN w.balance ELSE 0 END) user_sys_balance,
+            SUM(CASE WHEN w.wallet_type = 2 THEN w.balance ELSE 0 END) agent_sys_balance
+        FROM
+            s_wallet w
+        INNER JOIN s_user u ON u.id = w.user_id AND u.user_type != 1
+        WHERE w.wallet_type IN (0,2)
+        GROUP BY
+            u.market_site_id,
+            u.market_team_id,
+            u.marketer_id
+    </insert>
+</mapper>

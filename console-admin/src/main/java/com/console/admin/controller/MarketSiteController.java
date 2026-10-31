@@ -2,7 +2,7 @@ package com.console.admin.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.console.core.model.dto.req.MarketSiteReq;
+import com.console.core.model.req.MarketSiteReq;
 import com.console.core.entity.MarketSite;
 import com.console.core.service.MarketSiteService;
 import com.console.framework.domain.Result;

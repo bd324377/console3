@@ -21,7 +21,7 @@ public class WalletProc implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @TableId(type = IdType.AUTO)
-    private Integer id; // 用户钱包过程id
+    private Long id; // 用户钱包过程id
     private Long relatedId; // 过程产生的关联ID（充值提现则关联订单ID，中转进出则关联转账id）
     private Integer userId; // 钱包id
     private Wallet.WalletType walletType;//钱包类型
@@ -35,7 +35,8 @@ public class WalletProc implements Serializable {
     private LocalDateTime procTime; // 过程发生时间
     private String description; // 变动原因说明
     private String remark; // 备注
-
+    @TableField(exist = false)
+    private Integer procCount;
     @TableField(exist = false)
     private Integer tenantId;
     @TableField(exist = false)
@@ -75,7 +76,8 @@ public class WalletProc implements Serializable {
         MANUAL_PAY_OUT(5, "人工下分","walletProc.description.manualCashOut"),
         CASH_OUT_FAILED_REFUND(6, "提现失败退回","walletProc.description.cashOutFailedBack"),
         TRANSFER_TO_THIRD_PARTY(7, "转入第三方","walletProc.description.toTransfer"),
-        TRANSFER_FROM_THIRD_PARTY(8, "第三方转出","walletProc.description.fromTransfer");
+        TRANSFER_FROM_THIRD_PARTY(8, "第三方转出","walletProc.description.fromTransfer"),
+        USER_EXPEND_AMT(9,"用户平台内消费金额","");
 
         @EnumValue
         @JsonValue

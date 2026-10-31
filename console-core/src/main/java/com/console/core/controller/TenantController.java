@@ -2,7 +2,7 @@ package com.console.core.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.console.core.model.dto.req.TenantReq;
+import com.console.core.model.req.TenantReq;
 import com.console.core.entity.Tenant;
 import com.console.core.service.TenantService;
 import com.console.framework.domain.Result;

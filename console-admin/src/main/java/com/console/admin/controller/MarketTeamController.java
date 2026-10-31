@@ -3,7 +3,7 @@ package com.console.admin.controller;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.console.core.entity.MarketTeam;
-import com.console.core.model.dto.req.MarketTeamReq;
+import com.console.core.model.req.MarketTeamReq;
 import com.console.core.service.MarketTeamService;
 import com.console.framework.domain.Result;
 import lombok.RequiredArgsConstructor;

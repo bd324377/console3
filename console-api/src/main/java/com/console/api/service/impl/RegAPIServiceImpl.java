@@ -20,6 +20,7 @@ import com.console.framework.constants.ParameterConstants;
 import com.console.framework.domain.BusinessException;
 import com.console.framework.request.RequestMember;
 import com.console.framework.utils.*;
+import com.console.user.entity.MarketSiteUser;
 import com.console.user.entity.User;
 import com.console.user.entity.UserShuntConfig;
 import com.console.user.model.bo.InviteNewConfig;
@@ -33,6 +34,7 @@ import org.springframework.util.StringUtils;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.security.SecureRandom;
+import java.util.List;
 
 @Service
 public class RegAPIServiceImpl implements RegAPIService {
@@ -41,7 +43,7 @@ public class RegAPIServiceImpl implements RegAPIService {
     @Resource
     private MarketerService marketerService;
     @Resource
-    private UserIdService userIdService;
+    private MarketSiteUserService marketSiteUserService;
     @Resource
     private UserService userService;
     @Resource
@@ -84,11 +86,10 @@ public class RegAPIServiceImpl implements RegAPIService {
             inviteNewConfig.setShuntStatus(shuntStatus);
             //判断是否继承上级用户的分流规则
         }
-//        checkRegAccount(regReq.getAccount(), regReq.getPhone());//监测账号是否重复(无需判断，通过MySQL唯一索引去判断即可)
         checkRegParam(inviteNewConfig, regReq.getRegDeviceId());//
         User user = regReq.initUser();
         inviteNewConfig.buildUserByConfig(user);
-        user.setId(userIdService.initUserId());
+        MarketSiteUser marketSiteUser = marketSiteUserService.initUserId(user);
         user.setVipId(vipService.getInitialVipId());
         user.setAgentId(agentService.getInitialAgentId());
         Wallet userWallet = new Wallet();
@@ -102,7 +103,8 @@ public class RegAPIServiceImpl implements RegAPIService {
         UserProc regProc = new UserProc(user.getId(), tenant.getId(), UserProc.ProcType.REGISTER);
         regProc.setLoginChannel(regReq.getRegChannel());
         try {
-            if (userService.save(user) && walletService.save(userWallet) && walletService.save(agentWallet) && userProcService.save(regProc)) {//异步处理后续事项
+            if (userService.save(user) && walletService.saveBatch(List.of(userWallet,agentWallet)) &&
+                    userProcService.save(regProc) && marketSiteUserService.save(marketSiteUser)) {//异步处理后续事项
                 userService.syncNewUserConfig(user,inviteNewConfig);
             }
         } catch (DuplicateKeyException e) {

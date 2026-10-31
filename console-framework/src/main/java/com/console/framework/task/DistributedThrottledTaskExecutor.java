@@ -36,7 +36,7 @@ import java.util.function.Consumer;
 @Component
 public class DistributedThrottledTaskExecutor {
     /** 默认最小执行间隔（毫秒） */
-    private static final long DEFAULT_MIN_HOLD_TIME_MS = 15_000L;
+    private static final long DEFAULT_MIN_HOLD_TIME_MS = 10_000L;
 
     /** Redis 中"最后执行时间"key 的过期时间：7 天 */
     private static final long DEFAULT_EXPIRE_SECONDS = 7 * 24 * 3600L;

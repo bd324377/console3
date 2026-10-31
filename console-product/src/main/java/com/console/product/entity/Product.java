@@ -10,6 +10,7 @@ import lombok.Setter;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -22,7 +23,6 @@ public class Product implements Serializable {
     private Integer id; // 产品id
     @JSONField(name = "platId")
     private Integer platformId; // 产商id
-    private Integer platformBelong;//产商归属 如：官方等
     @JSONField(name = "categoryId")
     private ProductCategory category; // 产品分类
     @JSONField(name = "gameCode")
@@ -31,7 +31,7 @@ public class Product implements Serializable {
     @JSONField(name = "gameName")
     private String productName; // 产品名称（json）
     private Integer status; // 产品状态：1、正常；0、关闭
-    private Integer addTime; // 添加时间
+    private LocalDateTime addTime; // 添加时间
     private Integer sort; // 排序值
 
     @Getter

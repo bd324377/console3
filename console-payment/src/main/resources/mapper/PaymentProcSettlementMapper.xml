@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.console.payment.mapper.PaymentProcSettlementMapper">
+    <!--查询未结算最新单单信息-->
+    <select id="selectNewestProc" resultType="com.console.payment.entity.PaymentProc">
+        SELECT MAX(t.id) AS id, COUNT(1) AS proc_count FROM (
+            SELECT id FROM p_payment_proc WHERE id > #{settledProcId} ORDER BY id LIMIT #{limitSize}
+        ) t
+    </select>
+    <!--汇总支付报告-->
+    <insert id="insertOrUpdatePaymentReport">
+        INSERT INTO s_payment_report (
+            report_date,
+            user_id,
+            start_recharge_times,
+            start_recharge_amt,
+            start_recharge_failed_times,
+            recharge_success_times,
+            recharge__success_amt,
+            manual_recharge_times,
+            manual_recharge_amt,
+            channel_fee,
+            marketer_fee
+        )
+        SELECT
+            p.proc_date,
+            p.user_id,
+            SUM(CASE WHEN p.proc_type = 1 THEN 1 ELSE 0 END)              AS start_recharge_times,
+            SUM(CASE WHEN p.proc_type = 1 THEN p.order_amt ELSE 0 END)    AS start_recharge_amt,
+            SUM(CASE WHEN p.proc_type = 3 THEN 1 ELSE 0 END)              AS start_recharge_failed_times,
+            SUM(CASE WHEN p.proc_type = 5 THEN 1 ELSE 0 END)              AS recharge_success_times,
+            SUM(CASE WHEN p.proc_type = 5 THEN p.order_amt ELSE 0 END)    AS recharge_success_amt,
+            SUM(CASE WHEN p.proc_type = 7 THEN 1 ELSE 0 END)              AS manual_recharge_times,
+            SUM(CASE WHEN p.proc_type = 7 THEN p.order_amt ELSE 0 END)    AS manual_recharge_amt,
+            SUM(CASE WHEN p.proc_type = 5 THEN p.channel_fee ELSE 0 END)  AS channel_fee,
+            SUM(CASE WHEN p.proc_type = 5 THEN p.marketer_fee ELSE 0 END) AS marketer_fee
+        FROM p_payment_proc p LEFT JOIN s_channel c ON c.id = p.channel_id
+        WHERE p.id BETWEEN #{fromId} AND #{toId}   -- 增量订单 ID 区间
+        GROUP BY p.proc_date, p.user_id
+        ON DUPLICATE KEY UPDATE
+            start_recharge_times        = start_recharge_times        + VALUES(start_recharge_times),
+            start_recharge_amt          = start_recharge_amt          + VALUES(start_recharge_amt),
+            start_recharge_failed_times = start_recharge_failed_times + VALUES(start_recharge_failed_times),
+            recharge_success_times      = recharge_success_times      + VALUES(recharge_success_times),
+            recharge__success_amt       = recharge__success_amt       + VALUES(recharge__success_amt),
+            manual_recharge_times       = manual_recharge_times       + VALUES(manual_recharge_times),
+            manual_recharge_amt         = manual_recharge_amt         + VALUES(manual_recharge_amt),
+            channel_fee                 = channel_fee                 + VALUES(channel_fee)
+    </insert>
+</mapper>

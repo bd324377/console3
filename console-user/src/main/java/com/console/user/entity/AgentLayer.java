@@ -34,5 +34,7 @@ public class AgentLayer implements Serializable {
     private Integer layerStatus;//层级关系状态 1、正常邀新，0、分流掉链
 
     @TableField(exist = false)
+    private Integer agentLayerCount;
+    @TableField(exist = false)
     private Integer subUserCount;//直属下级用户数量
 }

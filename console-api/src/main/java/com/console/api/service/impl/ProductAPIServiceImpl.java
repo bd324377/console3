@@ -5,7 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
-import com.console.api.dto.ProductDTO;
+import com.console.api.dto.req.ProductReq;
 import com.console.api.service.ProductAPIService;
 import com.console.core.entity.Parameter;
 import com.console.core.entity.Tenant;
@@ -22,6 +22,7 @@ import com.console.framework.request.RequestMember;
 import com.console.framework.utils.*;
 import com.console.product.api.TransferApi;
 import com.console.product.api.res.TransferRecordRes;
+import com.console.product.dto.TransferReq;
 import com.console.product.entity.*;
 import com.console.product.service.*;
 import com.console.user.entity.User;
@@ -74,7 +75,7 @@ public class ProductAPIServiceImpl extends BaseServiceImpl implements ProductAPI
     private WalletProcMerger walletProcMerger;
 
     @Override
-    public String enterProduct(ProductDTO.EnterProductRes enterProductRes) {
+    public String enterProduct(ProductReq.EnterProductReq enterProductReq) {
         RequestMember member = RequestUtils.getRequestMember();
         MarketSiteBo marketSite = marketSiteService.getMarketSiteByDomain(RequestUtils.getRequestDomain());
         if (marketSite.getTenantStatus() != Tenant.TenantStatus.OPEN) {
@@ -86,7 +87,7 @@ public class ProductAPIServiceImpl extends BaseServiceImpl implements ProductAPI
         try {
             locked = lock.tryLock(100, TimeUnit.MILLISECONDS);
             if (locked) {
-                Product product = verifyProduct(enterProductRes.getProductId());//产品信息校验
+                Product product = verifyProduct(enterProductReq.getProductId());//产品信息校验
                 verifyProductPlatform(product.getPlatformId());//产商信息校验
                 Wallet wallet = verifyWallet(member.getId());//钱包信息校验
                 //下单模式确认
@@ -100,10 +101,18 @@ public class ProductAPIServiceImpl extends BaseServiceImpl implements ProductAPI
                 jsonObject.put("tranId", transactionId);
                 jsonObject.put("locale",RequestUtils.getLang());
                 jsonObject.put("merchantCode",platformBelongRuleItem.getMerchantCode());
-                jsonObject.put("subMerchantCode",platformBelongRuleItem.getSubMerchantCode());
+                if (StringUtils.hasText(platformBelongRuleItem.getSubMerchantCode())) jsonObject.put("subMerchantCode",platformBelongRuleItem.getSubMerchantCode());
                 jsonObject.put("secreley",platformBelongRuleItem.getSecretkey());
                 jsonObject.put("ipAddress",RequestUtils.getRequestIp());
                 jsonObject.put("memberSuffix",platformBelongRuleItem.getUserSuffix());
+
+//                TransferReq.EnterTransferReq enterTransferReq = new TransferReq.EnterTransferReq(member,platformBelongRuleItem);
+//                enterTransferReq.setGameId(product.getId());
+//                enterTransferReq.setAmount(wallet.getBalance());
+//                enterTransferReq.setTranId(transactionId.toString());
+
+
+
                 String timestamp = DateUtils.getCurrentTimestampOfMs().toString();
                 String sign = EncryptUtils.hmacSHA256Encrypt(jsonObject.toString(),secret,apiKey + timestamp + serviceCode);
                 Result result = transferApi.enterProduct(transferUrl + "/api/game/prepare",apiKey, timestamp,sign,jsonObject).execute().body();
@@ -114,7 +123,7 @@ public class ProductAPIServiceImpl extends BaseServiceImpl implements ProductAPI
                     }
                     UpdateWrapper<Wallet> updateWrapper = new UpdateWrapper<>();
                     updateWrapper.lambda().set(Wallet::getBalance, BigDecimal.ZERO).set(Wallet::getAmtLocation,1)
-                            .eq(Wallet::getUserId, member.getId()).eq(Wallet::getWalletType,wallet.getWalletType());
+                            .eq(Wallet::getId, wallet.getId());
                     if (wallet.isSwitchOrderModelIndex()) {
                         updateWrapper.lambda().set(Wallet::getOrderModeIndex,wallet.getOrderModeIndex()).set(Wallet::getSwitchIndexTime, LocalDateTime.now());
                     }
@@ -185,6 +194,7 @@ public class ProductAPIServiceImpl extends BaseServiceImpl implements ProductAPI
                                 updateWrapper.setSql("cash_able_amt = balance");
                             }
                             walletService.update(updateWrapper);//更新钱包信息
+                            wallet.setBalance(balanceAmt);
                             WalletProc walletProc = new WalletProc(wallet.getTransactionId(),wallet.getUserId(),wallet.getWalletType(),1,WalletProc.ProcType.TRANSFER_FROM_THIRD_PARTY,
                                     wallet.getBalance(),transferRecordRes.getAmount(),null);
                             walletProcMerger.submit(walletProc);//添加退出中转平台钱包记录
@@ -213,6 +223,18 @@ public class ProductAPIServiceImpl extends BaseServiceImpl implements ProductAPI
         return null;
     }
 
+    /** 收藏产品 **/
+    @Override
+    public void collectProduct(Long productId) {
+
+    }
+
+    /** 取消收藏产品 **/
+    @Override
+    public void cancelCollectProduct(Long productId) {
+
+    }
+
     /**校验产品信息**/
     private Product verifyProduct(Integer productId) {
         Product product = productService.getProductById(productId);
@@ -238,6 +260,7 @@ public class ProductAPIServiceImpl extends BaseServiceImpl implements ProductAPI
                 .eq(Wallet::getUserId,userId)
                 .eq(Wallet::getWalletType,Wallet.WalletType.USER_WALLET);
         Wallet wallet = walletService.getOne(queryWrapper);
+        wallet.setSwitchOrderModelIndex(false);
         if (wallet.getTransferStatus() != null && wallet.getTransferStatus() == 2) {//与中转平台存在转账记录异常，先解决异常
             fixAbnormalWalletStatus(wallet);
         }
@@ -273,6 +296,8 @@ public class ProductAPIServiceImpl extends BaseServiceImpl implements ProductAPI
                     walletProc = new WalletProc(wallet.getTransactionId(),wallet.getUserId(),wallet.getWalletType(),1,WalletProc.ProcType.TRANSFER_FROM_THIRD_PARTY,
                             wallet.getBalance(),transferRecordRes.getAmount(),null);
                 }
+                walletService.update(updateWrapper);
+                wallet.setTransferStatus(1);
                 walletProcMerger.submit(walletProc);
             } else if (result != null && result.getCode() == 404) {//该记录不存在，无需变更钱包金额，清除钱包异常状态即可
                 walletService.update(updateWrapper);
@@ -291,7 +316,7 @@ public class ProductAPIServiceImpl extends BaseServiceImpl implements ProductAPI
             platformBelongRule = platformBelongRuleService.getPlatformBelongRuleById(orderMode.getSwitchRules().get(0).getPlatformBelongRuleId());
         } else {
             if (User.UserType.getUserType(requestMember.getUserType()) == User.UserType.TEST) {//测试用户直接使用测试库
-                OrderMode orderMode = orderModeService.getSysOrderModeByType(requestMember.getSiteId(),OrderMode.OrderModeType.TEST.getKey());
+                OrderMode orderMode = orderModeService.getSysOrderModeByType(0,OrderMode.OrderModeType.TEST.getKey());
                 platformBelongRule = platformBelongRuleService.getPlatformBelongRuleById(orderMode.getSwitchRules().get(0).getPlatformBelongRuleId());
             } else {
                 //是否开启时间段定制下单模式机制

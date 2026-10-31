@@ -1,9 +1,8 @@
 package com.console.api.controller;
 
-import com.console.api.dto.ProductDTO;
+import com.console.api.dto.req.ProductReq;
 import com.console.api.service.ProductAPIService;
 import com.console.framework.domain.Result;
-import com.console.framework.utils.RequestUtils;
 import jakarta.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,19 +16,30 @@ public class ProductAPI {
 
     /**
      * 进入产品中转服务
-     * @param enterProductRes 产品信息
+     * @param enterProductReq 产品信息
      */
-    @PostMapping
-    public Result enterProduct(@RequestBody @Validated ProductDTO.EnterProductRes enterProductRes) {
+    @PostMapping("/enterProduct")
+    public Result enterProduct(@RequestBody @Validated ProductReq.EnterProductReq enterProductReq) {
+        return Result.success(productAPIService.enterProduct(enterProductReq));
+    }
+
+    /** 退出产品中转服务 **/
+    @PostMapping("/logoutTransfer")
+    public Result logoutTransfer() {
+        return Result.success(productAPIService.logoutTransfer());
+    }
+
+    /** 收藏产品 **/
+    @PostMapping("/collectProduct")
+    public Result collectProduct(@RequestBody @Validated ProductReq.CollectProductReq collectProductReq) {
+        productAPIService.collectProduct(collectProductReq.getProductId());
         return Result.success();
     }
 
-    /**
-     * 退出产品中转服务
-     */
-    @PostMapping("/logoutTransfer")
-    public Result logoutTransfer() {
+    /** 取消收藏 **/
+    @PostMapping("/cancelCollectProduct")
+    public Result cancelCollectProduct(@RequestBody @Validated ProductReq.CollectProductReq collectProductReq) {
+        productAPIService.cancelCollectProduct(collectProductReq.getProductId());
         return Result.success();
-//        return Result.success(productAPIService.logoutTransfer(RequestUtils.getUser().getId(),false));
     }
 }

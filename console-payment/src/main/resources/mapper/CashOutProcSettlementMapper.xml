@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.console.payment.mapper.CashOutProcSettlementMapper">
+    <!--查询未结算最新单单信息-->
+    <select id="selectNewestProc" resultType="com.console.payment.entity.CashOutProc">
+        SELECT MAX(t.id) AS id, COUNT(1) AS proc_count FROM (
+            SELECT id FROM p_payment_proc WHERE id > #{settledProcId} ORDER BY id LIMIT #{limitSize}
+        ) t
+    </select>
+    <!--汇总提现报告-->
+    <insert id="insertOrUpdateCashOutReport">
+        INSERT INTO s_cash_out_report (
+            report_date,
+            user_id,
+            wallet_type,
+            start_cash_out_times,
+            start_cash_out_amt,
+            start_cash_out_failed_times,
+            cash_out_success_times,
+            cash_out_success_amt,
+            false_cash_out_times,
+            false_cash_out_amt,
+            manual_cash_out_times,
+            manual_cash_out_amt,
+            fee,
+            channel_fee,
+            marketer_fee
+        )
+        SELECT
+            p.proc_date,
+            p.user_id,
+            p.wallet_type,
+            SUM(CASE WHEN p.proc_type = 1 THEN 1 ELSE 0 END)              AS start_cash_out_times,
+            SUM(CASE WHEN p.proc_type = 1 THEN p.order_amt ELSE 0 END)    AS start_cash_out_amt,
+            SUM(CASE WHEN p.proc_type = 8 THEN 1 ELSE 0 END)              AS start_cash_out_failed_times,
+            SUM(CASE WHEN p.proc_type = 3 THEN 1 ELSE 0 END)              AS cash_out_success_times,
+            SUM(CASE WHEN p.proc_type = 3 THEN p.order_amt ELSE 0 END)    AS cash_out_success_amt,
+            SUM(CASE WHEN p.proc_type = 5 THEN 1 ELSE 0 END)              AS false_cash_out_times,
+            SUM(CASE WHEN p.proc_type = 5 THEN p.order_amt ELSE 0 END)    AS false_cash_out_amt,
+            SUM(CASE WHEN p.proc_type = 6 THEN 1 ELSE 0 END)              AS manual_cash_out_times,
+            SUM(CASE WHEN p.proc_type = 6 THEN p.order_amt ELSE 0 END)    AS manual_cash_out_amt,
+            SUM(CASE WHEN p.proc_type = 3 THEN p.fee          ELSE 0 END) AS fee,
+            SUM(CASE WHEN p.proc_type = 3 THEN p.channel_fee  ELSE 0 END) AS channel_fee,
+            SUM(CASE WHEN p.proc_type = 3 THEN p.marketer_fee ELSE 0 END) AS marketer_fee
+        FROM p_cash_out_proc p
+        WHERE p.id BETWEEN #{fromId} AND #{toId}
+        GROUP BY p.proc_date, p.user_id, p.wallet_type
+        ON DUPLICATE KEY UPDATE
+            start_cash_out_times        = IFNULL(start_cash_out_times,0)        + VALUES(start_cash_out_times),
+            start_cash_out_amt          = IFNULL(start_cash_out_amt,0)          + VALUES(start_cash_out_amt),
+            start_cash_out_failed_times = IFNULL(start_cash_out_failed_times,0) + VALUES(start_cash_out_failed_times),
+            cash_out_success_times      = IFNULL(cash_out_success_times,0)      + VALUES(cash_out_success_times),
+            cash_out_success_amt        = IFNULL(cash_out_success_amt,0)        + VALUES(cash_out_success_amt),
+            false_cash_out_times        = IFNULL(false_cash_out_times,0)        + VALUES(false_cash_out_times),
+            false_cash_out_amt          = IFNULL(false_cash_out_amt,0)          + VALUES(false_cash_out_amt),
+            manual_cash_out_times       = IFNULL(manual_cash_out_times,0)       + VALUES(manual_cash_out_times),
+            manual_cash_out_amt         = IFNULL(manual_cash_out_amt,0)         + VALUES(manual_cash_out_amt),
+            fee                         = IFNULL(fee,0)                         + VALUES(fee),
+            channel_fee                 = IFNULL(channel_fee,0)                 + VALUES(channel_fee),
+            marketer_fee                = IFNULL(marketer_fee,0)                + VALUES(marketer_fee)
+    </insert>
+</mapper>

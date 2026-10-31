@@ -19,7 +19,7 @@ public class PaymentProc implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @TableId(type = IdType.AUTO)
-    private Integer id; // 过程id
+    private Long id; // 过程id
     private Long orderId; // 订单id
     private Integer userId; // 用户id
     private Integer channelId; // 渠道id
@@ -31,6 +31,8 @@ public class PaymentProc implements Serializable {
     private Integer operatorId; // 管理员id
     private String remark;
 
+    @TableField(exist = false)
+    private Integer procCount;
     @TableField(exist = false)
     private Integer tenantId;
     @TableField(exist = false)
@@ -52,6 +54,7 @@ public class PaymentProc implements Serializable {
     }
     @Getter
     public enum ProcType {
+        //1、线上发起入款；2、后台人工发起入款；3.线上发起入款失败；4、后台发起人工入款失败；5、线上入款成功；6、人工补单成功；7、人工入款成功;8、线上入款失败；9、人工入款失败
         UNDEFINED(0, "未定义操作状态"),
         START_ONLINE_PAYMENT(1, "线上发起入款"),
         START_MANUAL_PAYMENT(2, "后台发起人工入款"),

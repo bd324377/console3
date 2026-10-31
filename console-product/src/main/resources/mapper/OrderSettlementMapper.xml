@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.console.product.mapper.OrderSettlementMapper">
+    <!-- 查询未结算最新的订单数据 -->
+    <select id="selectNewestOrder" resultType="com.console.product.entity.ProductOrder">
+        SELECT MAX(t.id) AS id, COUNT(1) AS order_count FROM (
+            SELECT id FROM s_product_order WHERE id > #{settledOrderId} ORDER BY id LIMIT #{limitSize}
+        ) t
+    </select>
+    <!--结算用户下单情况-->
+    <update id="settlementOrderedAmt">
+        UPDATE s_wallet w
+        JOIN (
+        SELECT
+            o.user_id,
+            o.amt_source,
+            sum( o.order_amt ) order_amt,
+            sum( o.result_amt ) result_amt
+        FROM
+            s_product_order o
+        WHERE
+            o.id BETWEEN #{fromId} AND #{toId}
+        GROUP BY
+            o.user_id,
+            o.amt_source)
+        AS ot ON ot.user_id = w.user_id AND ot.amt_source = w.wallet_type
+        set w.order_result_amt = IFNULL(w.order_result_amt,0) + ot.result_amt,
+            w.order_amt = IFNULL(w.order_amt,0) + ot.order_amt,
+            w.cash_able_amt = IF( GREATEST(w.to_be_order_amt - ot.order_amt,0) > 0,w.cash_able_amt,IF(w.balance = 0,w.cash_able_amt,w.balance)),
+            w.to_be_order_amt = GREATEST(w.to_be_order_amt - ot.order_amt,0)
+    </update>
+
+    <!--汇总用户下单日汇总报告-->
+    <insert id="insertOrderReport">
+        INSERT INTO s_product_order_report (
+            report_date,
+            user_id,
+            product_id,
+            platform_id,
+            category,
+            amt_source,
+            user_suffix,
+            order_count,
+            order_amt,
+            payout_amt,
+            result_amt
+        )
+        SELECT
+            o.order_date,
+            o.user_id,
+            o.product_id,
+            o.platform_id,
+            o.category,
+            o.amt_source,
+            o.user_suffix,
+            SUM(o.status)         AS order_count,
+            SUM(o.order_amt)      AS order_amt,
+            SUM(o.payout_amt)     AS payout_amt,
+            SUM(o.result_amt)     AS result_amt
+        FROM s_product_order o
+        WHERE o.id BETWEEN #{fromId} AND #{toId}
+        GROUP BY
+            o.order_date,
+            o.user_id,
+            o.product_id,
+            o.platform_id,
+            o.category,
+            o.amt_source,
+            o.user_suffix
+            ON DUPLICATE KEY UPDATE
+             order_count = order_count + VALUES(order_count),
+             order_amt   = order_amt   + VALUES(order_amt),
+             payout_amt  = payout_amt  + VALUES(payout_amt),
+             result_amt  = result_amt  + VALUES(result_amt)
+    </insert>
+
+    <!-- 添加用户下单记录 -->
+    <insert id="insertUserProcAboutOrder">
+        INSERT INTO p_user_proc (user_id, proc_type, proc_date, proc_time, proc_value, order_result_amt,order_times)
+        SELECT
+            o.user_id,
+            4,
+            CURDATE(),
+            NOW(),
+            SUM(o.order_amt) order_amt,
+            SUM(o.result_amt) result_amt,
+            SUM(o.status) order_times
+        FROM
+            s_product_order o
+        WHERE o.id BETWEEN #{fromId} AND #{toId}
+        GROUP BY
+            o.user_id
+    </insert>
+</mapper>

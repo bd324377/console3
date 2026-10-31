@@ -27,7 +27,7 @@
         <layering-cache.version>3.5.0</layering-cache.version>
         <spring-boot-admin.version>3.1.8</spring-boot-admin.version>
         <mybatis-plus.version>3.5.7</mybatis-plus.version>
-        <fastjson.version>2.0.4</fastjson.version>
+        <fastjson.version>2.0.62</fastjson.version>
         <integration-redis.version>6.5.0</integration-redis.version>
         <kaptcha.version>2.3.3</kaptcha.version>
         <disruptor.version>4.0.0</disruptor.version>

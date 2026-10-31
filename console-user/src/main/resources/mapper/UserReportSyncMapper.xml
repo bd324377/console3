@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.console.user.mapper.UserProcSettlementMapper">
+    <!--获取未同步用户行为信息-->
+    <select id="selectNewestUserProc" resultType="com.console.core.entity.UserProc">
+        SELECT MAX(t.id) AS id, COUNT(1) AS proc_count FROM (
+            SELECT id FROM s_product_order WHERE id > #{syncedId} ORDER BY id LIMIT #{limitSize}
+        ) t
+    </select>
+
+    <!--用户行为同步总租户-->
+    <insert id="syndUserProcReport">
+        INSERT INTO s_market_site_user_report (
+            user_id,
+            report_date,
+            login_times,
+            register_status,
+            recharge_times,
+            recharge_amt,
+            first_recharge_status,
+            first_recharge_amt,
+            placeorder_times,
+            order_amt,
+            order_result_amt,
+            activate_status,
+            user_cash_out_times,
+            user_cash_out_amt,
+            agent_cash_out_times,
+            agent_cash_out_amt,
+            receive_user_reward_times,
+            receive_user_reward_amt,
+            receive_agent_reward_times,
+            receive_agent_reward_amt
+        )
+        SELECT
+            p.user_id,
+            p.proc_date,
+            -- 0 登录
+            COUNT( CASE WHEN p.proc_type = 0 THEN 1 END ) AS login_cnt,
+            -- 1 注册
+            COUNT( CASE WHEN p.proc_type = 1 THEN 1 END ) AS register_cnt,
+            -- 2 充值
+            COUNT( CASE WHEN p.proc_type = 2 THEN 1 END ) AS recharge_cnt,
+            COALESCE ( SUM( CASE WHEN p.proc_type = 2 THEN p.proc_value END ), 0 ) AS recharge_amout,
+            -- 3 首充
+            COUNT( CASE WHEN p.proc_type = 3 THEN 1 END ) AS first_recharge_cnt,
+            COALESCE ( SUM( CASE WHEN p.proc_type = 3 THEN p.proc_value END ), 0 ) AS first_recharge_amout,
+            -- 4 下单
+            COALESCE ( SUM( CASE WHEN p.proc_type = 4 THEN p.order_times END ), 0 ) AS order_times,
+            COALESCE ( SUM( CASE WHEN p.proc_type = 4 THEN p.proc_value END ), 0 ) AS order_val,
+            COALESCE ( SUM( CASE WHEN p.proc_type = 4 THEN p.order_result_amt END ), 0 ) AS order_result_amout,
+            -- 5 激活
+            COUNT( CASE WHEN p.proc_type = 5 THEN 1 END ) AS activate_cnt,
+            -- 6 用户钱包提现
+            COUNT( CASE WHEN p.proc_type = 6 THEN 1 END ) AS user_withdraw_cnt,
+            COALESCE ( SUM( CASE WHEN p.proc_type = 6 THEN p.proc_value END ), 0 ) AS user_withdraw_amt,
+            -- 7 代理钱包提现
+            COUNT( CASE WHEN p.proc_type = 7 THEN 1 END ) AS agent_withdraw_cnt,
+            COALESCE ( SUM( CASE WHEN p.proc_type = 7 THEN p.proc_value END ), 0 ) AS agent_withdraw_amt,
+            -- 8 领取用户活动奖励
+            COUNT( CASE WHEN p.proc_type = 8 THEN 1 END ) AS receive_user_reward_cnt,
+            COALESCE ( SUM( CASE WHEN p.proc_type = 8 THEN p.proc_value END ), 0 ) AS receive_user_reward_amout,
+            -- 9 领取代理活动奖励
+            COUNT( CASE WHEN p.proc_type = 9 THEN 1 END ) AS receive_agent_reward_cnt,
+            COALESCE ( SUM( CASE WHEN p.proc_type = 9 THEN p.proc_value END ), 0 ) AS receive_agent_reward_amout
+        FROM
+            p_user_proc p
+            INNER JOIN s_user u ON u.id = p.user_id
+            AND u.user_type != 1
+        WHERE p.id BETWEEN #{fromId} AND #{toId}
+        GROUP BY
+            p.user_id,
+            p.proc_date
+            ON DUPLICATE KEY UPDATE
+             login_times                = login_times + VALUES(login_times),
+             register_status            = GREATEST(register_status, VALUES(register_status)),
+             recharge_times             = recharge_times + VALUES(recharge_times),
+             recharge_amt               = recharge_amt + VALUES(recharge_amt),
+             first_recharge_status      = GREATEST(first_recharge_status, VALUES(first_recharge_status)),
+             first_recharge_amt         = first_recharge_amt + VALUES(first_recharge_amt),
+             placeorder_times           = placeorder_times + VALUES(placeorder_times),
+             order_amt                  = order_amt + VALUES(order_amt),
+             order_result_amt           = order_result_amt + VALUES(order_result_amt),
+             activate_status            = GREATEST(activate_status, VALUES(activate_status)),
+             user_cash_out_times        = user_cash_out_times + VALUES(user_cash_out_times),
+             user_cash_out_amt          = user_cash_out_amt + VALUES(user_cash_out_amt),
+             agent_cash_out_times       = agent_cash_out_times + VALUES(agent_cash_out_times),
+             agent_cash_out_amt         = agent_cash_out_amt + VALUES(agent_cash_out_amt),
+             receive_user_reward_times  = receive_user_reward_times + VALUES(receive_user_reward_times),
+             receive_user_reward_amt    = receive_user_reward_amt + VALUES(receive_user_reward_amt),
+             receive_agent_reward_times = receive_agent_reward_times + VALUES(receive_agent_reward_times),
+             receive_agent_reward_amt   = receive_agent_reward_amt + VALUES(receive_agent_reward_amt)
+    </insert>
+
+    <!--用户充值下单金额信息同步-->
+    <update id="updateMarketUserAmtData">
+        UPDATE console.s_market_site_user mu
+        INNER JOIN (
+        SELECT
+            p.user_id,
+            COALESCE ( SUM( CASE WHEN p.proc_type = 2 THEN p.proc_value END ), 0 ) AS recharge_amout,
+            COALESCE ( SUM( CASE WHEN p.proc_type = 4 THEN p.proc_value END ), 0 ) AS order_amout,
+            COALESCE ( SUM( CASE WHEN p.proc_type = 4 THEN p.order_result_amt END ), 0 ) AS order_result_amout
+        FROM
+            p_user_proc p
+            INNER JOIN s_user u ON u.id = p.user_id
+            AND u.user_type != 1
+        WHERE p.id BETWEEN #{fromId} AND #{toId} AND p.proc_type IN ( 2, 4 )
+        GROUP BY
+            p.user_id
+        ) t ON t.user_id = mu.user_id
+        SET mu.recharge_amt = t.recharge_amout,
+            mu.order_amt = t.order_amout,
+            mu.order_result_amt = t.order_result_amout
+    </update>
+</mapper>

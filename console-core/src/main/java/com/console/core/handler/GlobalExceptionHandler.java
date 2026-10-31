@@ -77,34 +77,34 @@ public class GlobalExceptionHandler {
 
     private void saveErrorRecord(Exception ex) {
         // 提取异常位置
-        StackTraceElement[] stackTrace = ex.getStackTrace();
-        String locationClass = "Unknown";
-        String locationMethod = "Unknown";
-        for (StackTraceElement element : stackTrace) {
-            if (element.getClassName().startsWith(BASE_PACKAGE)) {
-                locationClass = element.getClassName();
-                locationMethod = element.getMethodName();
-                break;
-            }
-        }
-        // 原因链
-        String causeChain = buildCauseChain(ex);
-        // 堆栈（开发环境或完全存储根据需求，此处生产也存）
-        String stackTraceStr = getStackTrace(ex);
-        log.error(
-                "\n=========================================前端API接口异常信息===========================================" +
-                "\n----【异常时间】：{}" +
-                "\n----【异常入口和函数】：{}----{}" +
-                "\n----【异常触发原因】：{}" +
-                "\n----【异常堆栈信息】：{}", LocalDateTime.now(),locationClass,locationMethod,causeChain,stackTraceStr);
-        ErrorRecord errorRecord = ErrorRecord.builder()
-                .errorClass(locationClass)
-                .errorMethod(locationMethod)
-                .stackTrace(stackTraceStr)
-                .errorDesc(causeChain)
-                .errorTime(DateUtils.getCurrentTimestamp())
-                .build();
-        errorRecordService.saveErrorRecord(errorRecord);
+//        StackTraceElement[] stackTrace = ex.getStackTrace();
+//        String locationClass = "Unknown";
+//        String locationMethod = "Unknown";
+//        for (StackTraceElement element : stackTrace) {
+//            if (element.getClassName().startsWith(BASE_PACKAGE)) {
+//                locationClass = element.getClassName();
+//                locationMethod = element.getMethodName();
+//                break;
+//            }
+//        }
+//        // 原因链
+//        String causeChain = buildCauseChain(ex);
+//        // 堆栈（开发环境或完全存储根据需求，此处生产也存）
+//        String stackTraceStr = getStackTrace(ex);
+//        log.error(
+//                "\n=========================================前端API接口异常信息===========================================" +
+//                "\n----【异常时间】：{}" +
+//                "\n----【异常入口和函数】：{}----{}" +
+//                "\n----【异常触发原因】：{}" +
+//                "\n----【异常堆栈信息】：{}", LocalDateTime.now(),locationClass,locationMethod,causeChain,stackTraceStr);
+//        ErrorRecord errorRecord = ErrorRecord.builder()
+//                .errorClass(locationClass)
+//                .errorMethod(locationMethod)
+//                .stackTrace(stackTraceStr)
+//                .errorDesc(causeChain)
+//                .errorTime(DateUtils.getCurrentTimestamp())
+//                .build();
+//        errorRecordService.saveErrorRecord(errorRecord);
     }
 
     private String buildCauseChain(Throwable ex) {

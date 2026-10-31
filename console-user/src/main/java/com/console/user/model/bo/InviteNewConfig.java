@@ -79,7 +79,7 @@ public class InviteNewConfig implements Serializable {//用户邀新配置信息
 
     public void buildUserByConfig(User user) {
         user.setTenantId(this.tenantId);
-        user.setMarketerId(this.marketSiteId);
+        user.setMarketSiteId(this.marketSiteId);
         user.setMarketTeamId(this.marketTeamId);
         user.setMarketerId(this.marketerId);
         user.setRegIp(RequestUtils.getRequestIp());

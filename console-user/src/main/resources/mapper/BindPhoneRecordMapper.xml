@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.console.user.mapper.BindPhoneRecordMapper">
+    <!-- 查询未结算最新的订单数据 -->
+    <select id="selectNewestRecord" resultType="com.console.user.entity.BindPhoneRecord">
+        SELECT MAX(t.id) AS id, COUNT(1) AS bind_count FROM (
+            SELECT id FROM t_bind_phone_record ORDER BY id LIMIT #{limitSize}
+        ) t
+    </select>
+
+    <!-- 绑定手机信息同步推送到总租户 -->
+    <update id="syncUserPhone">
+        UPDATE s_user_id u
+            INNER JOIN t_bind_phone_record b ON b.user_id = u.user_id AND b.id <![CDATA[<=]]> #{toId}
+            SET u.phone = b.phone,u.bind_time = b.bind_time
+    </update>
+
+    <!--创建总租户的唯一真实用户（手机号）-->
+    <insert id="createRealUser">
+        INSERT IGNORE INTO s_real_user (phone, create_time)
+        SELECT
+            t.phone,
+            t.bind_time
+        FROM
+            t_bind_phone_record t
+        WHERE t.id <![CDATA[<=]]> #{toId}
+    </insert>
+
+    <!--删除已同步过的绑定记录-->
+    <delete id="delSyncedRecords">
+        DELETE FROM t_bind_phone_record WHERE id <![CDATA[<=]]> #{toId};
+    </delete>
+</mapper>
