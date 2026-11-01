@@ -6,6 +6,7 @@ import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.Cursor;
+import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
@@ -14,10 +15,7 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
@@ -175,6 +173,32 @@ public class RedisUtils {
     }
 
     /**
+     * 根据缓存前缀计数
+     * @param prefix key前缀
+     * @return 数量
+     */
+    public static Long countByPrefix(String prefix) {
+        // 使用 RedisCallback 保证底层连接不被反复创建，且直接利用底层驱动的 scan 能力
+        return redisTemplate.execute((RedisCallback<Long>) connection -> {
+            long count = 0;
+            // 构建 Scan 选项，MATCH 匹配前缀，COUNT 提高单次批量获取的数量（推荐 1000 提升性能）
+            ScanOptions options = ScanOptions.scanOptions()
+                    .match(prefix)
+                    .count(1000)
+                    .build();
+            try (Cursor<byte[]> cursor = connection.scan(options)) {
+                while (cursor.hasNext()) {
+                    cursor.next();
+                    count++; // 只计数，不保留 key，内存占用极低
+                }
+            } catch (Exception e) {
+                throw new RuntimeException("Redis scan error", e);
+            }
+
+            return count;
+        });
+    }
+    /**
      * 执行脚本并得出对应结果
      * @param key       参与脚本执行的key
      * @param script    脚本
@@ -199,6 +223,35 @@ public class RedisUtils {
         } else {
             return value.toString();
         }
+    }
+
+    public static void addToZSet(String key, Object object,Integer score, int limitSize) {
+        // 使用 ZSet，分数为当前时间戳
+//        double score = System.currentTimeMillis();
+        redisTemplate.opsForZSet().add(key,object,score);
+        long size = redisTemplate.opsForZSet().size(key);
+        if (limitSize > 0 && size > limitSize) {
+            // 移除分数最小的元素（最旧的）
+            redisTemplate.opsForZSet().removeRange(key, 0, size - limitSize - 1);
+        }
+        setExpire(key,60 * 60 * 24 * 3);
+    }
+
+    public static <T> List<T> getZSetAdList(String key, Class<T> beanClass, int limit) {
+        if (!exists(key)) return Collections.emptyList();
+        Set<Object> objectSet = redisTemplate.opsForZSet().reverseRange(key, 0, limit - 1);
+        if (objectSet == null || objectSet.isEmpty()) {
+            return Collections.emptyList();
+        }
+        List<T> list = new ArrayList<>();
+        for (Object object : objectSet) {
+            if (object instanceof String objStr) {
+                list.add(JSON.parseObject(objStr, beanClass));
+            } else {
+                list.add(JSON.parseObject(JSON.toJSONString(object), beanClass));
+            }
+        }
+        return list;
     }
 
     /**

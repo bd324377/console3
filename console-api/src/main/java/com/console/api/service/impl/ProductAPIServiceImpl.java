@@ -58,6 +58,8 @@ public class ProductAPIServiceImpl extends BaseServiceImpl implements ProductAPI
     @Resource
     private ProductService productService;
     @Resource
+    private UserProductService userProductService;
+    @Resource
     private ProductPlatformService productPlatformService;
     @Resource
     private RedisLockRegistry lockRegistry;
@@ -233,6 +235,15 @@ public class ProductAPIServiceImpl extends BaseServiceImpl implements ProductAPI
     @Override
     public void cancelCollectProduct(Long productId) {
 
+    }
+
+    @Override
+    public List<Long> getHistoryProductIdList() {
+        List<Long> historyProductIdList = userProductService.getHistoryProductIdList();
+        if (historyProductIdList != null && historyProductIdList.size() > 30) {
+            historyProductIdList = historyProductIdList.subList(0, 30);
+        }
+        return historyProductIdList;
     }
 
     /**校验产品信息**/

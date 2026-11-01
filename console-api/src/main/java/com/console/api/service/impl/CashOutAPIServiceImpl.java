@@ -181,7 +181,7 @@ public class CashOutAPIServiceImpl extends BaseServiceImpl implements CashOutAPI
     public IPage<CashOutOrder> getCashOutOrderRecords(CashOutDTO.SearchCashOutOrderReq searchCashOutOrderReq) {
         Page<CashOutOrder> page = new Page<>(searchCashOutOrderReq.getCurrent(), searchCashOutOrderReq.getSize());
         QueryWrapper<CashOutOrder> queryWrapper = new QueryWrapper<>();
-        queryWrapper.select("id,order_time,order_amt,merchant_order_no,state").lambda()
+        queryWrapper.select("id,order_time,order_amt,transaction_id,status").lambda()
                 .eq(CashOutOrder::getUserId,RequestUtils.getRequestMember().getId())
                 .eq(searchCashOutOrderReq.getStatus() != null,CashOutOrder::getStatus,searchCashOutOrderReq.getStatus())
                 .between(searchCashOutOrderReq.getStartSearchTime() != null && searchCashOutOrderReq.getEndSearchTime() != null,

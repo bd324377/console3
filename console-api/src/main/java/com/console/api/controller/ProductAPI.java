@@ -7,6 +7,7 @@ import jakarta.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -41,5 +42,11 @@ public class ProductAPI {
     public Result cancelCollectProduct(@RequestBody @Validated ProductReq.CollectProductReq collectProductReq) {
         productAPIService.cancelCollectProduct(collectProductReq.getProductId());
         return Result.success();
+    }
+
+    /** 获取产品历史记录 **/
+    @RequestMapping("/productHistoryRecord")
+    public Result getHistoryProductIdList() {
+        return Result.success(productAPIService.getHistoryProductIdList());
     }
 }

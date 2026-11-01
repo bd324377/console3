@@ -24,6 +24,7 @@ public class CacheConstants {
     public static final String DEFAULT_MARKET_TEAM = "DEFAULT_MARKET_TEAM";
     public static final String MARKET_TEAM = "MARKET_TEAM";
     public static final String MARKETER = "MARKETER";
+    public static final String MARKETER_LIST = "MARKETER_LIST";
     public static final String USER_INVITE_NEW_CONFIG = "USER_INVITE_NEW_CONFIG";//用户邀新配置
     public static final String AGENT = "AGENT";
     public static final String INITIAL_AGENT = "INITIAL_AGENT";
@@ -44,6 +45,8 @@ public class CacheConstants {
     public static final String CAPTCHA_CODE = "CAPTCHA_CODE:";
     public static final String SAME_REG_IP_COUNT = "SAME_REG_IP_COUNT:";
     public static final String SAME_REG_DEVICE_COUNT = "SAME_REG_DEVICE_COUNT:";
+    public static final String ONLINE_USER_COUNT = "ONLINE_USER_COUNT:";
+    public static final String HISTORY_PRODUCT = "HISTORY_PRODUCT:";//历史下单产品记录
     //=========分布式锁=========
     public static final String ACQUIRE_LOCK_CREATE_PAY_ORDER = "ACQUIRE_LOCK:CREATE_PAY_ORDER:";//创建支付订单
     public static final String ACQUIRE_LOCK_UPDATE_PAYMENT_ORDER_STATE = "ACQUIRE_LOCK:UPDATE_PAYMENT_ORDER_STATE:";//修改支付订单状态
@@ -60,6 +63,7 @@ public class CacheConstants {
     public static final String ACQUIRE_LOCK_PAYMENT_PROC_SETTLEMENT = "ACQUIRE_LOCK:PAYMENT_PROC_SETTLEMENT";//支付行为结算
     public static final String ACQUIRE_LOCK_CASH_OUT_PROC_SETTLEMENT = "ACQUIRE_LOCK:CASH_OUT_PROC_SETTLEMENT";//提现行为结算
     public static final String ACQUIRE_LOCK_WALLET_PROC_SETTLEMENT = "ACQUIRE_LOCK:WALLET_PROC_SETTLEMENT";//钱包行为结算
+    public static final String ACQUIRE_LOCK_ONLINE_USER_SETTLEMENT = "ACQUIRE_LOCK:ONLINE_USER_SETTLEMENT";//在线用户统计
     public static final String ACQUIRE_LOCK_PHONE_SYNC_PUSH = "ACQUIRE_LOCK:PHONE_SYNC_PUSH";//手机上传同步行为推送
     public static final String ACQUIRE_LOCK_AGENT_LAYER_SYNC_PUSH = "ACQUIRE_LOCK:AGENT_LAYER_SYNC_PUSH";//代理层级关系同步给总租户推送
     public static final String ACQUIRE_LOCK_USER_REPORT_SYNC_PUSH = "ACQUIRE_LOCK:USER_REPORT_SYNC_PUSH";//代理层级关系同步给总租户推送

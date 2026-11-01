@@ -45,6 +45,10 @@ public class DateUtils {
         return (int) localDateTime.atZone(ZoneId.of(timeZone)).toEpochSecond();
     }
 
+    public int getTimestampByLocalDateTime(LocalDateTime localDateTime) {
+        return (int) localDateTime.atZone(ZoneId.systemDefault()).toEpochSecond();
+    }
+
     /**
      * 获取当前时间到目的时间的倒计时（秒）
      * @param targetTime 目的时间

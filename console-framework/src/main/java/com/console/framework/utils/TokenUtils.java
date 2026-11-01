@@ -123,6 +123,11 @@ public class TokenUtils {
         if (ObjectUtils.isEmpty(keys)) return null;
         return RedisUtils.get(keys.get(0), RequestMember.class);
     }
+
+    public static Long getAccessTokenCount(Integer tenantId,Integer marketSiteId,Integer marketerId) {
+        String accessTokenKeyPrefix = USER_ACCESS_TOKEN_PREFIX + tenantId + ":" + marketSiteId + ":" + marketerId + ":*";
+        return RedisUtils.countByPrefix(accessTokenKeyPrefix);
+    }
     public static void main(String[] args) {
         String encode = EncryptUtils.encodeToBase64Str("1_50238288");
         System.out.println(encode);

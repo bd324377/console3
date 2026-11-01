@@ -9,6 +9,7 @@ import lombok.Setter;
 import java.io.Serial;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 public class CashOutDTO {
     @Getter
@@ -44,8 +45,8 @@ public class CashOutDTO {
         private static final long serialVersionUID = 1L;
         private long    size = 20;          //每页条数
         private long    current = 1;        //当前分页
-        private Integer startSearchTime;    //开始查询时间
-        private Integer endSearchTime;      //结束查询时间
+        private LocalDateTime startSearchTime;    //开始查询时间
+        private LocalDateTime endSearchTime;      //结束查询时间
         private CashOutOrder.CashOutStatus status;              //订单状态，1、订单创建成功等待处理；2、审核通过；3、审核拒绝；4、出款中；5、提现成功；6、提现失败；7、订单取消；8、已退款;9、订单超时
     }
 }

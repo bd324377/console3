@@ -58,6 +58,7 @@ scheduled:
     cashOutProc: 9 * * * * ?
     productOrder: 4/10 * * * * ?
     walletProc: 5/15 * * * * ?
+    onlineUser: 1/5 * * * * ?
   dataPush:
     phone: 1 1/3 * * * ?
   sync:

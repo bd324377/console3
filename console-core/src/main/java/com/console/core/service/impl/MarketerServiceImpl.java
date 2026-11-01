@@ -13,6 +13,8 @@ import com.github.xiaolyuh.annotation.Cacheable;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class MarketerServiceImpl extends BaseServiceImpl<MarketerMapper, Marketer> implements MarketerService {
     @Resource
@@ -38,5 +40,13 @@ public class MarketerServiceImpl extends BaseServiceImpl<MarketerMapper, Markete
             }
         }
         return null;
+    }
+
+    @Override
+    @Cacheable(value = CacheConstants.MARKETER_LIST,key = "#marketSiteId")
+    public List<Marketer> getMarketerListBySiteId(Integer marketSiteId) {
+        QueryWrapper<Marketer> queryWrapper = new QueryWrapper<>();
+        queryWrapper.select("market_site_id,market_team_id,marketer_id").lambda().eq(Marketer::getMarketSiteId,marketSiteId);
+        return this.list(queryWrapper);
     }
 }

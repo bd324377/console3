@@ -67,6 +67,7 @@ public class PaymentAPIServiceImpl extends BaseServiceImpl implements PaymentAPI
         try {
             locked = lock.tryLock(100, TimeUnit.MILLISECONDS);
             if (!locked) throw new BusinessException(500, I18nUtil.getI8nMsg("paymentOrder.error.create.creating"));
+            createPayOrderReq.setUserId(member.getId());
             checkFirstRechargeParam(createPayOrderReq,member);//校验首充翻倍参数
             Channel channel = channelService.getChannelById(createPayOrderReq.getChannelId());
             PaymentOrder  paymentOrder  = buildPaymentOrder(createPayOrderReq,channel);//组装支付订单信息
@@ -101,7 +102,7 @@ public class PaymentAPIServiceImpl extends BaseServiceImpl implements PaymentAPI
     public IPage<PaymentOrder> getPaymentOrderRecords(PaymentDTO.SearchPayOrderRes searchPayOrderRes) {
         Page<PaymentOrder> page = new Page<>(searchPayOrderRes.getCurrent(), searchPayOrderRes.getSize());
         QueryWrapper<PaymentOrder> queryWrapper = new QueryWrapper<>();
-        queryWrapper.select("order_time,merchant_order_no,order_amt,status").lambda()
+        queryWrapper.select("order_time,transaction_id,order_amt,status").lambda()
                 .eq(PaymentOrder::getUserId,RequestUtils.getUser(RequestMember.class).getId())
                 .eq(searchPayOrderRes.getStatus() != null,PaymentOrder::getStatus,searchPayOrderRes.getStatus())
                 .between(searchPayOrderRes.getStartSearchTime() != null && searchPayOrderRes.getEndSearchTime() != null,PaymentOrder::getOrderTime,searchPayOrderRes.getStartSearchTime(),searchPayOrderRes.getEndSearchTime())

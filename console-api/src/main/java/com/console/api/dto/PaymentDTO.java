@@ -39,8 +39,8 @@ public class PaymentDTO {
         private static final long serialVersionUID = 1L;
         private long    size = 20;          //每页条数
         private long    current = 1;        //当前分页
-        private Integer startSearchTime;    //开始查询时间
-        private Integer endSearchTime;      //结束查询时间
+        private LocalDateTime startSearchTime;    //开始查询时间
+        private LocalDateTime endSearchTime;      //结束查询时间
         private PaymentOrder.PaymentStatus status;
     }
 }
