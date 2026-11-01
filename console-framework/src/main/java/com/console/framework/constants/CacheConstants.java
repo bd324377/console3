@@ -33,13 +33,17 @@ public class CacheConstants {
     public static final String PAYMENT_CHANNEL = "PAYMENT_CHANNEL";
     public static final String PAYMENT_CHANNEL_MERCHANT_ID = "PAYMENT_CHANNEL:MERCHANT_ID";
     public static final String CASH_OUT_RULE = "CASH_OUT_RULE";//提现规则
+    public static final String PLATFORM_BELONG = "PLATFORM_BELONG";//当前启用的产商归属
     public static final String PRODUCT_PLATFORM = "PRODUCT_PLATFORM";//产品信息
     public static final String PRODUCT_PLATFORM_LIST = "PRODUCT_PLATFORM_LIST";//产品信息
     public static final String PRODUCT = "PRODUCT";//产品信息
+    public static final String PRODUCT_LIST = "PRODUCT_LIST";//产品列表信息
     public static final String PLATFORM_BELONG_RULE = "PLATFORM_BELONG_RULE";//产商归属规则
     public static final String PLATFORM_RULE_ITEM = "PLATFORM_RULE_ITEM";//产商规则
     public static final String ORDER_MODE = "ORDER_MODE";
     public static final String SYS_ORDER_MODE = "SYS_ORDER_MODE";
+    public static final String MEDIA_LIST = "MEDIA_LIST";
+    public static final String SHORTCUT_ICON_LIST = "SHORTCUT_ICON_LIST";
 
     //=========业务==========
     public static final String CAPTCHA_CODE = "CAPTCHA_CODE:";

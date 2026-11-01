@@ -6,11 +6,14 @@ import com.console.core.model.bo.MarketSiteBo;
 import com.console.core.model.bo.MarketerBo;
 import com.console.core.service.MarketSiteService;
 import com.console.core.service.ParameterService;
+import com.console.core.service.TenantService;
 import com.console.framework.domain.BusinessException;
 import com.console.framework.utils.I18nUtil;
 import jakarta.annotation.Resource;
 
 public abstract class BaseServiceImpl {
+    @Resource
+    protected TenantService tenantService;
     @Resource
     protected MarketSiteService marketSiteService;
     @Resource

@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.EnumValue;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonValue;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -18,8 +19,10 @@ public class PlatformBelong implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @TableId
+    @NotNull
     private Integer id;
     private String  belongName;
+    @NotNull
     private Integer status;     //1、是 0、否
 
     @Getter
@@ -36,5 +39,14 @@ public class PlatformBelong implements Serializable {
             this.key  = key;
             this.desc = desc;
         }
+        public static Belong getBelongByKey(Integer key) {
+            for (Belong belong : Belong.values()) {
+                if (belong.key.equals(key)) {
+                    return belong;
+                }
+            }
+            throw new IllegalArgumentException("不支持的产商归属: " + key);
+        }
+
     }
 }

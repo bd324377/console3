@@ -4,8 +4,11 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.console.product.dto.ProductPlatformReq;
 import com.console.product.entity.ProductPlatform;
 
+import java.util.List;
+
 public interface ProductPlatformService extends IService<ProductPlatform> {
     boolean syncPlatformList();
     boolean updateProductPlatform(String field, ProductPlatformReq.UpdateProductPlatformReq updateProductPlatformReq);
     ProductPlatform getProductPlatformById(Integer platformId);
+    List<ProductPlatform> getProductPlatformList(Integer tenantId);
 }

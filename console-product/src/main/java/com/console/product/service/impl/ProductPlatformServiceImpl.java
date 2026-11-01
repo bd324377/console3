@@ -8,16 +8,23 @@ import com.console.framework.request.RequestBackendUser;
 import com.console.framework.utils.FieldUtils;
 import com.console.framework.utils.RequestUtils;
 import com.console.product.dto.ProductPlatformReq;
+import com.console.product.entity.PlatformBelong;
 import com.console.product.entity.ProductPlatform;
 import com.console.product.mapper.ProductPlatformMapper;
+import com.console.product.service.PlatformBelongService;
 import com.console.product.service.ProductPlatformService;
 import com.github.xiaolyuh.annotation.CacheEvict;
 import com.github.xiaolyuh.annotation.Cacheable;
+import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import java.util.List;
+
 @Service
 public class ProductPlatformServiceImpl extends BaseServiceImpl<ProductPlatformMapper,ProductPlatform> implements ProductPlatformService {
+    @Resource
+    private PlatformBelongService platformBelongService;
 
     @Override
     public boolean syncPlatformList() {
@@ -46,5 +53,16 @@ public class ProductPlatformServiceImpl extends BaseServiceImpl<ProductPlatformM
     @Cacheable(value = CacheConstants.PRODUCT_PLATFORM,key = "T(com.console.framework.utils.TenantUtils).getTenantId() + ':' + #platformId")
     public ProductPlatform getProductPlatformById(Integer platformId) {
         return this.getById(platformId);
+    }
+
+    @Override
+    @Cacheable(value = CacheConstants.PRODUCT_PLATFORM_LIST,key = "#tenantId")
+    public List<ProductPlatform> getProductPlatformList(Integer tenantId) {
+        PlatformBelong platformBelong = platformBelongService.getOpenPlatformBelong(tenantId);
+        QueryWrapper<ProductPlatform> queryWrapper = new QueryWrapper<>();
+        queryWrapper.select("id","icon","image","platform_name","belong").lambda()
+                .eq(ProductPlatform::getBelong,PlatformBelong.Belong.getBelongByKey(platformBelong.getId()))
+                .eq(ProductPlatform::getStatus,1);
+        return this.list(queryWrapper);
     }
 }

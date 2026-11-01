@@ -15,8 +15,10 @@ public class ProductPlatform {
     @TableId
     private Integer id;
     private String icon;
+    private String image;
     private Long officialId;
     private String platformName;
+    private PlatformBelong belong;
     private Integer status;
     private Integer sort;
     private BigDecimal serviceRate;

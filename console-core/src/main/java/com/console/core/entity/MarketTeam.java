@@ -25,7 +25,6 @@ public class MarketTeam implements Serializable {
     private Integer    idDefaultTeam;     //是否为站点默认团队（官方团队）
     private Integer    leaderMarketerId;    //渠道组长ID（关联营销人员表）
     private Integer    status;              //站点状态：0-关闭，1-开启，3-维护中，4-冻结，5-审核中，6-已过期
-    private Integer    layoutId;            //前端布局配置ID
     private Integer    orderMode;           //下单模型
     private BigDecimal activationRechargeAmt;//激活所需充值金额
     private BigDecimal activationOrderAmt;  //激活所需下单金额

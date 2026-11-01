@@ -114,9 +114,6 @@ public class MarketTeamServiceImpl extends BaseServiceImpl<MarketTeamMapper, Mar
         if (marketTeam.getStatus() != null) {
             queryWrapper.eq(MarketTeam::getStatus, marketTeam.getStatus());
         }
-        if (marketTeam.getLayoutId() != null) {
-            queryWrapper.eq(MarketTeam::getLayoutId, marketTeam.getLayoutId());
-        }
         queryWrapper.orderByDesc(MarketTeam::getCreateTime);
         return this.page(page, queryWrapper);
     }
