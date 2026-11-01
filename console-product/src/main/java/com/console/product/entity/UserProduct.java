@@ -1,9 +1,6 @@
 package com.console.product.entity;
 
-import com.baomidou.mybatisplus.annotation.EnumValue;
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Getter;
 import lombok.Setter;
@@ -23,10 +20,17 @@ public class UserProduct implements Serializable {
     @TableId(value = "id",type = IdType.AUTO)
     private Integer id;
     private Integer userId;
-    private Long productId;
+    private Integer productId;
     private String productName;
     private Type type;
     private LocalDateTime updateTime;
+
+    @TableField(exist = false)
+    private Integer tenantId;
+    @TableField(exist = false)
+    private Integer retryTimes;
+    @TableField(exist = false)
+    private Boolean fromRecovery;
 
     @Getter
     public enum Type {

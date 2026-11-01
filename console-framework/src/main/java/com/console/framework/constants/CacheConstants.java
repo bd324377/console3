@@ -47,6 +47,7 @@ public class CacheConstants {
     public static final String SAME_REG_DEVICE_COUNT = "SAME_REG_DEVICE_COUNT:";
     public static final String ONLINE_USER_COUNT = "ONLINE_USER_COUNT:";
     public static final String HISTORY_PRODUCT = "HISTORY_PRODUCT:";//历史下单产品记录
+    public static final String COOLECT_PRODUCT = "COOLECT_PRODUCT:";//用户收藏产品记录
     //=========分布式锁=========
     public static final String ACQUIRE_LOCK_CREATE_PAY_ORDER = "ACQUIRE_LOCK:CREATE_PAY_ORDER:";//创建支付订单
     public static final String ACQUIRE_LOCK_UPDATE_PAYMENT_ORDER_STATE = "ACQUIRE_LOCK:UPDATE_PAYMENT_ORDER_STATE:";//修改支付订单状态

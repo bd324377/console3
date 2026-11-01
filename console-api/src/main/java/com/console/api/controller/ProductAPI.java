@@ -30,6 +30,12 @@ public class ProductAPI {
         return Result.success(productAPIService.logoutTransfer());
     }
 
+    /** 获取产品收藏记录 **/
+    @RequestMapping("/productCollectRecord")
+    public Result getCollectProductIds() {
+        return Result.success(productAPIService.getCollectProductIds());
+    }
+
     /** 收藏产品 **/
     @PostMapping("/collectProduct")
     public Result collectProduct(@RequestBody @Validated ProductReq.CollectProductReq collectProductReq) {
@@ -47,6 +53,6 @@ public class ProductAPI {
     /** 获取产品历史记录 **/
     @RequestMapping("/productHistoryRecord")
     public Result getHistoryProductIdList() {
-        return Result.success(productAPIService.getHistoryProductIdList());
+        return Result.success(productAPIService.getHistoryProductIds());
     }
 }

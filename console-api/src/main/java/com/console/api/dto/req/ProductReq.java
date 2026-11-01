@@ -25,6 +25,6 @@ public class ProductReq {
         private static final long serialVersionUID = 1L;
 
         @NotNull
-        private Long productId;    //产品ID
+        private Integer productId;    //产品ID
     }
 }

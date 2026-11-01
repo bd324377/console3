@@ -136,6 +136,7 @@ public class ProductAPIServiceImpl extends BaseServiceImpl implements ProductAPI
                     WalletProc walletProc = new WalletProc(transactionId,wallet.getUserId(),wallet.getWalletType(),1, WalletProc.ProcType.TRANSFER_TO_THIRD_PARTY,BigDecimal.ZERO,wallet.getBalance(),null);
                     walletProcMerger.submit(walletProc);
                     if (result.getCode() == 0) {
+                        userProductService.addUserProduct(product.getId(),member.getTenantId(),member.getId(),UserProduct.Type.HISTORY);
                         return result.getData().toString();
                     }
                     throw new BusinessException(500,result.getMsg());
@@ -225,25 +226,27 @@ public class ProductAPIServiceImpl extends BaseServiceImpl implements ProductAPI
         return null;
     }
 
+    @Override
+    public List<Integer> getCollectProductIds() {
+        return userProductService.getCollectProductIdList();
+    }
+
     /** 收藏产品 **/
     @Override
-    public void collectProduct(Long productId) {
-
+    public void collectProduct(Integer productId) {
+        RequestMember requestMember = RequestUtils.getRequestMember();
+        userProductService.addUserProduct(productId,requestMember.getTenantId(),requestMember.getId(), UserProduct.Type.COLLECT);
     }
 
     /** 取消收藏产品 **/
     @Override
-    public void cancelCollectProduct(Long productId) {
-
+    public void cancelCollectProduct(Integer productId) {
+        userProductService.removeUserProduct(productId,UserProduct.Type.COLLECT);
     }
 
     @Override
-    public List<Long> getHistoryProductIdList() {
-        List<Long> historyProductIdList = userProductService.getHistoryProductIdList();
-        if (historyProductIdList != null && historyProductIdList.size() > 30) {
-            historyProductIdList = historyProductIdList.subList(0, 30);
-        }
-        return historyProductIdList;
+    public List<Integer> getHistoryProductIds() {
+        return userProductService.getHistoryProductIdList();
     }
 
     /**校验产品信息**/

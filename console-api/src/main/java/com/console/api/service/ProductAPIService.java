@@ -8,7 +8,8 @@ import java.util.List;
 public interface ProductAPIService {
     String enterProduct(ProductReq.EnterProductReq enterProductReq);//进去产品中转服务
     Wallet logoutTransfer();//退出中转平台
-    void collectProduct(Long productId);
-    void cancelCollectProduct(Long productId);
-    List<Long> getHistoryProductIdList();
+    List<Integer> getCollectProductIds();
+    void collectProduct(Integer productId);
+    void cancelCollectProduct(Integer productId);
+    List<Integer> getHistoryProductIds();
 }
