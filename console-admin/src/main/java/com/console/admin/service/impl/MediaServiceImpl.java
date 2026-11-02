@@ -65,6 +65,7 @@ public class MediaServiceImpl extends BaseServiceImpl<MediaMapper, Media> implem
     public IPage<Media> getMediaPage(Page<Media> page, MediaReq.SearchMediaReq searchMediaReq) {
         QueryWrapper<Media> queryWrapper = new QueryWrapper<>();
         queryWrapper.lambda()
+                .eq(Media::getMarketSiteId,searchMediaReq.getMarketSiteId())
                 .eq(searchMediaReq.getTitle()  != null, Media::getTitle, searchMediaReq.getTitle())
                 .eq(searchMediaReq.getMediaType() != null, Media::getMediaType,searchMediaReq.getMediaType())
                 .eq(searchMediaReq.getContent() != null, Media::getContent, searchMediaReq.getContent());

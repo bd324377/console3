@@ -61,6 +61,8 @@ scheduled:
     onlineUser: 1/5 * * * * ?
   dataPush:
     phone: 1 1/3 * * * ?
+    userReport: 5 1/3 * * * ?
+    agentLayer: 1 1 1 * * ?
   sync:
     product:
       enabled: false

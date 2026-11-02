@@ -20,6 +20,6 @@ public class LoadAPI {
     /** 加载布局信息 **/
     @PostMapping("/loadLayout")
     public Result loadLayout() {
-        return Result.success(loadAPIService.getProductInfo());
+        return Result.success(loadAPIService.getLayoutInfo());
     }
 }
