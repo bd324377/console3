@@ -94,6 +94,7 @@ public class AdminProc implements Serializable {
         MEDIA(10,"多媒体管理"),
         SHORTCUT_ICON(10,"多媒体管理"),
         PRODUCT_TYPE(11,"产品类型管理"),
+        PRODUCT(12,"产品管理"),
 
         MENU(2,"菜单管理"),
         ROLE_MENU(3,"权限管理"),

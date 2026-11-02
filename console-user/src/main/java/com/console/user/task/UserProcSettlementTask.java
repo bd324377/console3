@@ -29,8 +29,9 @@ public class UserProcSettlementTask extends ScheduledTask {//用户行为结算�
 
     /** 用户行为结算与汇总 **/
     @Override
-    @Scheduled(cron = "${scheduled.settlementCron.userProc}")
+    @Scheduled(cron = "${scheduled.settlement.cron.userProc}")
     public void execute() {
+        if (!this.enabledSettlement) return;
         Lock lock = lockRegistry.obtain(CacheConstants.ACQUIRE_LOCK_USER_PROC_SETTLEMENT);
         boolean locked = false;
         try {

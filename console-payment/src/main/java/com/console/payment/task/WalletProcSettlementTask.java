@@ -29,8 +29,9 @@ public class WalletProcSettlementTask extends ScheduledTask {
 
     /** 钱包账变过程结算 **/
     @Override
-    @Scheduled(cron = "${scheduled.settlementCron.walletProc}")
+    @Scheduled(cron = "${scheduled.settlement.cron.walletProc}")
     public void execute() {
+        if (!this.enabledSettlement) return;
         Lock lock = lockRegistry.obtain(CacheConstants.ACQUIRE_LOCK_WALLET_PROC_SETTLEMENT);
         boolean locked = false;
         try {

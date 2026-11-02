@@ -3,6 +3,7 @@ package com.console.framework.config;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.DynamicTableNameInnerInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.OptimisticLockerInnerInterceptor;
+import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
 import com.console.framework.utils.TenantUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -15,11 +16,8 @@ public class MybatisPlusConfig {
     @Value("${database.prefix:console}")
     private String dbPrefix;
     private final List<String> baseTables = List.of(//基础表（总租户表）
-            "s_tenant","s_tenant_profile","s_user_id",
-            "s_transfer",
-            "s_product_platform",
-            "s_product",
-            "s_error_record");
+            "s_tenant","r_tenant_domain","s_market_site_user","s_layout_config",
+            "s_transfer","s_error_record","s_platform_belong");
 
 
     /**
@@ -28,7 +26,7 @@ public class MybatisPlusConfig {
     @Bean
     public MybatisPlusInterceptor mybatisPlusInterceptor() {
         MybatisPlusInterceptor interceptor = new MybatisPlusInterceptor();
-        interceptor.addInnerInterceptor(new com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor(com.baomidou.mybatisplus.annotation.DbType.MYSQL));
+//        interceptor.addInnerInterceptor(new com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor(com.baomidou.mybatisplus.annotation.DbType.MYSQL));
         // 乐观锁插件
         interceptor.addInnerInterceptor(new OptimisticLockerInnerInterceptor());
         //动态表名规则添加
@@ -38,7 +36,7 @@ public class MybatisPlusConfig {
             if (tableName.contains(".")) {
                 return tableName;
             }
-            if (tableName.contains("temp_")) {
+            if (tableName.contains("temp_") || tableName.contains("NOWAIT")) {
                 return tableName;
             }
             // 如果表名在基础表列表中，直接加上前缀并返回
@@ -57,6 +55,7 @@ public class MybatisPlusConfig {
             return String.format("%s_%d.%s", dbPrefix, tenantId, tableName);
         });
         interceptor.addInnerInterceptor(dynamicTableNameInnerInterceptor);
+        interceptor.addInnerInterceptor(new PaginationInnerInterceptor());
         return interceptor;
     }
 }

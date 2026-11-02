@@ -20,6 +20,7 @@ public class MarketSiteBo implements Serializable {//站点信息
     private Integer marketSiteId;//站点ID
     private Integer marketTeamId;//营销团队ID(默认团队)
     private Integer marketerId;//业务员（默认业务员）ID
+    private Integer layoutId;
     private Tenant.TenantStatus tenantStatus;//租户状态
     private MarketSite.SiteStatus siteStatus;//站点状态
     private Integer tenantOrderMode;//租户默认下单模型
@@ -34,6 +35,7 @@ public class MarketSiteBo implements Serializable {//站点信息
         this.setTenantId(marketSite.getTenantId());
         this.setMarketSiteId(marketSite.getId());
         this.setMarketTeamId(marketTeam.getId());
+        this.setLayoutId(marketSite.getLayoutId());
         this.setMarketerId(marketTeam.getLeaderMarketerId());
         this.setTenantStatus(tenant.getStatus());
         this.setSiteStatus(marketSite.getStatus());

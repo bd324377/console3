@@ -45,9 +45,9 @@ public class ProductType implements Serializable {
     private List<Integer> typeProductIdList;
 
     @Getter
-    public enum Type {//类型 1、系统分类；2、自定义分类 系统分类不可删除，只可修改排序；3、产商分类；4、产品产商列表
+    public enum Type {//类型 1、热门；2、最近 （1/2系统分类不可删除，只可修改排序）；3、自定义产品分类；4、自定义产商分类；5、产品产商列表
         UNKNOWN_TYPE(0,"未知类型"),
-        SYSTEM(1,"热门"),
+        HOT(1,"热门"),
         HISTORY(2,"历史"),
         PRODUCT(3,"自定义产品分类"),
         PLATFORM(4,"自定义产商分类"),

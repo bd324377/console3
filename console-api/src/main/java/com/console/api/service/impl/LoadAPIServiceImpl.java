@@ -9,6 +9,7 @@ import com.console.admin.service.ShortcutIconService;
 import com.console.api.dto.res.LoadLayoutRes;
 import com.console.api.service.LoadAPIService;
 import com.console.core.model.bo.MarketSiteBo;
+import com.console.framework.config.DynamicTableNameHandler;
 import com.console.framework.utils.RequestUtils;
 import com.console.product.entity.Product;
 import com.console.product.entity.ProductPlatform;
@@ -44,7 +45,7 @@ public class LoadAPIServiceImpl extends BaseServiceImpl implements LoadAPIServic
     public Map<String,Object> getProductInfo() {
         MarketSiteBo marketSiteBo = marketSiteService.getMarketSiteByDomain(RequestUtils.getRequestDomain());
         verifySiteValidity(marketSiteBo);//校验租户，站点情况
-
+        DynamicTableNameHandler.setTenantId(marketSiteBo.getTenantId());
         List<ProductPlatform> productPlatformList = productPlatformService.getProductPlatformList(marketSiteBo.getTenantId());
         List<Product> productList = productService.getProductList(marketSiteBo.getTenantId());
         Map<String,Object> productInfoMap = new HashMap<>();
@@ -57,8 +58,8 @@ public class LoadAPIServiceImpl extends BaseServiceImpl implements LoadAPIServic
     public LoadLayoutRes getLayoutInfo() {
         MarketSiteBo marketSiteBo = marketSiteService.getMarketSiteByDomain(RequestUtils.getRequestDomain());
         verifySiteValidity(marketSiteBo);//校验租户，站点情况
-
-        LayoutConfig layoutConfig = layoutConfigService.getLayoutConfigById(marketSiteBo.getMarketSiteId());
+        DynamicTableNameHandler.setTenantId(marketSiteBo.getTenantId());
+        LayoutConfig layoutConfig = layoutConfigService.getLayoutConfigById(marketSiteBo.getLayoutId());
         List<Media> mediaList = mediaService.getMediaList(marketSiteBo.getTenantId(),marketSiteBo.getMarketSiteId());
 
         List<ShortcutIcon> shortcutIconList = shortcutIconService.getShortcutIconList(marketSiteBo.getTenantId(),marketSiteBo.getMarketSiteId());

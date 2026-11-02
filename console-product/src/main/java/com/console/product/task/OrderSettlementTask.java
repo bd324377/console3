@@ -29,8 +29,9 @@ public class OrderSettlementTask extends ScheduledTask {//定时做订单结算 
 
     /** 订单结算 **/
     @Override
-    @Scheduled(cron = "${scheduled.settlementCron.productOrder}")
+    @Scheduled(cron = "${scheduled.settlement.cron.productOrder}")
     public void execute() {
+        if (!this.enabledSettlement) return;
         Lock lock = lockRegistry.obtain(CacheConstants.ACQUIRE_LOCK_PRODUCT_ORDER_SETTLEMENT);
         boolean locked = false;
         try {

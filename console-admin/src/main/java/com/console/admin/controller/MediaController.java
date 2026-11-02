@@ -35,7 +35,7 @@ public class MediaController {
     }
 
     @PutMapping("/{part}")
-    @PreAuthorize(value = "media:update",accountType = 1)
+//    @PreAuthorize(value = "media:update",accountType = 1)
     public Result updateMedia(@PathVariable String part, @RequestBody @Validated MediaReq.UpdateMediaReq updateMediaReq) {
         return mediaService.updateMedia(part, updateMediaReq) ? Result.success() : Result.failed();
     }

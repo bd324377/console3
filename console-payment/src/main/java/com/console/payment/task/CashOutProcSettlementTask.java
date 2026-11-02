@@ -29,8 +29,9 @@ public class CashOutProcSettlementTask extends ScheduledTask {
 
     /** 提现过程结算 **/
     @Override
-    @Scheduled(cron = "${scheduled.settlementCron.cashOutProc}")
+    @Scheduled(cron = "${scheduled.settlement.cron.cashOutProc}")
     public void execute() {
+        if (!this.enabledSettlement) return;
         Lock lock = lockRegistry.obtain(CacheConstants.ACQUIRE_LOCK_CASH_OUT_PROC_SETTLEMENT);
         boolean locked = false;
         try {

@@ -24,7 +24,7 @@ public class OnlineReport implements Serializable {
     private LocalDateTime reportTime;
     private Integer tenantId;
     private Integer marketSiteId;
-    private Integer maketTeamId;
-    private Integer maketerId;
+    private Integer marketTeamId;
+    private Integer marketerId;
     private Long onlineUserCount;
 }

@@ -12,6 +12,6 @@ public interface ProductTypeService extends IService<ProductType> {
     boolean addProductType(ProductTypeReq.AddProductTypeReq addProductTypeReq);
     boolean delProductType(ProductTypeReq.DelProductTypeReq delProductTypeReq);
     boolean updateProductType(String part, ProductTypeReq.UpdateProductTypeReq updateProductTypeReq);
-    IPage<ProductType> getMediaPage(Page<ProductType> page, ProductTypeReq.SearchProductTypeReq searchProductTypeReq);
+    IPage<ProductType> getProductTypePage(Page<ProductType> page, ProductTypeReq.SearchProductTypeReq searchProductTypeReq);
     List<ProductType> getProductTypeList(Integer tenantId, Integer marketSiteId);
 }

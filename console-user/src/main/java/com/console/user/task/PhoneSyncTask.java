@@ -26,8 +26,9 @@ public class PhoneSyncTask extends ScheduledTask {//子站点向总租户同步�
     private BindPhoneRecordMapper bindPhoneRecordMapper;
 
     @Override
-    @Scheduled(cron = "${scheduled.dataPush.phone}")
+    @Scheduled(cron = "${scheduled.dataPush.cron.phone}")
     public void execute() {
+        if (!this.enabledDataPush) return;
         Lock lock = lockRegistry.obtain(CacheConstants.ACQUIRE_LOCK_PHONE_SYNC_PUSH);
         boolean locked = false;
         try {

@@ -60,7 +60,7 @@ public class ProductPlatformServiceImpl extends BaseServiceImpl<ProductPlatformM
     public List<ProductPlatform> getProductPlatformList(Integer tenantId) {
         PlatformBelong platformBelong = platformBelongService.getOpenPlatformBelong(tenantId);
         QueryWrapper<ProductPlatform> queryWrapper = new QueryWrapper<>();
-        queryWrapper.select("id","icon","image","platform_name","belong").lambda()
+        queryWrapper.select("id","icon","platform_name","belong").lambda()
                 .eq(ProductPlatform::getBelong,PlatformBelong.Belong.getBelongByKey(platformBelong.getId()))
                 .eq(ProductPlatform::getStatus,1);
         return this.list(queryWrapper);

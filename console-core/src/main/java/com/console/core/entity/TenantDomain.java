@@ -13,7 +13,7 @@ import java.io.Serializable;
 
 @Getter
 @Setter
-@TableName(value = "tenant_domain")
+@TableName(value = "r_tenant_domain")
 public class TenantDomain implements Serializable {
 
     @Serial

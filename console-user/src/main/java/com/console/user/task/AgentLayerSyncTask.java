@@ -29,8 +29,9 @@ public class AgentLayerSyncTask extends ScheduledTask {
 
     /** 代理层级关系同步 **/
     @Override
-    @Scheduled(cron = "${scheduled.dataPush.agentLayer}")
+    @Scheduled(cron = "${scheduled.dataPush.cron.agentLayer}")
     public void execute() {
+        if (!this.enabledDataPush) return;
         Lock lock = lockRegistry.obtain(CacheConstants.ACQUIRE_LOCK_AGENT_LAYER_SYNC_PUSH);
         boolean locked = false;
         try {

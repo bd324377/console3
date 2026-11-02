@@ -27,10 +27,6 @@ public class ProductPlatformReq {
         private Integer sort;               // 排序
         private BigDecimal serviceRate;     // 服务费率
 
-//        private UpdateWrapper<ProductPlatform> updateWrapper;
-//        private AdminProc adminProc;
-//        private String errorDesc;
-
         @Getter
         public enum UpdateField implements IUpdateField<ProductPlatform> {
             ICON("icon", ProductPlatform::getIcon, "productPlatform.proc.update.icon"),
@@ -49,10 +45,6 @@ public class ProductPlatformReq {
                 this.function = function;
                 this.descriptionKey = descriptionKey;
             }
-
-            public static UpdateField getUpdateFieldByField(String fieldName) {
-                return IUpdateField.resolve(UpdateField.class, fieldName);
-            }
         }
 
         @Override
@@ -69,28 +61,5 @@ public class ProductPlatformReq {
         protected IUpdateField<ProductPlatform> parseField(String part) {
             return IUpdateField.resolve(UpdateField.class, part);
         }
-
-//        public void buildUpdateParam(String part, ProductPlatform productPlatform, RequestBackendUser backendUser) {
-//            if (productPlatform == null) {
-//                errorDesc = "待修改产品平台不存在，请确认后重试";
-//                return;
-//            }
-//            UpdateField updateField = UpdateField.getUpdateFieldByField(part);
-//            updateWrapper = new UpdateWrapper<>();
-//            updateWrapper.lambda().eq(ProductPlatform::getId, productPlatform.getId());
-//
-//            // 统一设置字段
-//            Object newValue = FieldUtils.getFieldValue(this, updateField.getFieldName());
-//            SFunction<ProductPlatform, Object> function = updateField.getFunction();
-//            Object oldValue = function.apply(productPlatform);
-//            if (Objects.equals(newValue, oldValue)) {
-//                errorDesc = "修改值和原值一样，无需修改，请确认后重试";
-//                return;
-//            }
-//            WrapperUtils.setPropertyValue(updateWrapper, function, newValue);
-//
-//            adminProc = new AdminProc(backendUser, AdminProc.ProcBelong.PRODUCT_PLATFORM,
-//                    AdminProc.ProcType.UPDATE, productPlatform.getId(), oldValue, newValue);
-//        }
     }
 }

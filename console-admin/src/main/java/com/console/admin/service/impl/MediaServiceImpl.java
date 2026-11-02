@@ -76,7 +76,7 @@ public class MediaServiceImpl extends BaseServiceImpl<MediaMapper, Media> implem
     @Cacheable(value = CacheConstants.MEDIA_LIST,key = "#tenantId + ':' + #marketSiteId")
     public List<Media> getMediaList(Integer tenantId, Integer marketSiteId) {
         QueryWrapper<Media> queryWrapper = new QueryWrapper<>();
-        queryWrapper.lambda().eq(Media::getMarketSiteId,marketSiteId).orderByDesc(Media::getSort);
+        queryWrapper.select("pic_path,media_type,route_path").lambda().eq(Media::getMarketSiteId,marketSiteId).orderByDesc(Media::getSort);
         return this.list(queryWrapper);
     }
 }

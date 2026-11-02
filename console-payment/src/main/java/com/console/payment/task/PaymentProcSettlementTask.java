@@ -27,8 +27,9 @@ public class PaymentProcSettlementTask extends ScheduledTask {
 
     /** 支付过程结算 **/
     @Override
-    @Scheduled(cron = "${scheduled.settlementCron.paymentProc}")
+    @Scheduled(cron = "${scheduled.settlement.cron.paymentProc}")
     public void execute() {
+        if (!this.enabledSettlement) return;
         Lock lock = lockRegistry.obtain(CacheConstants.ACQUIRE_LOCK_PAYMENT_PROC_SETTLEMENT);
         boolean locked = false;
         try {

@@ -97,9 +97,10 @@ public class MediaReq {
 
         @NotNull
         private Integer marketSiteId;//站点ID
+        @NotNull
+        private Integer mediaType;//类型：1、轮播图；2、弹出框；3、广告位
         private String title;
         private String content;
-        private Media.MediaType mediaType;//类型：1、轮播图；2、弹出框；3、广告位
     }
 
     @Getter

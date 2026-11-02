@@ -1,7 +1,9 @@
 package com.console.product.controller;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.console.framework.domain.Result;
 import com.console.product.dto.ProductPlatformReq;
+import com.console.product.entity.ProductPlatform;
 import com.console.product.service.ProductPlatformService;
 import jakarta.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
@@ -24,5 +26,10 @@ public class ProductPlatformController {
     @PutMapping("/{field}")
     public Result updateProductPlatform(@PathVariable String field, @RequestBody @Validated ProductPlatformReq.UpdateProductPlatformReq updateProductPlatformReq) {
         return productPlatformService.updateProductPlatform(field,updateProductPlatformReq) ? Result.success() : Result.failed();
+    }
+
+    @GetMapping
+    public Result getProductPlatformPage(Page<ProductPlatform> page) {
+        return Result.success(productPlatformService.page(page));
     }
 }

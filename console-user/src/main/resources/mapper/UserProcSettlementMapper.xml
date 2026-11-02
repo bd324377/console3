@@ -92,14 +92,13 @@
 
     <!-- 创建待处理(VIP升级，代理升级，用户激活)用户临时表 -->
     <insert id="createTempPendingUserData">
-        INSERT IGNORE INTO t_pending_user (user_id,market_team_id,parent_id,vip_id,activate_status,agent_id)
+        INSERT IGNORE INTO t_pending_user (user_id,market_team_id,parent_id,vip_id,activate_status)
         SELECT
             p.user_id,
             u.market_team_id,
             u.parent_id,
             u.vip_id,
-            u.activate_status,
-            u.agent_id
+            u.activate_status
         FROM
             p_user_proc p
                 INNER JOIN s_user u ON u.id = p.user_id
@@ -120,8 +119,8 @@
     <!-- 更新用户激活规则 -->
     <update id="updateUserActivateRule">
         UPDATE t_pending_user p INNER JOIN s_market_team t ON t.id = p.market_team_id
-        WHERE p.activate_status = 0
-        SET p.activation_recharge_amt  t.activation_recharge_amt,p.activation_order_amt = t.activation_order_amt;
+        SET p.activation_recharge_amt = t.activation_recharge_amt,p.activation_order_amt = t.activation_order_amt
+        WHERE p.activate_status = 0;
     </update>
 
     <!-- 用户激活 -->
@@ -142,7 +141,9 @@
             curdate(),
             NOW()
         FROM
-            t_user_activate t
+            t_pending_user t INNER JOIN s_user u ON u.id = t.user_id AND u.user_type != 1
+        WHERE t.activate_status = 0
+          AND t.recharge_amt >= activation_recharge_amt AND t.order_amt >= activation_order_amt
     </insert>
 
     <!-- 更新待处理用户可升级VIP信息 -->

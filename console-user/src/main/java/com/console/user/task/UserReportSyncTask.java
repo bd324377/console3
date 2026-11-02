@@ -29,8 +29,9 @@ public class UserReportSyncTask extends ScheduledTask {
 
     /** 用户日汇总表同步 **/
     @Override
-    @Scheduled(cron = "${scheduled.dataPush.userReport}")
+    @Scheduled(cron = "${scheduled.dataPush.cron.userReport}")
     public void execute() {
+        if (!enabledDataPush) return;
         Lock lock = lockRegistry.obtain(CacheConstants.ACQUIRE_LOCK_USER_REPORT_SYNC_PUSH);
         boolean locked = false;
         try {

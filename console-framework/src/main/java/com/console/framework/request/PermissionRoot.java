@@ -35,7 +35,7 @@ public class PermissionRoot {
             if (expire == -2) {//token不存在
                 throw new BusinessException(401, I18nUtil.getI8nMsg("http.error.401"));
             }
-            if (expire < 180) {//attoken有效时间小于三分钟则刷新at token过期时间
+            if (expire < 300) {//attoken有效时间小于三分钟则刷新at token过期时间
                 TokenUtils.refreshAccessTokenExpire(tokenKey);
             }
         } else {

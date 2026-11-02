@@ -37,8 +37,9 @@ public class OnlineUserSettlementTask extends ScheduledTask {
     private MarketerService marketerService;
 
     @Override
-    @Scheduled(cron = "${scheduled.settlementCron.onlineUser}")
+    @Scheduled(cron = "${scheduled.settlement.cron.onlineUser}")
     public void execute() {
+        if (!this.enabledSettlement) return;
         Lock lock = lockRegistry.obtain(CacheConstants.ACQUIRE_LOCK_ONLINE_USER_SETTLEMENT);
         boolean locked = false;
         try {
@@ -97,8 +98,8 @@ public class OnlineUserSettlementTask extends ScheduledTask {
                     onlineReport.setReportTime(reportTime);
                     onlineReport.setTenantId(marketer.getTenantId());
                     onlineReport.setMarketSiteId(marketer.getMarketSiteId());
-                    onlineReport.setMaketTeamId(marketer.getMarketTeamId());
-                    onlineReport.setMaketerId(marketer.getId());
+                    onlineReport.setMarketTeamId(marketer.getMarketTeamId());
+                    onlineReport.setMarketerId(marketer.getMarketerId());
                     onlineReport.setOnlineUserCount(TokenUtils.getAccessTokenCount(marketer.getTenantId(),marketer.getMarketSiteId(),marketer.getMarketerId()));
                     onlineReportList.add(onlineReport);
                     String onlineKey = CacheConstants.ONLINE_USER_COUNT + marketer.getTenantId() + ":" + marketer.getMarketSiteId() + ":" + marketer.getId();

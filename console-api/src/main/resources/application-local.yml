@@ -52,21 +52,25 @@ console:
     baseFilePath: D:/console/uploadPath/
 
 scheduled:
-  settlementCron:
-    userProc: 1/15 * * * * ?
-    paymentProc: 3 * * * * ?
-    cashOutProc: 9 * * * * ?
-    productOrder: 4/10 * * * * ?
-    walletProc: 5/15 * * * * ?
-    onlineUser: 1/5 * * * * ?
+  settlement:
+    enabled: false
+    cron:
+      userProc: 1/15 * * * * ?
+      paymentProc: 3 * * * * ?
+      cashOutProc: 9 * * * * ?
+      productOrder: 4/10 * * * * ?
+      walletProc: 5/15 * * * * ?
+      onlineUser: 1/5 * * * * ?
   dataPush:
-    phone: 1 1/3 * * * ?
-    userReport: 5 1/3 * * * ?
-    agentLayer: 1 1 1 * * ?
+    enabled: false
+    cron:
+      phone: 1 1/3 * * * ?
+      userReport: 5 1/3 * * * ?
+      agentLayer: 1 1 1 * * ?
   sync:
     product:
       enabled: false
       cron: 1 * * * * ? #游戏列表定时任务cron表达式
     productOrder:
-      enabled: true
+      enabled: false
       cron: 1/10 * * * * ? #游戏列表定时任务cron表达式

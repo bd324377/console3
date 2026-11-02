@@ -142,7 +142,7 @@ public class MarketSiteServiceImpl extends BaseServiceImpl<MarketSiteMapper, Mar
     }
 
     @Override
-    @Cacheable( value = CacheConstants.MARKET_SITE_LIST, key   = "#tenantId + ':ALL'")
+    @Cacheable( value = CacheConstants.MARKET_SITE_LIST, key   = "#tenantId")
     public List<MarketSite> getMarketSiteList(Integer tenantId) {
         DynamicTableNameHandler.setTenantId(tenantId);
         QueryWrapper<MarketSite> queryWrapper = new QueryWrapper<>();
