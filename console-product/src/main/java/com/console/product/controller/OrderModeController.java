@@ -1,7 +1,7 @@
 package com.console.product.controller;
 
 import com.console.framework.domain.Result;
-import com.console.product.dto.OrderModeReq;
+import com.console.product.model.req.OrderModeReq;
 import com.console.product.service.OrderModeService;
 import jakarta.annotation.Resource;
 import org.springframework.validation.annotation.Validated;

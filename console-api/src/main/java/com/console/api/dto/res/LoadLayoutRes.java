@@ -1,9 +1,12 @@
 package com.console.api.dto.res;
 
-import com.console.admin.entity.LayoutConfig;
 import com.console.admin.entity.Media;
 import com.console.admin.entity.ShortcutIcon;
+import com.console.admin.model.bo.LayoutConfigDTO;
+import com.console.admin.model.bo.MediaDTO;
+import com.console.admin.model.bo.ShortcutIconDTO;
 import com.console.product.entity.ProductType;
+import com.console.product.model.dto.ProductTypeDTO;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.util.ObjectUtils;
@@ -15,26 +18,29 @@ import java.util.stream.Collectors;
 @Getter
 @Setter
 public class LoadLayoutRes {
-    private LayoutConfig layoutConfig;
-    private List<Media>  bannerList;
-    private List<Media>  popUpBannerList;
-    private List<Media>  adverBannerList;
-    private List<ShortcutIcon> rightShortcutIconList;
-    private List<ShortcutIcon> leftShortcutIconList;
-    private List<ShortcutIcon> bottomShortcutIconList;
-    private List<ProductType>  productTypeList;
+    private LayoutConfigDTO layoutConfig;
+    private List<MediaDTO>  bannerList;
+    private List<MediaDTO>  popUpBannerList;
+    private List<MediaDTO>  adverBannerList;
+    private List<ShortcutIconDTO> rightShortcutIconList;
+    private List<ShortcutIconDTO> leftShortcutIconList;
+    private List<ShortcutIconDTO> bottomShortcutIconList;
+    private List<ProductTypeDTO>  productTypeList;
 
-    public LoadLayoutRes(LayoutConfig layoutConfig,List<Media> mediaList,List<ShortcutIcon> shortcutIconList,List<ProductType> productTypeList) {
+    public LoadLayoutRes(LayoutConfigDTO layoutConfig,
+                         List<MediaDTO> mediaList,
+                         List<ShortcutIconDTO> shortcutIconList,
+                         List<ProductTypeDTO> productTypeList) {
         this.layoutConfig = layoutConfig;
         this.productTypeList = productTypeList;
         if (!ObjectUtils.isEmpty(mediaList)) {
-            Map<Media.MediaType, List<Media>> mediaTypeMap = mediaList.stream().collect(Collectors.groupingBy(Media::getMediaType));
+            Map<Media.MediaType, List<MediaDTO>> mediaTypeMap = mediaList.stream().collect(Collectors.groupingBy(MediaDTO::getMediaType));
             this.bannerList = mediaTypeMap.get(Media.MediaType.BANNER);
             this.popUpBannerList = mediaTypeMap.get(Media.MediaType.POP_UP);
             this.adverBannerList = mediaTypeMap.get(Media.MediaType.ADVERT);
         }
         if (!ObjectUtils.isEmpty(shortcutIconList)) {
-            Map<ShortcutIcon.IconType,List<ShortcutIcon>> iconTypeMap = shortcutIconList.stream().collect(Collectors.groupingBy(ShortcutIcon::getIconType));
+            Map<ShortcutIcon.IconType,List<ShortcutIconDTO>> iconTypeMap = shortcutIconList.stream().collect(Collectors.groupingBy(ShortcutIconDTO::getIconType));
             this.rightShortcutIconList = iconTypeMap.get(ShortcutIcon.IconType.RIGHT);
             this.leftShortcutIconList = iconTypeMap.get(ShortcutIcon.IconType.LEFT);
             this.bottomShortcutIconList = iconTypeMap.get(ShortcutIcon.IconType.BOTTOM);

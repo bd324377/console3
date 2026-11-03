@@ -2,7 +2,7 @@ package com.console.product.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.console.framework.domain.Result;
-import com.console.product.dto.ProductReq;
+import com.console.product.model.req.ProductReq;
 import com.console.product.entity.Product;
 import com.console.product.service.ProductService;
 import jakarta.annotation.Resource;

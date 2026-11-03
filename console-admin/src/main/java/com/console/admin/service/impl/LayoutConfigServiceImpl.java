@@ -1,13 +1,17 @@
 package com.console.admin.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.console.admin.dto.req.LayoutConfigReq;
+import com.console.admin.model.bo.LayoutConfigDTO;
+import com.console.admin.model.req.LayoutConfigReq;
 import com.console.admin.entity.LayoutConfig;
 import com.console.admin.mapper.LayoutConfigMapper;
 import com.console.admin.service.LayoutConfigService;
+import com.console.framework.constants.CacheConstants;
+import com.github.xiaolyuh.annotation.Cacheable;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -43,8 +47,25 @@ public class LayoutConfigServiceImpl extends ServiceImpl<LayoutConfigMapper, Lay
     }
 
     @Override
-    public LayoutConfig getLayoutConfigById(Integer id) {
+    public LayoutConfig getLayoutConfigDetail(Integer id) {
         return this.getById(id);
+    }
+
+    @Override
+    @Cacheable(value = CacheConstants.LAYOUT_CONFIG,key = "#id")
+    public LayoutConfigDTO getLayoutConfigById(Integer id) {
+        QueryWrapper<LayoutConfig> queryWrapper = new QueryWrapper<>();
+        queryWrapper.select("show_icon,tab_one_off_icon,tab_one_on_icon," +
+                "tab_two_off_icon,tab_two_on_icon,tab_three_off_icon,tab_three_on_icon," +
+                "tab_four_off_icon,tab_four_on_icon,tab_five_off_icon,tab_five_on_icon, " +
+                "bottom_nav_bg_img,top_nav_logo, down_load_logo, web_icon,drawer_icon, " +
+                "placeholder_icon,top_icon,dominant_color,background_color,dev_mode_enabled")
+                .lambda().eq(LayoutConfig::getId,id);
+        LayoutConfig layoutConfig = this.getOne(queryWrapper);
+        if (layoutConfig == null) return null;
+        LayoutConfigDTO layoutConfigDTO = new LayoutConfigDTO();
+        BeanUtils.copyProperties(layoutConfig, layoutConfigDTO);
+        return layoutConfigDTO;
     }
 
     @Override

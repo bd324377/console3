@@ -11,7 +11,8 @@ import com.console.framework.request.RequestBackendUser;
 import com.console.framework.utils.FieldUtils;
 import com.console.framework.utils.RequestUtils;
 import com.console.framework.utils.TenantUtils;
-import com.console.product.dto.ProductTypeReq;
+import com.console.product.model.dto.ProductTypeDTO;
+import com.console.product.model.req.ProductTypeReq;
 import com.console.product.entity.ProductType;
 import com.console.product.entity.TypeProduct;
 import com.console.product.mapper.ProductTypeMapper;
@@ -21,10 +22,12 @@ import com.github.xiaolyuh.annotation.CacheEvict;
 import com.github.xiaolyuh.annotation.Cacheable;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -102,21 +105,28 @@ public class ProductTypeServiceImpl extends BaseServiceImpl<ProductTypeMapper, P
 
     @Override
     @Cacheable(value = CacheConstants.PRODUCT_TYPE_LIST,key = "#tenantId + ':' + #marketSiteId")
-    public List<ProductType> getProductTypeList(Integer tenantId, Integer marketSiteId) {
+    public List<ProductTypeDTO> getProductTypeList(Integer tenantId, Integer marketSiteId) {
         QueryWrapper<ProductType> queryWrapper = new QueryWrapper<>();
-        queryWrapper.lambda().eq(ProductType::getMarketSiteId,marketSiteId).eq(ProductType::getShowStatus,1).orderByDesc(ProductType::getSort);
+        queryWrapper.select("id,type_basis_id,type_code,top_icon,sub_icon,bg_img,type,show_type,is_show_in_top")
+                .lambda().eq(ProductType::getMarketSiteId,marketSiteId).eq(ProductType::getShowStatus,1).orderByDesc(ProductType::getSort);
         List<ProductType> productTypeList = this.list(queryWrapper);
-        if (!ObjectUtils.isEmpty(productTypeList)) {
-            for (ProductType productType : productTypeList) {
-                if (productType.getType() == ProductType.Type.HISTORY || productType.getType() == ProductType.Type.PLATFORM) continue;
-                QueryWrapper<TypeProduct> typeProductQueryWrapper = new QueryWrapper<>();
-                typeProductQueryWrapper.select("product_id").lambda().eq(TypeProduct::getTypeId,productType.getId()).orderByDesc(TypeProduct::getSort);
-                List<TypeProduct>  typeProductList = typeProductService.list(typeProductQueryWrapper);
-                if (!ObjectUtils.isEmpty(typeProductList)) {
-                    productType.setTypeProductIdList(typeProductList.stream().map(TypeProduct::getProductId).toList());
-                }
+        if (ObjectUtils.isEmpty(productTypeList)) return null;
+        List<ProductTypeDTO> productTypeDTOS = new ArrayList<>();
+        for (ProductType productType : productTypeList) {
+            ProductTypeDTO productTypeDTO = new ProductTypeDTO();
+            BeanUtils.copyProperties(productType,productTypeDTO);
+            if (productType.getType() == ProductType.Type.HISTORY || productType.getType() == ProductType.Type.PLATFORM) {
+                productTypeDTOS.add(productTypeDTO);
+                continue;
             }
+            QueryWrapper<TypeProduct> typeProductQueryWrapper = new QueryWrapper<>();
+            typeProductQueryWrapper.select("product_id").lambda().eq(TypeProduct::getTypeId,productType.getId()).orderByDesc(TypeProduct::getSort);
+            List<TypeProduct>  typeProductList = typeProductService.list(typeProductQueryWrapper);
+            if (!ObjectUtils.isEmpty(typeProductList)) {
+                productTypeDTO.setTypeProductIdList(typeProductList.stream().map(TypeProduct::getProductId).toList());
+            }
+            productTypeDTOS.add(productTypeDTO);
         }
-        return this.list(queryWrapper);
+        return productTypeDTOS;
     }
 }

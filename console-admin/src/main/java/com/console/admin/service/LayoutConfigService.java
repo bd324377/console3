@@ -3,7 +3,8 @@ package com.console.admin.service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.console.admin.dto.req.LayoutConfigReq;
+import com.console.admin.model.bo.LayoutConfigDTO;
+import com.console.admin.model.req.LayoutConfigReq;
 import com.console.admin.entity.LayoutConfig;
 
 import java.util.List;
@@ -34,12 +35,8 @@ public interface LayoutConfigService extends IService<LayoutConfig> {
      */
     boolean deleteLayoutConfig(Integer id);
 
-    /**
-     * 根据ID获取布局配置信息
-     * @param id 布局配置ID
-     * @return 布局配置信息
-     */
-    LayoutConfig getLayoutConfigById(Integer id);
+    LayoutConfig getLayoutConfigDetail(Integer id);
+    LayoutConfigDTO getLayoutConfigById(Integer id);
 
     /**
      * 获取所有布局配置列表

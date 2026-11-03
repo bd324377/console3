@@ -22,7 +22,6 @@ import com.console.framework.request.RequestMember;
 import com.console.framework.utils.*;
 import com.console.product.api.TransferApi;
 import com.console.product.api.res.TransferRecordRes;
-import com.console.product.dto.TransferReq;
 import com.console.product.entity.*;
 import com.console.product.service.*;
 import com.console.user.entity.User;

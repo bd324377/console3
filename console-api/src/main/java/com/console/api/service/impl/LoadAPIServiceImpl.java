@@ -1,8 +1,9 @@
 package com.console.api.service.impl;
 
-import com.console.admin.entity.LayoutConfig;
-import com.console.admin.entity.Media;
 import com.console.admin.entity.ShortcutIcon;
+import com.console.admin.model.bo.LayoutConfigDTO;
+import com.console.admin.model.bo.MediaDTO;
+import com.console.admin.model.bo.ShortcutIconDTO;
 import com.console.admin.service.LayoutConfigService;
 import com.console.admin.service.MediaService;
 import com.console.admin.service.ShortcutIconService;
@@ -14,6 +15,7 @@ import com.console.framework.utils.RequestUtils;
 import com.console.product.entity.Product;
 import com.console.product.entity.ProductPlatform;
 import com.console.product.entity.ProductType;
+import com.console.product.model.dto.ProductTypeDTO;
 import com.console.product.service.ProductPlatformService;
 import com.console.product.service.ProductService;
 import com.console.product.service.ProductTypeService;
@@ -23,7 +25,6 @@ import org.springframework.stereotype.Service;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Service
 public class LoadAPIServiceImpl extends BaseServiceImpl implements LoadAPIService {
@@ -59,11 +60,10 @@ public class LoadAPIServiceImpl extends BaseServiceImpl implements LoadAPIServic
         MarketSiteBo marketSiteBo = marketSiteService.getMarketSiteByDomain(RequestUtils.getRequestDomain());
         verifySiteValidity(marketSiteBo);//校验租户，站点情况
         DynamicTableNameHandler.setTenantId(marketSiteBo.getTenantId());
-        LayoutConfig layoutConfig = layoutConfigService.getLayoutConfigById(marketSiteBo.getLayoutId());
-        List<Media> mediaList = mediaService.getMediaList(marketSiteBo.getTenantId(),marketSiteBo.getMarketSiteId());
-
-        List<ShortcutIcon> shortcutIconList = shortcutIconService.getShortcutIconList(marketSiteBo.getTenantId(),marketSiteBo.getMarketSiteId());
-        List<ProductType> productTypeList = productTypeService.getProductTypeList(marketSiteBo.getTenantId(),marketSiteBo.getMarketSiteId());
+        LayoutConfigDTO layoutConfig = layoutConfigService.getLayoutConfigById(marketSiteBo.getLayoutId());
+        List<MediaDTO> mediaList = mediaService.getMediaList(marketSiteBo.getTenantId(),marketSiteBo.getMarketSiteId());
+        List<ShortcutIconDTO> shortcutIconList = shortcutIconService.getShortcutIconList(marketSiteBo.getTenantId(),marketSiteBo.getMarketSiteId());
+        List<ProductTypeDTO> productTypeList = productTypeService.getProductTypeList(marketSiteBo.getTenantId(),marketSiteBo.getMarketSiteId());
         return new LoadLayoutRes(layoutConfig,mediaList,shortcutIconList,productTypeList);
     }
 }

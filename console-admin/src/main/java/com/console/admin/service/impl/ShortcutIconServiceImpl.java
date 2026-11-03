@@ -3,8 +3,8 @@ package com.console.admin.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.console.admin.dto.req.ShortcutIconReq;
-import com.console.admin.entity.Media;
+import com.console.admin.model.bo.ShortcutIconDTO;
+import com.console.admin.model.req.ShortcutIconReq;
 import com.console.admin.entity.ShortcutIcon;
 import com.console.admin.mapper.ShortcutIconMapper;
 import com.console.admin.service.ShortcutIconService;
@@ -16,10 +16,11 @@ import com.console.framework.utils.FieldUtils;
 import com.console.framework.utils.RequestUtils;
 import com.github.xiaolyuh.annotation.CacheEvict;
 import com.github.xiaolyuh.annotation.Cacheable;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ObjectUtils;
 
-import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -76,9 +77,15 @@ public class ShortcutIconServiceImpl extends BaseServiceImpl<ShortcutIconMapper,
 
     @Override
     @Cacheable(value = CacheConstants.SHORTCUT_ICON_LIST,key = "#tenantId + ':' + #marketSiteId")
-    public List<ShortcutIcon> getShortcutIconList(Integer tenantId, Integer marketSiteId) {
+    public List<ShortcutIconDTO> getShortcutIconList(Integer tenantId, Integer marketSiteId) {
         QueryWrapper<ShortcutIcon> queryWrapper = new QueryWrapper<>();
-        queryWrapper.lambda().eq(ShortcutIcon::getMarketSiteId,marketSiteId).orderByDesc(ShortcutIcon::getSort);
-        return this.list(queryWrapper);
+        queryWrapper.select("icon_type,show_img,route_path").lambda().eq(ShortcutIcon::getMarketSiteId,marketSiteId).orderByDesc(ShortcutIcon::getSort);
+        List<ShortcutIcon> shortcutIconList = this.list(queryWrapper);
+        if (ObjectUtils.isEmpty(shortcutIconList)) return null;
+        return shortcutIconList.stream().map(item ->{
+            ShortcutIconDTO shortcutIconDTO = new ShortcutIconDTO();
+            BeanUtils.copyProperties(item,shortcutIconDTO);
+            return shortcutIconDTO;
+        }).toList();
     }
 }

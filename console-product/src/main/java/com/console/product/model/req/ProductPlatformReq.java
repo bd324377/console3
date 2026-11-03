@@ -1,4 +1,4 @@
-package com.console.product.dto;
+package com.console.product.model.req;
 
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.console.core.entity.AdminProc;

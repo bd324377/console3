@@ -6,7 +6,7 @@ import com.console.framework.constants.CacheConstants;
 import com.console.framework.request.RequestBackendUser;
 import com.console.framework.utils.FieldUtils;
 import com.console.framework.utils.RequestUtils;
-import com.console.product.dto.OrderModeReq;
+import com.console.product.model.req.OrderModeReq;
 import com.console.product.entity.OrderMode;
 import com.console.product.mapper.OrderModeMapper;
 import com.console.product.service.OrderModeService;

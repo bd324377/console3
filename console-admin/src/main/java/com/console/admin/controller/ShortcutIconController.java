@@ -1,7 +1,7 @@
 package com.console.admin.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.console.admin.dto.req.ShortcutIconReq;
+import com.console.admin.model.req.ShortcutIconReq;
 import com.console.admin.entity.ShortcutIcon;
 import com.console.admin.service.ShortcutIconService;
 import com.console.framework.domain.Result;
@@ -20,8 +20,8 @@ public class ShortcutIconController {
         return shortcutIconService.addShortcutIcon(createShortIconReq) ? Result.success() : Result.failed();
     }
 
-    @DeleteMapping("/{shortcutIconIds}")
-    public Result delCustomerCaresByIds(@RequestBody @Validated ShortcutIconReq.DelShortIconReq delShortIconReq) {
+    @DeleteMapping
+    public Result delShortcutIcon(@RequestBody @Validated ShortcutIconReq.DelShortIconReq delShortIconReq) {
         return shortcutIconService.delShortcutIcon(delShortIconReq) ? Result.success() : Result.failed();
     }
 

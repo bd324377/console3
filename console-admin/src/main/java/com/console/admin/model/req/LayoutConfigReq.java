@@ -1,4 +1,4 @@
-package com.console.admin.dto.req;
+package com.console.admin.model.req;
 
 import lombok.Getter;
 import lombok.Setter;

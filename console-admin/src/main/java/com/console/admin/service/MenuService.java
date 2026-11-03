@@ -1,8 +1,8 @@
 package com.console.admin.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.console.admin.dto.req.MenuReq;
-import com.console.admin.dto.vo.MenuNode;
+import com.console.admin.model.req.MenuReq;
+import com.console.admin.model.vo.MenuNode;
 import com.console.admin.entity.Menu;
 
 import java.util.List;

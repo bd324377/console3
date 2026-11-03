@@ -1,7 +1,7 @@
 package com.console.product.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.console.product.dto.ProductPlatformReq;
+import com.console.product.model.req.ProductPlatformReq;
 import com.console.product.entity.ProductPlatform;
 
 import java.util.List;

@@ -3,7 +3,7 @@ package com.console.admin.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.console.admin.dto.req.BackendUserReq;
+import com.console.admin.model.req.BackendUserReq;
 import com.console.admin.entity.BackendUser;
 import com.console.core.entity.Tenant;
 import com.console.admin.mapper.BackendUserMapper;

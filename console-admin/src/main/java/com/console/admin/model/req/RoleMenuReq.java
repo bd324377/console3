@@ -1,4 +1,4 @@
-package com.console.admin.dto.req;
+package com.console.admin.model.req;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;

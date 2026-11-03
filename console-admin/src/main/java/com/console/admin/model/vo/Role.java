@@ -1,4 +1,4 @@
-package com.console.admin.dto.vo;
+package com.console.admin.model.vo;
 
 import lombok.Getter;
 import lombok.Setter;

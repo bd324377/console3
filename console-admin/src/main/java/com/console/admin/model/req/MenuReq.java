@@ -1,4 +1,4 @@
-package com.console.admin.dto.req;
+package com.console.admin.model.req;
 
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;

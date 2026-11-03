@@ -41,9 +41,6 @@ public class ProductType implements Serializable {
     private Integer isShowInTop;//是否在顶部展示 1、是 0、否
     private Integer showStatus;//展示状态 1、是 0、否
 
-    @TableField(exist = false)
-    private List<Integer> typeProductIdList;
-
     @Getter
     public enum Type {//类型 1、热门；2、最近 （1/2系统分类不可删除，只可修改排序）；3、自定义产品分类；4、自定义产商分类；5、产品产商列表
         UNKNOWN_TYPE(0,"未知类型"),

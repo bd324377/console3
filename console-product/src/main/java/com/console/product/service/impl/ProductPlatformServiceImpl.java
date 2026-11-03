@@ -3,11 +3,10 @@ package com.console.product.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.console.core.service.impl.BaseServiceImpl;
 import com.console.framework.constants.CacheConstants;
-import com.console.framework.domain.BusinessException;
 import com.console.framework.request.RequestBackendUser;
 import com.console.framework.utils.FieldUtils;
 import com.console.framework.utils.RequestUtils;
-import com.console.product.dto.ProductPlatformReq;
+import com.console.product.model.req.ProductPlatformReq;
 import com.console.product.entity.PlatformBelong;
 import com.console.product.entity.ProductPlatform;
 import com.console.product.mapper.ProductPlatformMapper;
@@ -17,7 +16,6 @@ import com.github.xiaolyuh.annotation.CacheEvict;
 import com.github.xiaolyuh.annotation.Cacheable;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
 import java.util.List;
 

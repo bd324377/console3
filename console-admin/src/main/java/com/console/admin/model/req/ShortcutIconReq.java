@@ -1,4 +1,4 @@
-package com.console.admin.dto.req;
+package com.console.admin.model.req;
 
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.console.admin.entity.ShortcutIcon;
@@ -99,8 +99,6 @@ public class ShortcutIconReq {
         @NotNull
         private Integer marketSiteId;//站点ID
         @NotNull
-        private ShortcutIcon.IconType iconType;//快捷键类型类型
-        private Integer showStatus;
-        private String routePath;//跳转地址
+        private Integer iconType;//
     }
 }

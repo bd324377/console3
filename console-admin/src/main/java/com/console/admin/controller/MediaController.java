@@ -1,11 +1,10 @@
 package com.console.admin.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.console.admin.dto.req.MediaReq;
+import com.console.admin.model.req.MediaReq;
 import com.console.admin.entity.Media;
 import com.console.admin.service.MediaService;
 import com.console.framework.domain.Result;
-import com.console.framework.request.PreAuthorize;
 import jakarta.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;

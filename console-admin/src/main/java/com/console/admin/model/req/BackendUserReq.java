@@ -1,4 +1,4 @@
-package com.console.admin.dto.req;
+package com.console.admin.model.req;
 
 import com.console.admin.entity.BackendUser;
 import jakarta.validation.constraints.NotBlank;

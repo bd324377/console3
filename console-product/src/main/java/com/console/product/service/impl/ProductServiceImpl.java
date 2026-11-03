@@ -9,13 +9,10 @@ import com.console.framework.request.RequestBackendUser;
 import com.console.framework.utils.FieldUtils;
 import com.console.framework.utils.RequestUtils;
 import com.console.framework.utils.TenantUtils;
-import com.console.product.dto.ProductReq;
-import com.console.product.entity.PlatformBelong;
+import com.console.product.model.req.ProductReq;
 import com.console.product.entity.Product;
 import com.console.product.entity.ProductPlatform;
-import com.console.product.entity.ProductType;
 import com.console.product.mapper.ProductMapper;
-import com.console.product.service.PlatformBelongService;
 import com.console.product.service.ProductPlatformService;
 import com.console.product.service.ProductService;
 import com.github.xiaolyuh.annotation.CacheEvict;
@@ -25,9 +22,7 @@ import jakarta.annotation.Resource;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
-import org.springframework.util.StringUtils;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service

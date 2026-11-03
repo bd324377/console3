@@ -2,8 +2,8 @@ package com.console.admin.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
-import com.console.admin.dto.req.MenuReq;
-import com.console.admin.dto.vo.MenuNode;
+import com.console.admin.model.req.MenuReq;
+import com.console.admin.model.vo.MenuNode;
 import com.console.core.entity.AdminProc;
 import com.console.admin.entity.Menu;
 import com.console.core.mapper.AdminProcMapper;

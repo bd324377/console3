@@ -25,6 +25,8 @@ public class CacheConstants {
     public static final String MARKET_TEAM = "MARKET_TEAM";
     public static final String MARKETER = "MARKETER";
     public static final String MARKETER_LIST = "MARKETER_LIST";
+    public static final String LAYOUT_CONFIG = "LAYOUT_CONFIG";
+    public static final String LAYOUT_CONFIG_LIST = "LAYOUT_CONFIG_LIST";
     public static final String USER_INVITE_NEW_CONFIG = "USER_INVITE_NEW_CONFIG";//用户邀新配置
     public static final String AGENT = "AGENT";
     public static final String INITIAL_AGENT = "INITIAL_AGENT";

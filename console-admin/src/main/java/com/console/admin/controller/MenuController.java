@@ -1,6 +1,6 @@
 package com.console.admin.controller;
 
-import com.console.admin.dto.req.MenuReq;
+import com.console.admin.model.req.MenuReq;
 import com.console.admin.service.MenuService;
 import com.console.framework.domain.Result;
 import jakarta.annotation.Resource;

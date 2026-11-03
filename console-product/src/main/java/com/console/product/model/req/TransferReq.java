@@ -1,4 +1,4 @@
-package com.console.product.dto;
+package com.console.product.model.req;
 
 import com.console.framework.request.RequestMember;
 import com.console.framework.utils.RequestUtils;

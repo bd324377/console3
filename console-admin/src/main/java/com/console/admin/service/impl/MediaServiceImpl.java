@@ -3,7 +3,8 @@ package com.console.admin.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.console.admin.dto.req.MediaReq;
+import com.console.admin.model.bo.MediaDTO;
+import com.console.admin.model.req.MediaReq;
 import com.console.admin.entity.Media;
 import com.console.admin.mapper.MediaMapper;
 import com.console.admin.service.MediaService;
@@ -15,7 +16,9 @@ import com.console.framework.utils.FieldUtils;
 import com.console.framework.utils.RequestUtils;
 import com.github.xiaolyuh.annotation.CacheEvict;
 import com.github.xiaolyuh.annotation.Cacheable;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
 
 import java.util.List;
 
@@ -74,9 +77,15 @@ public class MediaServiceImpl extends BaseServiceImpl<MediaMapper, Media> implem
 
     @Override
     @Cacheable(value = CacheConstants.MEDIA_LIST,key = "#tenantId + ':' + #marketSiteId")
-    public List<Media> getMediaList(Integer tenantId, Integer marketSiteId) {
+    public List<MediaDTO> getMediaList(Integer tenantId, Integer marketSiteId) {
         QueryWrapper<Media> queryWrapper = new QueryWrapper<>();
         queryWrapper.select("pic_path,media_type,route_path").lambda().eq(Media::getMarketSiteId,marketSiteId).orderByDesc(Media::getSort);
-        return this.list(queryWrapper);
+        List<Media> mediaList = this.list(queryWrapper);
+        if (ObjectUtils.isEmpty(mediaList)) return null;
+        return mediaList.stream().map(item -> {
+            MediaDTO mediaDTO = new MediaDTO();
+            BeanUtils.copyProperties(item, mediaDTO);
+            return mediaDTO;
+        }).toList();
     }
 }

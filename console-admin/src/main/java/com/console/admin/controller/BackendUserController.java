@@ -1,6 +1,6 @@
 package com.console.admin.controller;
 
-import com.console.admin.dto.req.BackendUserReq;
+import com.console.admin.model.req.BackendUserReq;
 import com.console.admin.service.BackendUserService;
 import com.console.framework.domain.Result;
 import jakarta.annotation.Resource;

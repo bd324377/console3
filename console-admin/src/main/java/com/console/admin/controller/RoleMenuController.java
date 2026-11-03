@@ -1,6 +1,6 @@
 package com.console.admin.controller;
 
-import com.console.admin.dto.req.RoleMenuReq;
+import com.console.admin.model.req.RoleMenuReq;
 import com.console.admin.service.RoleMenuService;
 import com.console.framework.domain.Result;
 import jakarta.annotation.Resource;

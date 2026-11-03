@@ -2,7 +2,7 @@ package com.console.admin.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.console.admin.dto.req.LayoutConfigReq;
+import com.console.admin.model.req.LayoutConfigReq;
 import com.console.admin.entity.LayoutConfig;
 import com.console.admin.service.LayoutConfigService;
 import com.console.framework.domain.Result;
@@ -36,8 +36,8 @@ public class LayoutConfigController {
      * @param layoutConfig 布局配置信息
      * @return 结果
      */
-    @PutMapping("/{part}")
-    public Result update(@PathVariable String part, @RequestBody LayoutConfig layoutConfig) {
+    @PutMapping("/{field}")
+    public Result update(@PathVariable String field, @RequestBody LayoutConfig layoutConfig) {
         boolean result = layoutConfigService.updateLayoutConfig(layoutConfig);
         return result ? Result.success() : Result.failed();
     }
@@ -60,8 +60,7 @@ public class LayoutConfigController {
      */
     @GetMapping("/{id}")
     public Result getById(@PathVariable Integer id) {
-        LayoutConfig layoutConfig = layoutConfigService.getLayoutConfigById(id);
-        return Result.success(layoutConfig);
+        return Result.success(layoutConfigService.getLayoutConfigDetail(id));
     }
 
     /**

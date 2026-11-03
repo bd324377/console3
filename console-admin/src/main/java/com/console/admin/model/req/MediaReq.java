@@ -1,12 +1,9 @@
-package com.console.admin.dto.req;
+package com.console.admin.model.req;
 
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
-import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import com.console.admin.entity.Media;
 import com.console.core.entity.AdminProc;
 import com.console.core.model.req.BaseUpdateReq;
-import com.console.framework.constants.ValidationGroup;
 import com.console.framework.domain.IUpdateField;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
