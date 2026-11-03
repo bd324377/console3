@@ -85,7 +85,7 @@ public class UserProductServiceImpl extends BaseServiceImpl<UserProductMapper, U
     @Override
     public List<Integer> getCollectProductIdList() {
         RequestMember requestMember = RequestUtils.getRequestMember();
-        String redisKey = CacheConstants.COOLECT_PRODUCT + requestMember.getId() + ":" + requestMember.getId();
+        String redisKey = CacheConstants.COOLECT_PRODUCT + requestMember.getTenantId() + ":" + requestMember.getId();
         List<Integer> coolectProductIdList = new ArrayList<>();
         if (RedisUtils.exists(redisKey)) {
             coolectProductIdList = RedisUtils.getZSetAdList(redisKey, Integer.class, 1000);

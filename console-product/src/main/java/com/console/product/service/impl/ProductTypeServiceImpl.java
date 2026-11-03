@@ -39,9 +39,9 @@ public class ProductTypeServiceImpl extends BaseServiceImpl<ProductTypeMapper, P
     @Transactional(rollbackFor = Exception.class)
     @CacheEvict(value = CacheConstants.PRODUCT_TYPE_LIST,key = "T(com.console.framework.utils.TenantUtils).getTenantId() + ':' + #addProductTypeReq.marketSiteId")
     public boolean addProductType(ProductTypeReq.AddProductTypeReq addProductTypeReq) {
-//        if (addProductTypeReq.getType() == ProductType.Type.HISTORY || addProductTypeReq.getType() == ProductType.Type.HOT) {
-//            throw new BusinessException(500,"添加产品分类失败，不可新增系统默认分类");
-//        }
+        if (addProductTypeReq.getType() == ProductType.Type.HISTORY || addProductTypeReq.getType() == ProductType.Type.HOT) {
+            throw new BusinessException(500,"添加产品分类失败，不可新增系统默认分类");
+        }
         ProductType productType = addProductTypeReq.buildProductType();
         if (this.save(productType)) {
             RequestBackendUser requestBackendUser = RequestUtils.getRequestBackendUser();
@@ -60,12 +60,12 @@ public class ProductTypeServiceImpl extends BaseServiceImpl<ProductTypeMapper, P
         if (productType == null) {
             throw new BusinessException(500,"删除失败，未在系统中找到该分类");
         }
-//        if (productType.getType() == ProductType.Type.HISTORY || productType.getType() == ProductType.Type.HOT) {
-//            throw new BusinessException(500,"删除失败，不可删除系统默认分类");
-//        }
+        if (productType.getType() == ProductType.Type.HISTORY || productType.getType() == ProductType.Type.HOT) {
+            throw new BusinessException(500,"删除失败，不可删除系统默认分类");
+        }
         if (this.removeById(delProductTypeReq.getProductTypeId())) {
             RequestBackendUser requestBackendUser = RequestUtils.getRequestBackendUser();
-            AdminProc adminProc = new AdminProc(requestBackendUser, AdminProc.ProcBelong.PRODUCT_TYPE, AdminProc.ProcType.DELETE, delProductTypeReq.getProductTypeId(),null,null);
+            AdminProc adminProc = new AdminProc(requestBackendUser, AdminProc.ProcBelong.PRODUCT_TYPE, AdminProc.ProcType.DELETE, delProductTypeReq.getProductTypeId(),productType,null);
             adminProcMapper.insert(adminProc);
             return true;
         }

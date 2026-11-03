@@ -27,6 +27,17 @@ public class RequestUtils {
     }
 
     /**
+     * 获取当前请求头信息
+     */
+    public String getHttpHeader(String headerName) {
+        HttpServletRequest httpServletRequest = getCurrentRequest();
+        if (httpServletRequest == null) {
+            return null;
+        }
+        return httpServletRequest.getHeader(headerName);
+    }
+
+    /**
      * 获取当前请求的完整路径
      * @return 请求url，包括：域名，端口，上下文访问路径
      */

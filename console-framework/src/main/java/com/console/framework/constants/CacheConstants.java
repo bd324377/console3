@@ -47,8 +47,10 @@ public class CacheConstants {
     public static final String SYS_ORDER_MODE = "SYS_ORDER_MODE";
     public static final String MEDIA_LIST = "MEDIA_LIST";
     public static final String SHORTCUT_ICON_LIST = "SHORTCUT_ICON_LIST";
+    public static final String CUSTOMER_CARE_LIST = "SUCTOM_CARE_LIST";
     public static final String PRODUCT_TYPE_LIST = "PRODUCT_TYPE_LIST";
 
+    public static String DDD(String ddd) {return "PRODUCT_TYPE_LIST:" + ddd;}
     //=========业务==========
     public static final String CAPTCHA_CODE = "CAPTCHA_CODE:";
     public static final String SAME_REG_IP_COUNT = "SAME_REG_IP_COUNT:";

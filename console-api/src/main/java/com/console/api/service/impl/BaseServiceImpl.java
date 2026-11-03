@@ -5,6 +5,7 @@ import com.console.core.entity.Tenant;
 import com.console.core.model.bo.MarketSiteBo;
 import com.console.core.model.bo.MarketerBo;
 import com.console.core.service.MarketSiteService;
+import com.console.core.service.MarketerService;
 import com.console.core.service.ParameterService;
 import com.console.core.service.TenantService;
 import com.console.framework.domain.BusinessException;
@@ -13,7 +14,7 @@ import jakarta.annotation.Resource;
 
 public abstract class BaseServiceImpl {
     @Resource
-    protected TenantService tenantService;
+    protected MarketerService marketerService;
     @Resource
     protected MarketSiteService marketSiteService;
     @Resource

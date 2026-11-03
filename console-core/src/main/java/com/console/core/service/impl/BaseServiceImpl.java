@@ -9,6 +9,8 @@ import com.console.core.service.TenantService;
 import com.console.framework.utils.RequestUtils;
 import jakarta.annotation.Resource;
 
+import java.util.List;
+
 public class BaseServiceImpl<M extends BaseMapper<T>, T> extends ServiceImpl<M, T> {
     @Resource
     protected TenantService tenantService;
@@ -33,6 +35,14 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T> extends ServiceImpl<M, 
         if (tenant != null) {
             return tenant.getId();
         }
+        return null;
+    }
+
+    protected List<Integer> getBackendUserMarketSiteIds() {
+        return null;
+    }
+
+    protected List<Integer> getBackendUserMarketTeamIds() {
         return null;
     }
 }

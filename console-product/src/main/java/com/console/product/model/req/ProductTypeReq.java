@@ -66,17 +66,17 @@ public class ProductTypeReq {
 
         @Getter
         public enum UpdateField implements IUpdateField<ProductType> {
-            TYPE_BASIS_ID("typeBasisId",ProductType::getTypeBasisId,"productType.proc.update.picPath"),
-            TYPE_CODE("typeCode",ProductType::getTypeCode,"productType.proc.update.title"),
-            TYPE_NAME("typeName",ProductType::getTypeName,"productType.proc.update.content"),
-            INTRODUCE("introduce",ProductType::getIntroduce,"productType.proc.update.routePath"),
-            TOP_ICON("topIcon",ProductType::getTopIcon,"productType.proc.update.sort"),
-            SUB_ICON("subIcon",ProductType::getSubIcon,"productType.proc.update.popUpRule"),
-            BG_IMG("bgImg",ProductType::getBgImg,"productType.proc.update.title"),
-            SORT("sort",ProductType::getSort,"productType.proc.update.content"),
-            SHOW_TYPE("showType",ProductType::getShowType,"productType.proc.update.routePath"),
-            IS_SHOW_IN_TOP("isShowInTop",ProductType::getIsShowInTop,"productType.proc.update.sort"),
-            SHOW_STATUS("showStatus",ProductType::getShowStatus,"productType.proc.update.popUpRule");
+            TYPE_BASIS_ID("typeBasisId",ProductType::getTypeBasisId,"productType.proc.update.typeBasisId"),
+            TYPE_CODE("typeCode",ProductType::getTypeCode,"productType.proc.update.typeCode"),
+            TYPE_NAME("typeName",ProductType::getTypeName,"productType.proc.update.typeName"),
+            INTRODUCE("introduce",ProductType::getIntroduce,"productType.proc.update.introduce"),
+            TOP_ICON("topIcon",ProductType::getTopIcon,"productType.proc.update.topIcon"),
+            SUB_ICON("subIcon",ProductType::getSubIcon,"productType.proc.update.subIcon"),
+            BG_IMG("bgImg",ProductType::getBgImg,"productType.proc.update.bgImg"),
+            SORT("sort",ProductType::getSort,"productType.proc.update.sort"),
+            SHOW_TYPE("showType",ProductType::getShowType,"productType.proc.update.showType"),
+            IS_SHOW_IN_TOP("isShowInTop",ProductType::getIsShowInTop,"productType.proc.update.isShowInTop"),
+            SHOW_STATUS("showStatus",ProductType::getShowStatus,"productType.proc.update.showStatus");
             private final String fieldName;
             private final SFunction<ProductType, Object> function;
             private final String descriptionKey;
