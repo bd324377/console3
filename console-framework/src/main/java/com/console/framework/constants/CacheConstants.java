@@ -33,6 +33,7 @@ public class CacheConstants {
     public static final String VIP = "VIP";
     public static final String INITIAL_VIP = "INITIAL_VIP";
     public static final String PAYMENT_CHANNEL = "PAYMENT_CHANNEL";
+    public static final String PAYMENT_CHANNEL_LIST = "PAYMENT_CHANNEL_LIST";
     public static final String PAYMENT_CHANNEL_MERCHANT_ID = "PAYMENT_CHANNEL:MERCHANT_ID";
     public static final String CASH_OUT_RULE = "CASH_OUT_RULE";//提现规则
     public static final String PLATFORM_BELONG = "PLATFORM_BELONG";//当前启用的产商归属

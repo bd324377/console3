@@ -11,6 +11,7 @@ import com.console.core.service.WalletService;
 import com.console.core.service.impl.BaseServiceImpl;
 import com.console.framework.config.DynamicTableNameHandler;
 import com.console.framework.constants.CacheConstants;
+import com.console.framework.constants.LoginChannel;
 import com.console.framework.domain.BusinessException;
 import com.console.framework.request.RequestBackendUser;
 import com.console.framework.request.RequestMember;
@@ -163,9 +164,6 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
         }
         //添加r_agent_layer层级信息
         agentLayerService.addAgentLayerBatch(user,inviteNewConfig);
-        //同步总租户
-        DynamicTableNameHandler.setTenantId(0);
-        this.save(user);
     }
 
     /**
@@ -182,7 +180,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
             updateWrapper.lambda()
                     .set(User::getLoginIp, userProc.getIp())
                     .set(User::getLoginTime, userProc.getProcTime())
-                    .set(User::getLoginChannel, userProc.getLoginChannel())
+                    .set(User::getLoginChannel, LoginChannel.fromKey(userProc.getProcValue().intValue()))
                     .eq(User::getId, userProc.getUserId());
             this.update(updateWrapper);
         } finally {

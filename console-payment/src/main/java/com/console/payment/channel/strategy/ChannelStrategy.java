@@ -67,8 +67,8 @@ public class ChannelStrategy {
         return new UnsupportedOperationException("payment channel operation is not supported");
     }
 
-    public Channel getPaymentChannel(Integer siteId, String merchantId) {
-        return channelService.getChannelByMerchantId(siteId,merchantId);
+    public Channel getPaymentChannel(String merchantId) {
+        return channelService.getChannelByMerchantId(merchantId);
     }
 
     /**

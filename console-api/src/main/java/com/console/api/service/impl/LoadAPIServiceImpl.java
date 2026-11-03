@@ -49,9 +49,11 @@ public class LoadAPIServiceImpl extends BaseServiceImpl implements LoadAPIServic
         DynamicTableNameHandler.setTenantId(marketSiteBo.getTenantId());
         List<ProductPlatform> productPlatformList = productPlatformService.getProductPlatformList(marketSiteBo.getTenantId());
         List<Product> productList = productService.getProductList(marketSiteBo.getTenantId());
+        List<ProductTypeDTO> productTypeList = productTypeService.getProductTypeList(marketSiteBo.getTenantId(),marketSiteBo.getMarketSiteId());
         Map<String,Object> productInfoMap = new HashMap<>();
         productInfoMap.put("productPlatforms",productPlatformList);
         productInfoMap.put("products",productList);
+        productInfoMap.put("productTypes",productTypeList);
         return productInfoMap;
     }
 
@@ -63,7 +65,6 @@ public class LoadAPIServiceImpl extends BaseServiceImpl implements LoadAPIServic
         LayoutConfigDTO layoutConfig = layoutConfigService.getLayoutConfigById(marketSiteBo.getLayoutId());
         List<MediaDTO> mediaList = mediaService.getMediaList(marketSiteBo.getTenantId(),marketSiteBo.getMarketSiteId());
         List<ShortcutIconDTO> shortcutIconList = shortcutIconService.getShortcutIconList(marketSiteBo.getTenantId(),marketSiteBo.getMarketSiteId());
-        List<ProductTypeDTO> productTypeList = productTypeService.getProductTypeList(marketSiteBo.getTenantId(),marketSiteBo.getMarketSiteId());
-        return new LoadLayoutRes(layoutConfig,mediaList,shortcutIconList,productTypeList);
+        return new LoadLayoutRes(layoutConfig,mediaList,shortcutIconList);
     }
 }

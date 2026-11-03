@@ -1,7 +1,6 @@
 package com.console.payment.channel.strategy.u2c.req;
 
 import com.console.framework.utils.RequestUtils;
-import com.console.framework.utils.TenantUtils;
 import com.console.payment.entity.BankCard;
 import com.console.payment.entity.CashOutOrder;
 import com.console.payment.entity.Channel;
@@ -39,7 +38,7 @@ public class CashOutOrderReq {
         if (cashOutOrder.getFee() != null && cashOutOrder.getFee().compareTo(BigDecimal.ZERO) > 0) {
             cashOutAmt = cashOutAmt.subtract(cashOutOrder.getFee());
         }
-        this.merchantId      = channel.getAppKey();
+        this.merchantId      = channel.getMerchantId();
         this.merchantOrderNo = cashOutOrder.getMerchantOrderNo();
         //serviceCode + "_" + TenantUtils.getTenantId() + "_" + cashOutOrder.getMarketSiteId() + "_" + cashOutOrder.getId().toString();
         this.amount          = cashOutAmt.multiply(new BigDecimal("100")).intValue();

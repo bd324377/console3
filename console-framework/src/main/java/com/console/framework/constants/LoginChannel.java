@@ -19,4 +19,13 @@ public enum LoginChannel {
         this.key   = key;
         this.value = value;
     }
+
+    public static LoginChannel fromKey(Integer key) {
+        for (LoginChannel loginChannel : LoginChannel.values()) {
+            if (loginChannel.key.equals(key)) {
+                return loginChannel;
+            }
+        }
+        throw new IllegalArgumentException("Invalid key: " + key);
+    }
 }

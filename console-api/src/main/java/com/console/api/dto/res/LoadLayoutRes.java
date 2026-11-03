@@ -25,14 +25,11 @@ public class LoadLayoutRes {
     private List<ShortcutIconDTO> rightShortcutIconList;
     private List<ShortcutIconDTO> leftShortcutIconList;
     private List<ShortcutIconDTO> bottomShortcutIconList;
-    private List<ProductTypeDTO>  productTypeList;
 
     public LoadLayoutRes(LayoutConfigDTO layoutConfig,
                          List<MediaDTO> mediaList,
-                         List<ShortcutIconDTO> shortcutIconList,
-                         List<ProductTypeDTO> productTypeList) {
+                         List<ShortcutIconDTO> shortcutIconList) {
         this.layoutConfig = layoutConfig;
-        this.productTypeList = productTypeList;
         if (!ObjectUtils.isEmpty(mediaList)) {
             Map<Media.MediaType, List<MediaDTO>> mediaTypeMap = mediaList.stream().collect(Collectors.groupingBy(MediaDTO::getMediaType));
             this.bannerList = mediaTypeMap.get(Media.MediaType.BANNER);

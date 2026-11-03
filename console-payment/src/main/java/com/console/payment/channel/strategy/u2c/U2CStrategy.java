@@ -45,7 +45,7 @@ public class U2CStrategy extends ChannelStrategy {
     /** 使用本地商户订单号查询 U2C 充值状态。 */
     @Override
     public ChannelResult queryPayOrder(String merchantOrderNo, Channel channel) {
-        QueryOrderReq request = new QueryOrderReq(channel.getAppKey(), merchantOrderNo, null);
+        QueryOrderReq request = new QueryOrderReq(channel.getMerchantId(), merchantOrderNo, null);
         request.setSign(PaymentUtils.sign(request, channel.getApiSecret()));
         U2CResponse<PayRes> response = execute(paymentApi.queryPayment(channel.getPaySearchUrl(),request));
         return response.isSuccess() && response.getData() != null ? response.getData().buildPaymentResult() : toFailureResult(response);
@@ -62,7 +62,7 @@ public class U2CStrategy extends ChannelStrategy {
     /** 查询 U2C 提现状态。 */
     @Override
     public ChannelResult queryCashOutOrder(String merchantOrderNo, Channel channel) {
-        QueryOrderReq request = new QueryOrderReq(channel.getAppKey(), merchantOrderNo, null);
+        QueryOrderReq request = new QueryOrderReq(channel.getMerchantId(), merchantOrderNo, null);
         request.setSign(PaymentUtils.sign(request, channel.getApiSecret()));
         U2CResponse<CashOutRes> response = execute(paymentApi.queryCashOut(channel.getCashOutSearchUrl(),request));
         return response.isSuccess() && response.getData() != null ? response.getData().buildCashOutResult() : toFailureResult(response);
@@ -71,7 +71,7 @@ public class U2CStrategy extends ChannelStrategy {
     @Override
     public List<BalanceRes> queryBalance(Channel channel) {
         QueryBalanceReq request = new QueryBalanceReq();
-        request.setMerchantId(channel.getAppKey());
+        request.setMerchantId(channel.getMerchantId());
         request.setSign(PaymentUtils.sign(request, channel.getApiSecret()));
         U2CResponse<List<BalanceRes>> response = execute(paymentApi.queryBalance(channel.getBalanceQueryUrl(), request));
         if (!response.isSuccess() || response.getData() == null) {
@@ -100,9 +100,8 @@ public class U2CStrategy extends ChannelStrategy {
         }
         CallBackRes callBackResult = JSON.parseObject(JSON.toJSONString(callBackData), CallBackRes.class);
         Integer tenantId = Integer.valueOf(callBackResult.getMerchantOrderNo().split("_")[1]);
-        Integer siteId = Integer.valueOf(callBackResult.getMerchantOrderNo().split("_")[2]);
         DynamicTableNameHandler.setTenantId(tenantId);
-        Channel channel = getPaymentChannel(siteId,callBackResult.getMerchantId());
+        Channel channel = getPaymentChannel(callBackResult.getMerchantId());
         if (channel.getWhiteIps() != null && !channel.getWhiteIps().contains(RequestUtils.getRequestIp())) {//已设置白名单，但回调方未处于白名单范围
             return ChannelResult.failed(I18nUtil.getI8nMsg("channelCallBack.error.whiteIps.verify.failed"));
         }

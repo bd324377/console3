@@ -6,9 +6,9 @@ import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.console.api.dto.req.RegReq;
 import com.console.api.service.RegAPIService;
 import com.console.core.entity.Parameter;
-import com.console.core.entity.Tenant;
 import com.console.core.entity.UserProc;
 import com.console.core.entity.Wallet;
+import com.console.core.model.bo.MarketSiteBo;
 import com.console.core.model.bo.MarketerBo;
 import com.console.core.service.*;
 import com.console.framework.config.DynamicTableNameHandler;
@@ -36,7 +36,7 @@ import java.util.List;
 @Service
 public class RegAPIServiceImpl implements RegAPIService {
     @Resource
-    private TenantDomainService tenantDomainService;
+    private MarketSiteService marketSiteService;
     @Resource
     private MarketerService marketerService;
     @Resource
@@ -59,9 +59,10 @@ public class RegAPIServiceImpl implements RegAPIService {
     @Transactional(rollbackFor = Exception.class)
     public Object register(RegReq regReq) {
         //判断租户和站点情况
-        Tenant tenant = tenantDomainService.getTenantByDomain(RequestUtils.getRequestDomain());
-        verifyValidityTenant(tenant);
-        DynamicTableNameHandler.setTenantId(tenant.getId());
+        MarketSiteBo marketSite = marketSiteService.getMarketSiteByDomain(RequestUtils.getRequestDomain());
+        DynamicTableNameHandler.setTenantId(marketSite.getTenantId());
+        verifyValidityMarketSite(marketSite);
+        DynamicTableNameHandler.setTenantId(marketSite.getTenantId());
         //判断邀请人情况
         int inviteType = 2;Integer inviteCode = null;    //邀请类型 默认渠道推广 1、代理；2、站点业务员
         if (StringUtils.hasText(regReq.getInviteCode())) {
@@ -97,8 +98,8 @@ public class RegAPIServiceImpl implements RegAPIService {
         Wallet agentWallet = new Wallet();
         agentWallet.setUserId(user.getId());
         userWallet.setWalletType(Wallet.WalletType.AGENT_WALLET);
-        UserProc regProc = new UserProc(user.getId(), tenant.getId(), UserProc.ProcType.REGISTER);
-        regProc.setLoginChannel(regReq.getRegChannel());
+        UserProc regProc = new UserProc(user.getId(), marketSite.getTenantId(), UserProc.ProcType.REGISTER);
+        regProc.setProcValue(new BigDecimal(regReq.getRegChannel().getKey()));
         try {
             if (userService.save(user) && walletService.saveBatch(List.of(userWallet,agentWallet)) &&
                     userProcService.save(regProc) && marketSiteUserService.save(marketSiteUser)) {//异步处理后续事项
@@ -187,11 +188,8 @@ public class RegAPIServiceImpl implements RegAPIService {
     }
 
 
-    private void verifyValidityTenant(Tenant tenant) {
-        if (tenant == null) {
-            throw new BusinessException(500, I18nUtil.getI8nMsg("reg.error.tenant.notOpen"));
-        }
-        if (tenant.getStatus() == Tenant.TenantStatus.CLOSED && tenant.getWhiteIps().contains(RequestUtils.getRequestIp())) {
+    private void verifyValidityMarketSite(MarketSiteBo marketSite) {
+        if (marketSite == null) {
             throw new BusinessException(500, I18nUtil.getI8nMsg("reg.error.tenant.notOpen"));
         }
     }

@@ -1,6 +1,5 @@
 package com.console.payment.channel.strategy.fourz.req;
 
-import com.console.framework.utils.TenantUtils;
 import com.console.payment.entity.Channel;
 import com.console.payment.entity.PaymentOrder;
 import com.console.payment.utils.PaymentUtils;
@@ -25,7 +24,7 @@ public class PayOrderReq {
     private String  sign;            // 签名
 
     public PayOrderReq(PaymentOrder paymentOrder, Channel channel) {
-        merchantNo = channel.getAppKey();
+        merchantNo = channel.getMerchantId();
         merchantOrderNo = paymentOrder.getMerchantOrderNo();
         amount = PaymentUtils.toCents(paymentOrder.getOrderAmt());
         code = channel.getPayType();

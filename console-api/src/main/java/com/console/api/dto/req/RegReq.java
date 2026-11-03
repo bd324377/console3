@@ -31,6 +31,7 @@ public class RegReq implements Serializable {
         User user = new User();
         user.setAccount(this.getAccount());
         user.setLoginPwd(EncryptUtils.md5Encrypt(this.getPassword()));
+        user.setUserType(User.UserType.NORMAL);
         user.setRegDeviceId(this.getRegDeviceId());
         user.setLoginChannel(this.getRegChannel());
         if (this.getAccountType() == 1) {//邮箱注册

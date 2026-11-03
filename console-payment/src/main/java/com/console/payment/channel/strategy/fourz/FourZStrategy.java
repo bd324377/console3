@@ -40,7 +40,7 @@ public class FourZStrategy extends ChannelStrategy {
 
     @Override
     public ChannelResult queryPayOrder(String merchantOrderNo, Channel channel) {
-        QueryOrderReq request = new QueryOrderReq(channel.getAppKey(), merchantOrderNo, channel.getApiSecret());
+        QueryOrderReq request = new QueryOrderReq(channel.getMerchantId(), merchantOrderNo, channel.getApiSecret());
         FourZResponse<PayRes> response = execute(paymentApi.queryPayment(channel.getPaySearchUrl(), request));
         if (response.isSuccess()) {//成功
             return response.getData().buildPaymentResult();
@@ -57,14 +57,14 @@ public class FourZStrategy extends ChannelStrategy {
 
     @Override
     public ChannelResult queryCashOutOrder(String merchantOrderNo, Channel channel) {
-        QueryOrderReq cashOutOrderReq = new QueryOrderReq(channel.getAppKey(), merchantOrderNo, channel.getApiSecret());
+        QueryOrderReq cashOutOrderReq = new QueryOrderReq(channel.getMerchantId(), merchantOrderNo, channel.getApiSecret());
         FourZResponse<CashOutRes> response = execute(paymentApi.queryCashOut(channel.getCashOutSearchUrl(),cashOutOrderReq));
         return response.isSuccess() && response.getData() != null ? response.getData().buildCashOutResult() : ChannelResult.failed(response.getMessage());
     }
 
     @Override
     public List<BalanceRes> queryBalance(Channel channel) {
-        QueryBalanceReq queryBalanceReq = new QueryBalanceReq(channel.getAppKey(), channel.getApiSecret());
+        QueryBalanceReq queryBalanceReq = new QueryBalanceReq(channel.getMerchantId(), channel.getApiSecret());
         FourZResponse<List<BalanceRes>> response = execute(paymentApi.queryBalance(channel.getBalanceQueryUrl(), queryBalanceReq));
         if (!response.isSuccess() || ObjectUtils.isEmpty(response.getData())) {
             throw new IllegalStateException("FourZ balance query was not confirmed");
@@ -88,9 +88,9 @@ public class FourZStrategy extends ChannelStrategy {
         }
         CallBackRes callBackResult = JSON.parseObject(JSON.toJSONString(callBackData), CallBackRes.class);
         Integer tenantId = Integer.valueOf(callBackResult.getMerchantOrderNo().split("_")[1]);
-        Integer siteId = Integer.valueOf(callBackResult.getMerchantOrderNo().split("_")[2]);
+//        Integer siteId = Integer.valueOf(callBackResult.getMerchantOrderNo().split("_")[2]);
         DynamicTableNameHandler.setTenantId(tenantId);
-        Channel channel = getPaymentChannel(siteId,callBackResult.getMerchantNo());
+        Channel channel = getPaymentChannel(callBackResult.getMerchantNo());
         if (channel.getWhiteIps() != null && !channel.getWhiteIps().contains(RequestUtils.getRequestIp())) {//已设置白名单，但回调方未处于白名单范围
             return ChannelResult.failed(I18nUtil.getI8nMsg("channelCallBack.error.whiteIps.verify.failed"));
         }

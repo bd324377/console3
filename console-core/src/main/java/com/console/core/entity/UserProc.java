@@ -25,7 +25,6 @@ public class UserProc implements Serializable {
     private Long id;
     private Integer userId;
     private ProcType procType;
-    private LoginChannel loginChannel;//登录渠道
     private String ip;
     private String os;
     private String browser;

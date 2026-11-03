@@ -31,8 +31,7 @@ public class ChannelFactory {
                 : !Integer.valueOf(1).equals(channel.getPayStatus())) {
             throw new IllegalStateException("payment channel is disabled");
         }
-        if (!"u2cPay".equals(channel.getBelongClass())) throw new IllegalArgumentException("channel capability is not implemented");
-        ChannelStrategy strategy = strategies.get(channel.getBelongClass());
+        ChannelStrategy strategy = strategies.get(channel.getBelongClass().getBelong());
         if (strategy == null) {
             throw new IllegalArgumentException("unknown payment strategy: " + channel.getBelongClass());
         }

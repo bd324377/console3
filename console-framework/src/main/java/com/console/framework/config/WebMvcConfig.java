@@ -25,7 +25,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(authInterceptor)
-                .excludePathPatterns("/backendUser/login", "/backendUser/refreshToken", "/login");
+                .excludePathPatterns("/backendUser/login", "/backendUser/refreshToken", "/login","/register");
     }
 
     // 静态资源展示

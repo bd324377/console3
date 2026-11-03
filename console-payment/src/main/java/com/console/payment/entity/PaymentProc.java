@@ -1,6 +1,7 @@
 package com.console.payment.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
+import com.console.framework.utils.TenantUtils;
 import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Getter;
 import lombok.Setter;
@@ -45,6 +46,7 @@ public class PaymentProc implements Serializable {
     public PaymentProc(PaymentOrder paymentOrder,ProcType procType) {
         this.orderId = paymentOrder.getId();
         this.userId = paymentOrder.getUserId();
+        this.tenantId = TenantUtils.getTenantId();
         this.channelId = paymentOrder.getChannelId();
         this.orderAmt = paymentOrder.getOrderAmt();
         this.channelFee = paymentOrder.getChannelFee();

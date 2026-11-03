@@ -65,7 +65,7 @@ public class OrderCallBackHandler {
                 if (paymentOrder.getStatus() != PaymentOrder.PaymentStatus.PAYING) return;
                 DynamicTableNameHandler.setTenantId(channelResult.getTenantId());
                 UpdateWrapper<PaymentOrder> orderUpdateWrapper = new UpdateWrapper<>();
-                orderUpdateWrapper.lambda().eq(PaymentOrder::getId,paymentOrder.getId()).set(PaymentOrder::getCompleteState, 1);
+                orderUpdateWrapper.lambda().eq(PaymentOrder::getId,paymentOrder.getId()).set(PaymentOrder::getCompleteStatus, 1);
                 if (channelResult.isSuccess() && channelResult.getStatus() == 0) {
                     QueryWrapper<Wallet> queryWrapper = new QueryWrapper<>();
                     queryWrapper.select("id,balance,to_be_order_amt,recharge_times,recharge_amt")

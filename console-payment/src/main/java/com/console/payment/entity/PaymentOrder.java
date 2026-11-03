@@ -32,7 +32,6 @@ public class PaymentOrder {
     private BigDecimal toBeOrderAmt;//待下单金额
     private BigDecimal fee;//充值手续费
     private BigDecimal channelFee;//渠道手续费
-    private BigDecimal marketerFee; // 业务服务费
     private LocalDateTime orderTime;//订单生成时间
     private String payUrl;//拼装好的产商支付url，前端根据这个url转成支付二维码
     private LocalDateTime payTime;//订单支付时间
@@ -42,11 +41,11 @@ public class PaymentOrder {
     private Integer operatorId;//操作人ID（审核/拒审等后台操作人员ID）
     private LocalDateTime operatorTime;//操作时间
     private Integer rechargeTimes;//充值次数
+    private Integer completeStatus;//完结状态 1、已完结；0、未完结;
     private String errorMsg;//错误信息
-    private Integer completeState;//完结状态 1、已完结；0、未完结;
     private Integer errorType;
     private String remarks;
-    private Boolean resupply;
+//    private Boolean resupply;
 
     @TableField(exist = false)
     private String payerIdNo;

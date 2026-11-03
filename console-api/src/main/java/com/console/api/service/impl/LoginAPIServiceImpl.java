@@ -23,6 +23,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import java.math.BigDecimal;
+
 @Slf4j
 @Service
 public class LoginAPIServiceImpl extends BaseServiceImpl implements LoginAPIService {
@@ -48,7 +50,7 @@ public class LoginAPIServiceImpl extends BaseServiceImpl implements LoginAPIServ
         requestMember.setLoginChannel(loginReq.getLoginChanel().getKey());
         TokenUtils.deleteUserToken(requestMember);
         UserProc userProc = new UserProc(user.getId(), user.getTenantId(), UserProc.ProcType.LONGIN);
-        userProc.setLoginChannel(loginReq.getLoginChanel());
+        userProc.setProcValue(new BigDecimal(loginReq.getLoginChanel().getKey()));
         userService.updateUserByLogin(userProc);
         return TokenUtils.createUserToken(requestMember);
     }

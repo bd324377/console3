@@ -1,7 +1,6 @@
 package com.console.payment.channel.strategy.u2c.req;
 
 import com.console.framework.utils.RequestUtils;
-import com.console.framework.utils.TenantUtils;
 import com.console.payment.entity.Channel;
 import com.console.payment.entity.PaymentOrder;
 import com.console.payment.utils.PaymentUtils;
@@ -31,7 +30,7 @@ public class PayOrderReq {
     private String  sign;            // 签名
 
     public PayOrderReq(PaymentOrder paymentOrder, Channel channel) {
-        this.merchantId      = channel.getAppKey();
+        this.merchantId      = channel.getMerchantId();
         this.merchantOrderNo = paymentOrder.getMerchantOrderNo();
         this.amount          = paymentOrder.getOrderAmt().multiply(new BigDecimal("100")).intValue();
         this.payType         = channel.getPayType();
