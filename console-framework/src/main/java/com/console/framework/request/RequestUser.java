@@ -15,7 +15,6 @@ public class RequestUser implements Serializable {
     private Integer id;                     //用户id
     private Integer tenantId;               //用户登录的租户id
     private String  account;                //账号
-    private String  avatar;                 //头像
     private Integer accountType;            //1、用户 2、管理后台用户 3、业务员后台用户 4、渠道业务员用户
     private String  os;                     //操作系统
     private String  browser;                //浏览器

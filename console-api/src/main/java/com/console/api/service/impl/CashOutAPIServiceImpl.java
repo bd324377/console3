@@ -33,6 +33,7 @@ import com.console.user.entity.Agent;
 import com.console.user.entity.User;
 import com.console.user.entity.UserReport;
 import com.console.user.entity.Vip;
+import com.console.user.model.bo.VipBo;
 import com.console.user.service.AgentService;
 import com.console.user.service.UserReportService;
 import com.console.user.service.UserService;
@@ -274,7 +275,7 @@ public class CashOutAPIServiceImpl extends BaseServiceImpl implements CashOutAPI
     /** 等级相关规则校验 **/
     private BigDecimal verifyLevelRule(RequestMember member, Wallet wallet, CashOutDTO.CreateCashOutOrderReq cashOutOrderReq,List<String> reasonList) {
         if (cashOutOrderReq.getWalletType() == Wallet.WalletType.USER_WALLET) {//用户钱包
-            Vip vip = vipService.getVipById(member.getVipId());
+            VipBo vip = vipService.getVipById(member.getVipId());
             if (vip.getCashOutStatus() == 0) {
                 reasonList.add("cashOutOrder.check.reason.levelLimit");
             }

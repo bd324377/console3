@@ -3,11 +3,13 @@ package com.console.framework.request;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Getter
 @Setter
 public class RequestMember extends RequestUser {
+    private String  avatar;                 //头像
     private Integer siteId;         //站点ID
     private Integer teamId;         //团队ID
     private Integer marketerId;     //业务员ID
@@ -20,6 +22,8 @@ public class RequestMember extends RequestUser {
     private Integer emailStatus;     //邮箱绑定状态 1、绑定；0、未绑定
     private Integer cashOutStatus;  //个人提现状态 1是0否
     private Integer loginChannel;
+    private BigDecimal rechargeAmt;
+    private BigDecimal orderAmt;
     private Integer rechargeTimes;//充值次数
     private LocalDateTime rechargeTime;//上次充值时间
     private String cashOutPwd;//提现密码

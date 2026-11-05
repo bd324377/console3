@@ -46,6 +46,4 @@ public class Vip implements Serializable {
     private BigDecimal dayCashOutLimit;//日提现限额
     private BigDecimal rechargeRate;//充值手续费
     private String customerCares;//专属客服地址
-    @TableField(exist = false)
-    private Long nextVipId;//下一级VIP主键ID
 }
