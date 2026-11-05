@@ -1,79 +1,72 @@
 package com.console.framework.mq;
 
-import com.console.framework.utils.RedisMqUtils;
-import jakarta.annotation.Resource;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Range;
-import org.springframework.data.redis.connection.stream.*;
+import org.springframework.data.redis.connection.stream.PendingMessage;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
-@Slf4j
+/** 按游标分段扫描。限制每轮页数和耗时，下轮从上次访问的位置继续。 */
 @Component
 public class PendingMessageHandler {
-    @Resource
-    private StringRedisTemplate stringRedisTemplate;
-    @Resource
-    private ConsumerProvider consumerProvider;
-//    @Resource
-//    private CacheClearHandler cacheClearHandler;
-    @Value("${redis.stream.key:redisStreamMq}")
-    private String streamKey;
-    @Value("${redis.stream.group:redisStreamMq-channel}")
-    private String group;
+    private static final Logger log = LoggerFactory.getLogger(PendingMessageHandler.class);
+    private static final int PAGE_SIZE = 100;
+    private final StringRedisTemplate redis;
+    private final ConsumerProvider config;
+    private final RedisStreamConsumer consumer;
+    private String cursor;
 
-    // 每 30 秒扫描一次
-    @Scheduled(fixedDelay = 30_000)
+    public PendingMessageHandler(StringRedisTemplate redis, ConsumerProvider config, RedisStreamConsumer consumer) {
+        this.redis = redis;
+        this.config = config;
+        this.consumer = consumer;
+    }
+
+    @Scheduled(fixedDelayString = "${redis.stream.recovery-delay-ms:2000}")
     public void handlePendingMessages() {
-        // 1. 获取 Pending 概要
-        PendingMessagesSummary summary = stringRedisTemplate.opsForStream().pending(streamKey, group);
-        if (summary.getTotalPendingMessages() == 0) return;
+        if (!consumer.hasHandlers()) return;
+        try {
+            long deadline = System.nanoTime() + Duration.ofSeconds(2).toNanos();
+            for (int i = 0; i < 5 && System.nanoTime() < deadline; i++) {
+                if (!scanPage(deadline)) break;
+            }
+        } catch (RuntimeException ex) {
+            log.warn("Pending 扫描失败，下轮重试 group={}", config.group, ex);
+        }
+    }
 
-        // 2. 查询每条 Pending 消息（可分页）
-        PendingMessages pendingMessages = stringRedisTemplate.opsForStream()
-                .pending(streamKey, group, Range.unbounded(), 100);
-
-        for (PendingMessage pm : pendingMessages) {
-            // 3. 判断消息闲置时间
-            if (pm.getElapsedTimeSinceLastDelivery().compareTo(Duration.ofMinutes(5)) > 0) {
-                log.warn("消息 {} 超过 5 分钟未确认，尝试转移", pm.getIdAsString());
-                // 4. XCLAIM 转移给当前活跃消费者
-                String consumerName = consumerProvider.getConsumerName();
-                List<MapRecord<String, Object, Object>> claimed = stringRedisTemplate.opsForStream()
-                        .claim(streamKey, group, consumerName, Duration.ofMinutes(5),
-                                RecordId.of(pm.getIdAsString()));
-                if (!claimed.isEmpty()) {
-                    for (MapRecord<String, Object, Object> record : claimed) {
-                        // 将 Map<String, Object> 转为 Map<String, String>，所有值本质都是字符串
-                        Map<Object,Object> originalMap = record.getValue();
-                        Map<String, String> msgMap = originalMap.entrySet().stream()
-                                .filter(entry -> entry.getKey() != null && entry.getValue() != null)
-                                .collect(Collectors.toMap( entry -> String.valueOf(entry.getKey()),
-                                        entry -> String.valueOf(entry.getValue())
-                                ));
-                        log.debug("处理转移的消息: {}", msgMap);
-                        String type = msgMap.get("type");//消息类型
-                        // 处理业务逻辑..
-                        switch (type) {
-//                            case "CACHE_CLEAR":// 这里也可以路由到缓存清理，但点对点场景下缓存清理只由一个实例执行
-//                                cacheClearHandler.handle(msgMap);
-//                                break;
-                            default:
-                                log.warn("Unknown message type: {}", type);
-                        }
-                        // 处理成功后确认
-                        RedisMqUtils.acknowledge(streamKey, group, record.getId());
-                    }
-                    log.info("已成功转移消息 {} 至消费者 {}", pm.getIdAsString(), consumerName);
-                }
+    private boolean scanPage(long deadline) {
+        // 使用包含起点的范围并显式跳过游标，兼容支持 Streams 的 Redis 5+。
+        Range<String> range = cursor == null ? Range.unbounded()
+                : Range.of(Range.Bound.inclusive(cursor), Range.Bound.unbounded());
+        int count = cursor == null ? PAGE_SIZE : PAGE_SIZE + 1;
+        var page = redis.opsForStream().pending(config.stream, config.group, range, count);
+        String previous = cursor;
+        int visited = 0;
+        for (PendingMessage message : page) {
+            if (System.nanoTime() >= deadline || Thread.currentThread().isInterrupted()) return false;
+            visited++;
+            cursor = message.getIdAsString();
+            if (cursor.equals(previous)) continue;
+            try {
+                reclaim(message);
+            } catch (RuntimeException ex) {
+                log.warn("恢复单条消息失败 group={} record={}", config.group, cursor, ex);
             }
         }
+        if (visited < count) cursor = null;
+        return cursor != null;
+    }
+
+    private void reclaim(PendingMessage message) {
+        Duration idle = Duration.ofMillis(config.idleMillis);
+        if (message.getElapsedTimeSinceLastDelivery().compareTo(idle) < 0) return;
+        var records = redis.<String,String>opsForStream().claim(config.stream, config.group,
+                config.getConsumerName(), idle, message.getId());
+        for (var record : records) consumer.process(record, message.getTotalDeliveryCount() + 1);
     }
 }

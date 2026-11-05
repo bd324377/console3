@@ -1,6 +1,5 @@
 package com.console.api.service.impl;
 
-import com.console.admin.entity.ShortcutIcon;
 import com.console.admin.model.bo.LayoutConfigDTO;
 import com.console.admin.model.bo.MediaDTO;
 import com.console.admin.model.bo.ShortcutIconDTO;
@@ -14,7 +13,6 @@ import com.console.framework.config.DynamicTableNameHandler;
 import com.console.framework.utils.RequestUtils;
 import com.console.product.entity.Product;
 import com.console.product.entity.ProductPlatform;
-import com.console.product.entity.ProductType;
 import com.console.product.model.dto.ProductTypeDTO;
 import com.console.product.service.ProductPlatformService;
 import com.console.product.service.ProductService;
@@ -65,6 +63,6 @@ public class LoadAPIServiceImpl extends BaseServiceImpl implements LoadAPIServic
         LayoutConfigDTO layoutConfig = layoutConfigService.getLayoutConfigById(marketSiteBo.getLayoutId());
         List<MediaDTO> mediaList = mediaService.getMediaList(marketSiteBo.getTenantId(),marketSiteBo.getMarketSiteId());
         List<ShortcutIconDTO> shortcutIconList = shortcutIconService.getShortcutIconList(marketSiteBo.getTenantId(),marketSiteBo.getMarketSiteId());
-        return new LoadLayoutRes(layoutConfig,mediaList,shortcutIconList);
+        return new LoadLayoutRes(marketSiteBo.getTimeZone(),layoutConfig,mediaList,shortcutIconList);
     }
 }

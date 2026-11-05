@@ -73,7 +73,7 @@ public class TenantServiceImpl extends ServiceImpl<TenantMapper, Tenant> impleme
         QueryWrapper<Tenant> queryWrapper = new QueryWrapper<>();
         queryWrapper.select("id,tenant_name,layout_id,domains,backend_domains,status,time_zone,white_ips,backend_limit_ips," +
                         "pwa_down_load_domain,web_push_config,web_version,backend_web_version,order_mode,recharge_rate,manual_deposit_limit," +
-                        "withdrawal_limit,order_rate")
+                        "withdrawal_limit,order_rate,time_zone")
                 .lambda().eq(Tenant::getId,id);
         return this.getOne(queryWrapper);
     }

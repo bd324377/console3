@@ -97,7 +97,7 @@ public class RegAPIServiceImpl implements RegAPIService {
         userWallet.setSubUserOrderMode(inviteNewConfig.getSubUserOrderMode());
         Wallet agentWallet = new Wallet();
         agentWallet.setUserId(user.getId());
-        userWallet.setWalletType(Wallet.WalletType.AGENT_WALLET);
+        agentWallet.setWalletType(Wallet.WalletType.AGENT_WALLET);
         UserProc regProc = new UserProc(user.getId(), marketSite.getTenantId(), UserProc.ProcType.REGISTER);
         regProc.setProcValue(new BigDecimal(regReq.getRegChannel().getKey()));
         try {

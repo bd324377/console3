@@ -21,6 +21,7 @@ public class MarketSiteBo implements Serializable {//站点信息
     private Integer marketTeamId;//营销团队ID(默认团队)
     private Integer marketerId;//业务员（默认业务员）ID
     private Integer layoutId;
+    private String  timeZone;
     private Tenant.TenantStatus tenantStatus;//租户状态
     private MarketSite.SiteStatus siteStatus;//站点状态
     private Integer tenantOrderMode;//租户默认下单模型
@@ -44,5 +45,6 @@ public class MarketSiteBo implements Serializable {//站点信息
         this.setShuntStatus(marketTeam.getShuntStatus());
         this.setShuntRate(marketTeam.getShuntRate());
         this.setShuntThreshold(marketTeam.getShuntThreshold());
+        this.setTimeZone(tenant.getTimeZone());
     }
 }

@@ -34,7 +34,7 @@ public class UserProductServiceImpl extends BaseServiceImpl<UserProductMapper, U
         } else {
             redisKey = CacheConstants.HISTORY_PRODUCT + tenantId + ":" + userId;
         }
-        if (RedisUtils.existsInZSet(redisKey,productId)) {
+        if (!RedisUtils.existsInZSet(redisKey,productId)) {
             UserProduct userProduct = new UserProduct();
             userProduct.setProductId(productId);
             userProduct.setUserId(userId);

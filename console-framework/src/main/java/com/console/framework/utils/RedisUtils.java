@@ -5,6 +5,7 @@ import com.console.framework.domain.BusinessException;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.connection.DataType;
 import org.springframework.data.redis.core.Cursor;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -239,6 +240,7 @@ public class RedisUtils {
 
     /** 判断元素是否存在 **/
     public static boolean existsInZSet(String key, Object value) {
+        if (!redisTemplate.hasKey(key)) return false;
         Double score = redisTemplate.opsForZSet().score(key, value);
         return score != null;  // 返回 null 说明成员不存在
     }
@@ -289,6 +291,10 @@ public class RedisUtils {
         long incrementResult = Objects.requireNonNull(redisTemplate.opsForValue().increment(key, increment));
         redisTemplate.expire(key, timeOut, TimeUnit.SECONDS);
         return incrementResult;
+    }
+
+    public static double incrementOfDouble(String key,double increment) {
+        return Objects.requireNonNull(redisTemplate.opsForValue().increment(key, increment));
     }
 
     public static Long getListSize(String key) {

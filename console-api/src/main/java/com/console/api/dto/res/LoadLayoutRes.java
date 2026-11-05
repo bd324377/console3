@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 @Getter
 @Setter
 public class LoadLayoutRes {
+    private String  timeZone;
     private LayoutConfigDTO layoutConfig;
     private List<MediaDTO>  bannerList;
     private List<MediaDTO>  popUpBannerList;
@@ -26,9 +27,11 @@ public class LoadLayoutRes {
     private List<ShortcutIconDTO> leftShortcutIconList;
     private List<ShortcutIconDTO> bottomShortcutIconList;
 
-    public LoadLayoutRes(LayoutConfigDTO layoutConfig,
+    public LoadLayoutRes(String timeZone,
+                         LayoutConfigDTO layoutConfig,
                          List<MediaDTO> mediaList,
                          List<ShortcutIconDTO> shortcutIconList) {
+        this.timeZone = timeZone;
         this.layoutConfig = layoutConfig;
         if (!ObjectUtils.isEmpty(mediaList)) {
             Map<Media.MediaType, List<MediaDTO>> mediaTypeMap = mediaList.stream().collect(Collectors.groupingBy(MediaDTO::getMediaType));

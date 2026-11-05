@@ -7,4 +7,8 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 public class WalletAPIServiceImpl extends BaseServiceImpl implements WalletAPIService {
+    @Override
+    public Object getWalletBalance() {
+        return null;
+    }
 }

@@ -1,140 +1,130 @@
 package com.console.framework.mq;
 
+import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
-import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.data.redis.connection.stream.Consumer;
-import org.springframework.data.redis.connection.stream.MapRecord;
-import org.springframework.data.redis.connection.stream.ReadOffset;
-import org.springframework.data.redis.connection.stream.StreamOffset;
+import org.springframework.data.redis.connection.stream.*;
 import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.data.redis.stream.StreamMessageListenerContainer;
+import org.springframework.stereotype.Component;
 
 import java.time.Duration;
-import java.util.concurrent.ExecutorService;
+import java.time.Instant;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
+/** 一个专用轮询线程。连接中断后退避重试，恢复不依赖应用重启。 */
 @Slf4j
-@Configuration
+@Component
 public class RedisStreamConfig {
-    @Resource
-    private ConsumerProvider consumerProvider;
-    private final String streamKey = "redisStreamMq";
-    private final String group = "redisStreamMq-channel";
+    private final ScheduledExecutorService poller = Executors.newSingleThreadScheduledExecutor(
+            r -> new Thread(r, "redis-stream-poller"));
+    private final StringRedisTemplate redis;
+    private final ConsumerProvider config;
+    private final RedisStreamConsumer consumer;
+    private volatile boolean closing;
+    private boolean groupReady;
+    private volatile int failures;
 
-    private ExecutorService streamExecutor;
-    private StreamMessageListenerContainer<String, MapRecord<String, String, String>> container;
-
-    /**
-     * 创建线程池（Spring 管理生命周期）
-     */
-    @Bean(destroyMethod = "shutdown")
-    public ExecutorService streamExecutor() {
-        streamExecutor = Executors.newFixedThreadPool(4);
-        return streamExecutor;
+    public RedisStreamConfig(StringRedisTemplate redis, ConsumerProvider config, RedisStreamConsumer consumer) {
+        this.redis = redis;
+        this.config = config;
+        this.consumer = consumer;
     }
 
-    /**
-     * 创建消费者组（若不存在则创建）
-     */
-    @Bean
-    public String initConsumerGroup(StringRedisTemplate stringRedisTemplate) {
+    @PostConstruct
+    public void start() {
+        // 只发消息的服务不参与抢占，也不把其他服务的消息误转死信。
+        if (consumer.hasHandlers()) poller.execute(this::poll);
+        else log.info("未注册 MQ Handler，本实例仅提供消息发布");
+    }
+
+
+    @Component
+    public static class Publisher {
+        private final StringRedisTemplate redis;
+        private final ConsumerProvider config;
+
+        public Publisher(StringRedisTemplate redis, ConsumerProvider config) {
+            this.redis = redis;
+            this.config = config;
+        }
+
+        /** 同一业务重试须复用 eventId；返回值仅代表 Redis 已写入。 */
+        public RecordId publish(int tenantId, String eventId, String type, Map<String, String> payload) {
+            if (tenantId <= 0 || eventId == null || eventId.isBlank() || type == null || type.isBlank())
+                throw new IllegalArgumentException("消息需要有效的 tenantId、eventId 和 type");
+            Map<String, String> fields = new HashMap<>(Map.copyOf(payload));
+            fields.put("tenantId", Integer.toString(tenantId));
+            fields.put("eventId", eventId);
+            fields.put("type", type);
+            RecordId id = redis.<String, String>opsForStream().add(config.stream, fields);
+            if (id == null) throw new IllegalStateException("未取得 Redis Stream 消息 ID");
+            return id;
+        }
+    }
+
+    private void poll() {
+        if (closing) return;
+        long delay = 0;
         try {
-            stringRedisTemplate.opsForStream().createGroup(streamKey, group);
-        } catch (Exception e) {
-            String errorMessage = e.getMessage();
-            String causeMessage = e.getCause() != null ? e.getCause().getMessage() :"";
-            // 消费者组已存在，忽略；若为其他连接异常，可记录日志
-            if (errorMessage != null && errorMessage.contains("BUSYGROUP") || causeMessage.contains("BUSYGROUP")) {
-                log.info("Consumer group '{}' already exists, skip creation.", group);
-            } else {
-                log.error(e.getCause().getMessage());
-                log.error("Failed to create consumer group '{}'", group, e);
+            if (!groupReady) ensureGroup();
+            var records = redis.<String,String>opsForStream().read(
+                    Consumer.from(config.group, config.getConsumerName()),
+                    StreamReadOptions.empty().count(10).block(Duration.ofSeconds(1)),
+                    StreamOffset.create(config.stream, ReadOffset.lastConsumed()));
+            if (records != null) {
+                for (var record : records) {
+                    if (closing) break; // 未处理的批内记录保留在 PEL。
+                    try {
+                        consumer.process(record, 1);
+                    } catch (RuntimeException ex) {
+                        // ACK/死信写入结果未知，留给 PEL 恢复；继续处理已经投递的其他消息。
+                        log.error("单条 MQ 消息处理异常 group={} id={}", config.group, record.getId(), ex);
+                    }
+                }
             }
+            failures = 0;
+        } catch (RuntimeException ex) {
+            groupReady = false;
+            delay = Math.min(30, 1L << Math.min(failures++, 5));
+            if (!closing) log.warn("Redis Stream 轮询异常，{} 秒后重试", delay, ex);
         }
-        return "Group initialized";
+        synchronized (this) {
+            if (!closing) poller.schedule(this::poll, delay, TimeUnit.SECONDS);
+        }
     }
 
-
-    /**
-     * 创建并启动 Stream 监听容器（Spring 管理生命周期）
-     */
-    @Bean(destroyMethod = "stop")
-    public StreamMessageListenerContainer<String, MapRecord<String, String, String>> streamContainer(
-            RedisConnectionFactory factory,
-            RedisStreamConsumer consumerHandler,
-            ExecutorService streamExecutor) {
-
-        StreamMessageListenerContainer.StreamMessageListenerContainerOptions<String, MapRecord<String, String, String>> options = StreamMessageListenerContainer
-                .StreamMessageListenerContainerOptions
-                .builder()
-                .batchSize(10)
-                .pollTimeout(Duration.ofSeconds(1))
-                .executor(streamExecutor)
-                .errorHandler(t -> log.error("Redis Stream 底层异常", t))
-                .build();
-
-        container = StreamMessageListenerContainer.create(factory, options);
-
-        String consumerName = consumerProvider.getConsumerName();
-        log.info("启动消费者: group={}, consumer={}", group, consumerName);
-
-        // 订阅：手动确认模式（监听器中必须调用 acknowledge）
-        container.receive(
-                Consumer.from(group, consumerName),
-                StreamOffset.create(streamKey, ReadOffset.from(">")),
-                consumerHandler
-        );
-
-        container.start();
-        log.info("Redis Stream 消费者容器启动成功");
-        return container;
+    private void ensureGroup() {
+        try {
+            // 新组从历史起点开始。已有组保留原进度，不重置 offset。
+            redis.opsForStream().createGroup(config.stream, ReadOffset.from("0-0"), config.group);
+        } catch (RuntimeException ex) {
+            if (!isBusyGroup(ex)) throw ex;
+        }
+        groupReady = true;
     }
 
-    /**
-     * 容器关闭时额外确保线程池终止（双重保险）
-     */
+    private boolean isBusyGroup(Throwable error) {
+        for (Throwable cause = error; cause != null; cause = cause.getCause()) {
+            if (cause.getMessage() != null && cause.getMessage().contains("BUSYGROUP")) return true;
+        }
+        return false;
+    }
+
     @PreDestroy
-    public void destroy() {
-        if (streamExecutor != null && !streamExecutor.isShutdown()) {
-            streamExecutor.shutdownNow();
+    public void stop() {
+        synchronized (this) {
+            closing = true;
+            poller.shutdown();
+        }
+        try {
+            if (!poller.awaitTermination(30, TimeUnit.SECONDS)) poller.shutdownNow();
+        } catch (InterruptedException ex) {
+            poller.shutdownNow();
+            Thread.currentThread().interrupt();
         }
     }
-
-
-//    /**
-//     * 创建 Stream 监听容器及订阅
-//     */
-//    @Bean
-//    public Subscription subscription(RedisConnectionFactory factory,
-//                                     RedisStreamConsumer consumerHandler) {
-//        // 容器配置
-//        StreamMessageListenerContainer.StreamMessageListenerContainerOptions<String, MapRecord<String, String, String>> options =
-//                StreamMessageListenerContainer.StreamMessageListenerContainerOptions
-//                        .builder()
-//                        .batchSize(10)                              // 每次拉取消息数量
-//                        .pollTimeout(Duration.ofSeconds(1))         // 拉取超时
-//                        .executor(Executors.newFixedThreadPool(4))  // 有界线程池，避免无限膨胀
-//                        .errorHandler(t -> log.error("Redis Stream 消费异常", t)) // 错误处理器
-//                        .build();
-//
-//        StreamMessageListenerContainer<String, MapRecord<String, String, String>> container =
-//                StreamMessageListenerContainer.create(factory, options);
-//
-//        String consumerName = consumerProvider.getConsumerName();
-//        log.info("启动消费者: group={}, consumer={}", group, consumerName);
-//
-//        // 订阅：只消费新分配给该消费者的消息（>），手动确认模式（默认）
-//        Subscription subscription = container.receive(
-//                Consumer.from(group, consumerName),
-//                StreamOffset.create(streamKey, ReadOffset.from(">")),
-//                consumerHandler
-//        );
-//
-//        container.start();
-//        return subscription;
-//    }
 }
