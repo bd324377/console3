@@ -72,7 +72,8 @@ public class UserProc implements Serializable {
         AGENT_UPDRADE(11,"代理升级",""),
         BIND_PHONE(12,"绑定手机","userProc.bindPhone"),
         BIND_BANK_CARD(13,"绑定银行卡","userProc.bindBankCard"),
-        BIND_EMAIL(14,"绑定电子邮箱","userProc.bindEmail");
+        BIND_EMAIL(14,"绑定电子邮箱","userProc.bindEmail"),
+        UPDATE_LOGIN_PWD(15,"更新登录密码","userProc.updateLoginPwd");
 
         @EnumValue
         private final Integer key;

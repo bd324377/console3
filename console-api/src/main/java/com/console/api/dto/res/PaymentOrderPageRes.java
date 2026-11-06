@@ -17,7 +17,7 @@ public class PaymentOrderPageRes extends IPageRes<PaymentOrder> {
         this.setSize(paymentOrderIPage.getSize());
         this.setCurrent(paymentOrderIPage.getCurrent());
         this.setTotal(paymentOrderIPage.getTotal());
-        this.setPage(paymentOrderIPage.getPages());
+        this.setPages(paymentOrderIPage.getPages());
         this.setRecords(paymentOrderIPage.getRecords());
     }
 }

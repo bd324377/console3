@@ -18,7 +18,7 @@ public class CashOutOrderPageRes extends IPageRes<CashOutOrder> {
         this.setSize(cashOutOrderIPage.getSize());
         this.setCurrent(cashOutOrderIPage.getCurrent());
         this.setTotal(cashOutOrderIPage.getTotal());
-        this.setPage(cashOutOrderIPage.getPages());
+        this.setPages(cashOutOrderIPage.getPages());
         this.setRecords(cashOutOrderIPage.getRecords());
     }
 }

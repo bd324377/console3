@@ -12,5 +12,5 @@ public class IPageRes<T> {
     private long total;
     private long size;
     private long current;
-    private long page;
+    private long pages;
 }

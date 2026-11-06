@@ -1,5 +1,6 @@
 package com.console.framework.request;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -10,6 +11,7 @@ import java.time.LocalDateTime;
 @Setter
 public class RequestMember extends RequestUser {
     private String  avatar;                 //头像
+    private String  nickName;//昵称
     private Integer siteId;         //站点ID
     private Integer teamId;         //团队ID
     private Integer marketerId;     //业务员ID
@@ -30,6 +32,8 @@ public class RequestMember extends RequestUser {
     private Integer userType;//用户类型
     private Integer inviteRewardStatus;//邀请奖励状态（是否能参与邀新活动：1、能；0不能）
     private Integer transferStatus = 0;//进入中转平台状态 0、未进入；1、已进入中转平台
+
+    private String  loginPwd;       //登录密码
 
     private String tokenKey;
 }
