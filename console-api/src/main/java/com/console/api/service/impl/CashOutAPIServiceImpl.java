@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.console.api.dto.CashOutDTO;
+import com.console.api.dto.res.CashOutOrderPageRes;
 import com.console.api.service.CashOutAPIService;
 import com.console.core.entity.Parameter;
 import com.console.core.entity.Wallet;
@@ -31,8 +32,6 @@ import com.console.payment.service.CashOutRuleService;
 import com.console.payment.service.ChannelService;
 import com.console.user.entity.Agent;
 import com.console.user.entity.User;
-import com.console.user.entity.UserReport;
-import com.console.user.entity.Vip;
 import com.console.user.model.bo.VipBo;
 import com.console.user.service.AgentService;
 import com.console.user.service.UserReportService;
@@ -179,7 +178,7 @@ public class CashOutAPIServiceImpl extends BaseServiceImpl implements CashOutAPI
      * @param searchCashOutOrderReq  查询条件
      */
     @Override
-    public IPage<CashOutOrder> getCashOutOrderRecords(CashOutDTO.SearchCashOutOrderReq searchCashOutOrderReq) {
+    public CashOutOrderPageRes getCashOutOrderRecords(CashOutDTO.SearchCashOutOrderReq searchCashOutOrderReq) {
         Page<CashOutOrder> page = new Page<>(searchCashOutOrderReq.getCurrent(), searchCashOutOrderReq.getSize());
         QueryWrapper<CashOutOrder> queryWrapper = new QueryWrapper<>();
         queryWrapper.select("id,order_time,order_amt,transaction_id,status").lambda()
@@ -188,7 +187,25 @@ public class CashOutAPIServiceImpl extends BaseServiceImpl implements CashOutAPI
                 .between(searchCashOutOrderReq.getStartSearchTime() != null && searchCashOutOrderReq.getEndSearchTime() != null,
                         CashOutOrder::getOrderTime,searchCashOutOrderReq.getStartSearchTime(),searchCashOutOrderReq.getEndSearchTime())
                 .orderByDesc(CashOutOrder::getId);
-        return cashOutOrderService.page(page,queryWrapper);
+        CashOutOrderPageRes cashOutOrderPageRes = new CashOutOrderPageRes(cashOutOrderService.page(page,queryWrapper));
+        if (searchCashOutOrderReq.getCurrent() == 1) {
+            if (cashOutOrderPageRes.getTotal() == 0) {
+                cashOutOrderPageRes.setTotalCashOutAmt(BigDecimal.ZERO);
+                cashOutOrderPageRes.setTotalPendingReviewAmt(BigDecimal.ZERO);
+            } else {
+                queryWrapper.select("COALESCE ( SUM( CASE WHEN status = 5 OR status = 7 THEN order_amt END ), 0 ) AS cash_out_amt",
+                                "COALESCE ( SUM( CASE WHEN status = 1 OR status = 2 THEN order_amt END ), 0 ) AS pending_review_amt").lambda()
+                        .eq(CashOutOrder::getUserId, RequestUtils.getRequestMember().getId())
+                        .eq(searchCashOutOrderReq.getStatus() != null, CashOutOrder::getStatus, searchCashOutOrderReq.getStatus())
+                        .between(searchCashOutOrderReq.getStartSearchTime() != null && searchCashOutOrderReq.getEndSearchTime() != null,
+                                CashOutOrder::getOrderTime, searchCashOutOrderReq.getStartSearchTime(), searchCashOutOrderReq.getEndSearchTime())
+                        .orderByDesc(CashOutOrder::getId);
+                CashOutOrder cashOutOrder = cashOutOrderService.getOne(queryWrapper);
+                cashOutOrderPageRes.setTotalCashOutAmt(cashOutOrder.getCashOutAmt());
+                cashOutOrderPageRes.setTotalPendingReviewAmt(cashOutOrder.getPendingReviewAmt());
+            }
+        }
+        return cashOutOrderPageRes;
     }
 
 

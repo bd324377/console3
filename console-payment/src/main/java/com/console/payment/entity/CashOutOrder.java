@@ -1,9 +1,6 @@
 package com.console.payment.entity;
 
-import com.baomidou.mybatisplus.annotation.EnumValue;
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 import com.console.core.entity.Wallet;
 import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Getter;
@@ -52,6 +49,11 @@ public class CashOutOrder implements Serializable {
     private String errorMsg; // 错误信息
     private Integer errorType; // 错误信息类型 1-可展示给手机端的信息 2-不可展示给手机端的信息
 
+    @TableField(exist = false)
+    private BigDecimal cashOutAmt;
+    @TableField(exist = false)
+    private BigDecimal pendingReviewAmt;
+
     @Getter
     public enum CashOutStatus {
         //1待处理，2入款中，3成功，4失败，5取消，6审核通过，7审核失败，8退款
@@ -62,9 +64,10 @@ public class CashOutOrder implements Serializable {
         CASHOUTING(4, "出款中"),
         SUCCESS(5,"成功"),
         FAILED(6,"提现失败"),
-        CANCEL(7,"订单取消"),
+        FALSE_SUCCESS(7,"假出款成功"),//只扣金额不出款
         REFUNDED(8,"已退款"),
-        TIMEOUT(9,"订单超时");
+        TIMEOUT(9,"订单超时"),
+        SUSPEND(10,"卡单审核");
 
         @JsonValue
         @EnumValue

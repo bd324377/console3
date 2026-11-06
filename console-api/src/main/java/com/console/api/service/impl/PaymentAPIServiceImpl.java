@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.console.api.dto.PaymentDTO;
+import com.console.api.dto.res.PaymentOrderPageRes;
 import com.console.api.service.PaymentAPIService;
 import com.console.core.entity.Parameter;
 import com.console.core.model.bo.MarketerBo;
@@ -99,7 +100,7 @@ public class PaymentAPIServiceImpl extends BaseServiceImpl implements PaymentAPI
     }
 
     @Override
-    public IPage<PaymentOrder> getPaymentOrderRecords(PaymentDTO.SearchPayOrderRes searchPayOrderRes) {
+    public PaymentOrderPageRes getPaymentOrderRecords(PaymentDTO.SearchPayOrderRes searchPayOrderRes) {
         Page<PaymentOrder> page = new Page<>(searchPayOrderRes.getCurrent(), searchPayOrderRes.getSize());
         QueryWrapper<PaymentOrder> queryWrapper = new QueryWrapper<>();
         queryWrapper.select("order_time,transaction_id,order_amt,status").lambda()
@@ -107,7 +108,23 @@ public class PaymentAPIServiceImpl extends BaseServiceImpl implements PaymentAPI
                 .eq(searchPayOrderRes.getStatus() != null,PaymentOrder::getStatus,searchPayOrderRes.getStatus())
                 .between(searchPayOrderRes.getStartSearchTime() != null && searchPayOrderRes.getEndSearchTime() != null,PaymentOrder::getOrderTime,searchPayOrderRes.getStartSearchTime(),searchPayOrderRes.getEndSearchTime())
                 .orderByDesc(PaymentOrder::getId);
-        return paymentOrderService.page(page,queryWrapper);
+        IPage<PaymentOrder> paymentOrderIPage = paymentOrderService.page(page,queryWrapper);
+        PaymentOrderPageRes paymentOrderPageRes = new PaymentOrderPageRes(paymentOrderIPage);
+        if (searchPayOrderRes.getCurrent() == 1) {//第一页必须做汇总
+            if (paymentOrderPageRes.getTotal() == 0) {
+                paymentOrderPageRes.setTotalPaymentAmt(BigDecimal.ZERO);
+            } else {
+                queryWrapper = new QueryWrapper<>();
+                queryWrapper.select("COALESCE ( SUM( CASE WHEN status = 3 THEN order_amt END ), 0 ) AS order_amt").lambda()
+                        .eq(PaymentOrder::getUserId, RequestUtils.getUser(RequestMember.class).getId())
+                        .eq(searchPayOrderRes.getStatus() != null, PaymentOrder::getStatus, searchPayOrderRes.getStatus())
+                        .between(searchPayOrderRes.getStartSearchTime() != null && searchPayOrderRes.getEndSearchTime() != null, PaymentOrder::getOrderTime, searchPayOrderRes.getStartSearchTime(), searchPayOrderRes.getEndSearchTime())
+                        .orderByDesc(PaymentOrder::getId);
+                PaymentOrder paymentOrder = paymentOrderService.getOne(queryWrapper);
+                paymentOrderPageRes.setTotalPaymentAmt(paymentOrder.getOrderAmt());
+            }
+        }
+        return paymentOrderPageRes;
     }
 
     /** 判断首充参数 **/
