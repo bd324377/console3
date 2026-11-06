@@ -12,10 +12,12 @@ import com.console.framework.request.RequestMember;
 import com.console.framework.utils.I18nUtil;
 import com.console.framework.utils.RequestUtils;
 import com.console.framework.utils.TokenUtils;
+import com.console.user.entity.Avatar;
 import com.console.user.entity.BindPhoneRecord;
 import com.console.user.entity.User;
 import com.console.user.mapper.BindPhoneRecordMapper;
 import com.console.user.model.bo.VipBo;
+import com.console.user.service.AvatarService;
 import com.console.user.service.UserService;
 import com.console.user.service.VipService;
 import jakarta.annotation.Resource;
@@ -26,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -38,6 +41,8 @@ public class UserAPIServiceImpl implements UserAPIService {
     private UserProcMerger userProcMerger;
     @Resource
     private BindPhoneRecordMapper bindPhoneRecordMapper;
+    @Resource
+    private AvatarService avatarService;
 
     @Override
     public SelfInfoRes selfInfo() {
@@ -165,6 +170,12 @@ public class UserAPIServiceImpl implements UserAPIService {
             }
         }
         return true;
+    }
+
+    @Override
+    public List<Avatar> getAvatarList(Integer sex) {
+        RequestMember requestMember = RequestUtils.getRequestMember();
+        return avatarService.getAvatarList(requestMember.getMarketerId(),sex);
     }
 
 }

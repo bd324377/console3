@@ -47,11 +47,11 @@ public class UserAPI {
         return userAPIService.updateSelfInfo(updateUserInfoReq) ? Result.success() : Result.failed(2);
     }
 
-//    /**
-//     * 获取系统头像列表
-//     */
-//    @PostMapping("/avatarOptions/{sex}")
-//    public Result getAvatarPicUrlOptions(@PathVariable("sex") Integer sex) {
-//        return Result.success(userAPIService.getAvatarList(sex));
-//    }
+    /**
+     * 获取系统头像列表
+     */
+    @PostMapping("/avatarOptions/{sex}")
+    public Result getAvatarPicUrlOptions(@PathVariable("sex") Integer sex) {
+        return Result.success(userAPIService.getAvatarList(sex));
+    }
 }

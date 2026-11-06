@@ -26,8 +26,10 @@ public class Avatar implements Serializable {
     @TableId(value = "id",type = IdType.AUTO)
     @NotNull(groups = ValidationGroup.update.class)
     private Integer id;
+    private Integer marketSiteId;
     private Integer sex;    //性别 1、男；0、女
     @NotBlank(groups = ValidationGroup.insert.class)
     private String avatarPath;//头像地址
     private String avatarName;//头像名称
+    private Integer sort;//排序字段
 }
