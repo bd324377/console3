@@ -16,6 +16,7 @@ public class VipBo implements Serializable {//VIP相关信息
     private Integer id;
     private String vipName;//vip等级名称
     private String icon;//图标
+    private Integer level;
     private Integer cashOutStatus;//是否能提现：1是0否
     private BigDecimal cashOutRate;//提现手续费率
     private BigDecimal dayCashOutLimit;//日提现限额

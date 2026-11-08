@@ -31,6 +31,7 @@ public class VipServiceImpl extends BaseServiceImpl<VipMapper, Vip> implements V
         VipBo vipBo = new VipBo();
         vipBo.setId(vipId);
         vipBo.setIcon(vip.getIcon());
+        vipBo.setLevel(vip.getLevel());
         vipBo.setVipName(vip.getVipName());
         vipBo.setCashOutStatus(vip.getCashOutStatus());
         vipBo.setCashOutRate(vip.getCashOutRate());

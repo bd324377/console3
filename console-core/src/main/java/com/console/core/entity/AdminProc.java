@@ -98,6 +98,7 @@ public class AdminProc implements Serializable {
         CHANNEL(13,"支付渠道管理"),
         CUSTOMER_CARE(14,"客服管理"),
         AVATAR(15,"头像管理"),
+        ACTIVITY(16,"活动管理"),
 
         MENU(2,"菜单管理"),
         ROLE_MENU(3,"权限管理"),

@@ -50,6 +50,8 @@ public class CacheConstants {
     public static final String CUSTOMER_CARE_LIST = "SUCTOM_CARE_LIST";
     public static final String PRODUCT_TYPE_LIST = "PRODUCT_TYPE_LIST";
     public static final String AVATAR = "AVATAR";//头像
+    public static final String ACTIVITY = "ACTIVITY";//活动
+    public static final String ACTIVITY_LIST = "ACTIVITY_LIST";//活动列表
 
     //=========业务==========
     public static final String CAPTCHA_CODE = "CAPTCHA_CODE:";
