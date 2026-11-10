@@ -23,6 +23,12 @@
             <artifactId>console-core</artifactId>
             <version>0.0.1</version>
         </dependency>
+        <!-- Disruptor -->
+        <dependency>
+            <groupId>com.lmax</groupId>
+            <artifactId>disruptor</artifactId>
+            <version>4.0.0</version>
+        </dependency>
     </dependencies>
     <build>
         <plugins>

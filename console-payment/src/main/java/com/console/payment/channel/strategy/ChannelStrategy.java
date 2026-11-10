@@ -87,7 +87,7 @@ public class ChannelStrategy {
                 if (!checkOrderAmt(paymentOrder.getOrderAmt(),channelResult)) {
                     return false;//金额不一致
                 }
-                orderCallBackHandler.handlePaymentOrderByCallBack(paymentOrder, channelResult);
+                orderCallBackHandler.handleCashOutOrderByCallBack(paymentOrder, channelResult);
                 return true;
             }
         } catch (InterruptedException e) {
@@ -116,7 +116,7 @@ public class ChannelStrategy {
                 if (!checkOrderAmt(cashOutOrder.getOrderAmt(),channelResult)) {
                     return false;//金额不一致
                 }
-                orderCallBackHandler.handlePaymentOrderByCallBack(cashOutOrder, channelResult);
+                orderCallBackHandler.handleCashOutOrderByCallBack(cashOutOrder, channelResult);
                 return true;
             }
         } catch (InterruptedException e) {
@@ -131,7 +131,9 @@ public class ChannelStrategy {
 
     /** 订单金额和回调金额校验 **/
     private boolean checkOrderAmt(BigDecimal orderAmt, ChannelResult channelResult) {
-        BigDecimal callBackAmt = channelResult.getAmtUnit() == Channel.AmtUnit.FEN ? (new BigDecimal(channelResult.getAmount()).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP)) : new BigDecimal(channelResult.getAmount());
+        BigDecimal callBackAmt = channelResult.getAmtUnit() == Channel.AmtUnit.FEN ?
+                (channelResult.getAmount().divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP)) :
+                channelResult.getAmount();
         return orderAmt.compareTo(callBackAmt) == 0;
     }
 }

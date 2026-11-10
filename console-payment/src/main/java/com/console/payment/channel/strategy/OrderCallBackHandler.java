@@ -9,10 +9,11 @@ import com.console.core.merger.UserProcMerger;
 import com.console.core.merger.WalletProcMerger;
 import com.console.core.service.WalletService;
 import com.console.framework.config.DynamicTableNameHandler;
+import com.console.framework.constants.ActivityEvent;
+import com.console.framework.constants.ActivityType;
 import com.console.framework.constants.CacheConstants;
-import com.console.framework.domain.BusinessException;
-import com.console.framework.domain.ResultCode;
 import com.console.framework.utils.DateUtils;
+import com.console.framework.utils.SpringUtils;
 import com.console.framework.utils.TenantUtils;
 import com.console.payment.channel.model.ChannelResult;
 import com.console.payment.entity.CashOutOrder;
@@ -55,7 +56,7 @@ public class OrderCallBackHandler {
     @Resource
     private RedisLockRegistry redisLockRegistry;
     @Async
-    public void handlePaymentOrderByCallBack(PaymentOrder paymentOrder, ChannelResult channelResult) {
+    public void handleCashOutOrderByCallBack(PaymentOrder paymentOrder, ChannelResult channelResult) {
         String lockKey = CacheConstants.ACQUIRE_LOCK_UPDATE_PAYMENT_ORDER_STATE + channelResult.getTenantId() + ":" + paymentOrder.getId();
         Lock lock = redisLockRegistry.obtain(lockKey);
         boolean locked = false;
@@ -106,6 +107,12 @@ public class OrderCallBackHandler {
                         //添加支付成功过程
                         PaymentProc paymentProc = new PaymentProc(paymentOrder, PaymentProc.ProcType.ONLINE_PAYMENT_SUCCESS);
                         paymentProcMerger.submit(paymentProc);
+                        if (paymentOrder.getActivityId() != null) {//参与单次充值活动//0、用户ID；1、充值次数；2、充值金额
+                            String paramStr = paymentOrder.getUserId() + ";" + paymentOrder.getRechargeTimes() + ";" + paymentOrder.getOrderAmt();
+                            ActivityEvent activityEvent = new ActivityEvent(paymentOrder.getActivityId(),
+                                    ActivityType.SINGLE_RECHARGE,paymentOrder.getUserId(),channelResult.getTenantId(),paramStr);
+                            SpringUtils.publishEvent(activityEvent);
+                        }
                     }
                 }
             } else {//失败则添加失败信息
@@ -126,7 +133,7 @@ public class OrderCallBackHandler {
     }
 
     @Async
-    public void handlePaymentOrderByCallBack(CashOutOrder cashOutOrder, ChannelResult channelResult) {
+    public void handleCashOutOrderByCallBack(CashOutOrder cashOutOrder, ChannelResult channelResult) {
         String lockKey = CacheConstants.ACQUIRE_LOCK_UPDATE_CASH_OUT_ORDER_STATE + channelResult.getTenantId() + ":" + cashOutOrder.getId();
         Lock lock = redisLockRegistry.obtain(lockKey);
         boolean locked = false;

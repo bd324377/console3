@@ -12,6 +12,8 @@ import com.github.xiaolyuh.annotation.FirstCache;
 import com.github.xiaolyuh.annotation.SecondaryCache;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class VipServiceImpl extends BaseServiceImpl<VipMapper, Vip> implements VipService {
     @Override
@@ -48,5 +50,10 @@ public class VipServiceImpl extends BaseServiceImpl<VipMapper, Vip> implements V
             vipBo.setUpgradeOrderAmt(nextLevel.getUpgradeOrderAmt());
         }
         return vipBo;
+    }
+
+    @Override
+    public List<Vip> getVipList() {
+        return this.list();
     }
 }

@@ -2,11 +2,13 @@ package com.console.activity.dto.req;
 
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.console.activity.entity.Activity;
+import com.console.activity.entity.ActivityPrize;
 import com.console.activity.entity.ActivityRule;
 import com.console.activity.entity.ActivityRuleItem;
 import com.console.core.entity.AdminProc;
 import com.console.core.entity.Wallet;
 import com.console.core.model.req.BaseUpdateReq;
+import com.console.framework.constants.ActivityType;
 import com.console.framework.constants.LoginChannel;
 import com.console.framework.domain.IUpdateField;
 import jakarta.validation.constraints.NotNull;
@@ -23,6 +25,7 @@ public class ActivityReq {
     @Getter
     @Setter
     public static class AddActivityReq {
+        private Integer marketSiteId;
         private String  activityName;//活动名称
         private String  blurb;//活动简介
         private String  activityCode;//活动编码
@@ -32,10 +35,11 @@ public class ActivityReq {
         private Integer cycleRewardTimes;//周期内可触发次数
         private LoginChannel loginChannel;//登录渠道
         private Wallet.WalletType rewardWalletType;//奖励进入的钱包类型，同钱包类型
-        private Activity.ActivityType type;//活动类型
+        private ActivityType activityType;//活动类型
         private LocalDateTime startTime;//开始时间
         private LocalDateTime endTime;//结束时间
-        private Integer status;//活动状态：0、停用；1、可用
+        private Integer activityStatus;//活动状态：0、停用；1、可用
+        private Integer showStatus;//展示状态 1、展示；0、不展示
         private Integer sort;//排序，值越高排越前
         private String  routePath;//路由地址
         private Integer isHot;//是否为热门活动
@@ -85,6 +89,26 @@ public class ActivityReq {
             }
             return null;
         }
+
+        public List<ActivityPrize> buildActivityPirzes(List<ActivityRule> ruleList) {
+            if (!ObjectUtils.isEmpty(activityRules)) {
+                List<ActivityPrize> activityPrizeList = new ArrayList<>();
+                for (int i = 0; i < activityRules.size();i++) {
+                    ActivityRule activityRule = ruleList.get(i);
+                    ActivityRuleReq.AddActivityRuleReq activityRuleReq = activityRules.get(i);
+                    if (!ObjectUtils.isEmpty(activityRuleReq.getActivityPrizes())) {
+                        for (ActivityPrize activityPrize : activityRuleReq.getActivityPrizes()) {
+                            activityPrize.setId(null);
+                            activityPrize.setActivityId(activityRule.getActivityId());
+                            activityPrize.setActivityRuleId(activityRule.getId());
+                            activityPrizeList.add(activityPrize);
+                        }
+                    }
+                }
+                return activityPrizeList;
+            }
+            return null;
+        }
     }
 
     @Getter
@@ -106,6 +130,8 @@ public class ActivityReq {
         private LocalDateTime startTime;//开始时间
         private LocalDateTime endTime;//结束时间
         private Integer status;//活动状态：0、停用；1、可用
+        private Integer showStatus;
+        private ActivityType activityType;
         private Integer sort;//排序，值越高排越前
         private String routePath;//路由地址
         private Integer isHot;//是否为热门活动
@@ -123,6 +149,8 @@ public class ActivityReq {
             LOGIN_CHANNEL("loginChannel",Activity::getLoginChannel,"activity.proc.update.loginChannel"),
             REWARD_WALLET_TYPE("rewardWalletType",Activity::getRewardWalletType,"activity.proc.update.rewardWalletType"),
             STATUS("status",Activity::getActivityStatus,"activity.proc.update.status"),
+            SHOW_STATUS("showStatus",Activity::getShowStatus,"activity.proc.update.showStatus"),
+            ACTIVITY_TYPE("activityType",Activity::getActivityType,"activity.proc.update.activityType"),
             SORT("sort",Activity::getSort,"activity.proc.update.sort"),
             ROUTE_PATH("routePath",Activity::getRoutePath,"activity.proc.update.routePath"),
             IS_HOT("isHot",Activity::getIsHot,"activity.proc.update.isHot"),

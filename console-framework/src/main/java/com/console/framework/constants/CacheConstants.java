@@ -80,4 +80,5 @@ public class CacheConstants {
     public static final String ACQUIRE_LOCK_PHONE_SYNC_PUSH = "ACQUIRE_LOCK:PHONE_SYNC_PUSH";//手机上传同步行为推送
     public static final String ACQUIRE_LOCK_AGENT_LAYER_SYNC_PUSH = "ACQUIRE_LOCK:AGENT_LAYER_SYNC_PUSH";//代理层级关系同步给总租户推送
     public static final String ACQUIRE_LOCK_USER_REPORT_SYNC_PUSH = "ACQUIRE_LOCK:USER_REPORT_SYNC_PUSH";//代理层级关系同步给总租户推送
+    public static final String ACQUIRE_LOCK_TRIGGER_ACTIVITY = "ACQUIRE_LOCK:TRIGGER_ACTIVITY:";//活动触发
 }

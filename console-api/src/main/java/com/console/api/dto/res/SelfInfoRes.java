@@ -12,6 +12,7 @@ public class SelfInfoRes {
     private Integer userId;                 //用户ID
     private String  avatar;                 //头像
 
+    private Integer vipLevel;
     private String  vipName;                //VIP名称
     private String  vipIcon;                //VIP图标
     private BigDecimal orderAmt;            //当前下单金额

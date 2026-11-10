@@ -1,5 +1,6 @@
 package com.console.activity.dto.req;
 
+import com.console.activity.entity.ActivityPrize;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -10,6 +11,7 @@ public class ActivityRuleReq {
     @Getter
     @Setter
     public static class AddActivityRuleReq {
+        private Integer activityId;             //
         private String  ruleName;               //规则名称
         private Integer triggerType;            //奖励触发类型,1、全部满足；2、满足一项
         private Integer receiveType;            //奖励领取类型,1、全部领取；2、随机领取1件
@@ -17,5 +19,6 @@ public class ActivityRuleReq {
         private Integer ruleKey;                //排序
 
         private List<ActivityRuleItemReq.AddActivityRuleItemReq> activityRuleItems;
+        private List<ActivityPrize> activityPrizes;
     }
 }

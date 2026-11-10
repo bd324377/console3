@@ -59,6 +59,7 @@ public class UserAPIServiceImpl implements UserAPIService {
         selfInfoRes.setAvatar(requestMember.getAvatar());
 
         VipBo vip = vipService.getVipById(requestMember.getVipId());
+        selfInfoRes.setVipLevel(vip.getLevel());
         selfInfoRes.setVipName(vip.getVipName());
         selfInfoRes.setVipIcon(vip.getIcon());
         selfInfoRes.setUpgradeRechargeAmt(vip.getUpgradeRechargeAmt());

@@ -12,7 +12,8 @@ public enum RecordType {
     PAYMENT_PROC("PAYMENT_PROC"),
     CASH_OUT_PROC("CASH_OUT_PROC"),
     WALLET_PROC("WALLET_PROC"),
-    USER_PRODUCT("USER_PRODUCT");
+    USER_PRODUCT("USER_PRODUCT"),
+    ACTIVITY_PROC("ACTIVITY_PROC");
     @JsonValue
     private final String code;
 

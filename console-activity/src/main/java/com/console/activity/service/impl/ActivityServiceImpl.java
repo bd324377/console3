@@ -5,17 +5,20 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.console.activity.dto.req.ActivityReq;
 import com.console.activity.entity.Activity;
+import com.console.activity.entity.ActivityPrize;
 import com.console.activity.entity.ActivityRule;
 import com.console.activity.entity.ActivityRuleItem;
+import com.console.activity.entity.Prize;
 import com.console.activity.mapper.ActivityMapper;
+import com.console.activity.service.ActivityPrizeService;
 import com.console.activity.service.ActivityRuleItemService;
 import com.console.activity.service.ActivityRuleService;
 import com.console.activity.service.ActivityService;
+import com.console.activity.service.PrizeService;
 import com.console.core.entity.AdminProc;
 import com.console.core.service.impl.BaseServiceImpl;
 import com.console.framework.domain.BusinessException;
 import com.console.framework.request.RequestBackendUser;
-import com.console.framework.utils.FieldUtils;
 import com.console.framework.utils.RequestUtils;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
@@ -31,26 +34,41 @@ public class ActivityServiceImpl extends BaseServiceImpl<ActivityMapper, Activit
     private ActivityRuleService activityRuleService;
     @Resource
     private ActivityRuleItemService activityRuleItemService;
+    @Resource
+    private ActivityPrizeService activityPrizeService;
+    @Resource
+    private PrizeService prizeService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean addActivity(ActivityReq.AddActivityReq addActivityReq) {
         RequestBackendUser requestBackendUser = RequestUtils.getRequestBackendUser();
         Activity activity = addActivityReq.buildActivity();
+        if (activity.getMarketSiteId() == null) {
+            activity.setMarketSiteId(requestBackendUser.getMarketSiteId());
+        }
+        validateTime(activity.getStartTime(), activity.getEndTime());
         if (this.save(activity)) {
             List<ActivityRule> activityRules = addActivityReq.buildActivityRules(activity.getId());
             if (!ObjectUtils.isEmpty(activityRules)) {
-                if (activityRuleService.saveBatch(activityRules)) {
-                    List<ActivityRuleItem> activityRuleItems = addActivityReq.buildActivityRuleItems(activityRules);
-                    if (activityRuleItemService.saveBatch(activityRuleItems)) {
-                        AdminProc adminProc = new AdminProc(requestBackendUser, AdminProc.ProcBelong.ACTIVITY, AdminProc.ProcType.ADD,activity.getId(),null,activity);
-                        adminProcMapper.insert(adminProc);
-                        return true;
-                    }
+                if (!activityRuleService.saveBatch(activityRules)) {
+                    throw new BusinessException(500, "新增活动规则失败");
+                }
+                List<ActivityRuleItem> activityRuleItems = addActivityReq.buildActivityRuleItems(activityRules);
+                List<ActivityPrize> activityPrizes = addActivityReq.buildActivityPirzes(activityRules);
+                for (ActivityPrize activityPrize : activityPrizes) {
+                    activityPrize.setSurpCount(activityPrize.getCount());
+                }
+                if ((!activityRuleItems.isEmpty() && !activityRuleItemService.saveBatch(activityRuleItems))
+                        || (!activityPrizes.isEmpty() && !activityPrizeService.saveBatch(activityPrizes))) {
+                    throw new BusinessException(500, "新增活动规则明细或奖励失败");
                 }
             }
+            adminProcMapper.insert(new AdminProc(requestBackendUser, AdminProc.ProcBelong.ACTIVITY,
+                    AdminProc.ProcType.ADD, activity.getId(), null, activity));
+            return true;
         }
-        return false;
+        throw new BusinessException(500,"新增活动失败，请稍后重试");
     }
 
     @Override
@@ -63,21 +81,15 @@ public class ActivityServiceImpl extends BaseServiceImpl<ActivityMapper, Activit
         if (activity == null) {
             throw new BusinessException(500,"删除活动失败，平台未找到该活动");
         }
-        if (this.removeById(activityId)) {
-            QueryWrapper<ActivityRule> ruleQueryWrapper = new QueryWrapper<>();
-            ruleQueryWrapper.lambda().eq(ActivityRule::getActivityId,activityId);
-            activityRuleService.remove(ruleQueryWrapper);
-
-            QueryWrapper<ActivityRuleItem> ruleItemQueryWrapper = new QueryWrapper<>();
-            ruleQueryWrapper.lambda().eq(ActivityRule::getActivityId,activityId);
-            activityRuleItemService.remove(ruleItemQueryWrapper);
-
-            AdminProc adminProc = new AdminProc(requestBackendUser, AdminProc.ProcBelong.ACTIVITY, AdminProc.ProcType.DELETE,activity.getId(),activity,null);
-            adminProcMapper.insert(adminProc);
-            //清除缓存
-            return true;
+        activityPrizeService.lambdaUpdate().eq(ActivityPrize::getActivityId, activityId).remove();
+        activityRuleItemService.lambdaUpdate().eq(ActivityRuleItem::getActivityId, activityId).remove();
+        activityRuleService.lambdaUpdate().eq(ActivityRule::getActivityId, activityId).remove();
+        if (!this.removeById(activityId)) {
+            throw new BusinessException(409, "活动已变更，请刷新后重试");
         }
-        return false;
+        adminProcMapper.insert(new AdminProc(requestBackendUser, AdminProc.ProcBelong.ACTIVITY,
+                AdminProc.ProcType.DELETE, activityId, activity, null));
+        return true;
     }
 
     @Override
@@ -86,6 +98,7 @@ public class ActivityServiceImpl extends BaseServiceImpl<ActivityMapper, Activit
         RequestBackendUser requestBackendUser = RequestUtils.getRequestBackendUser();
         QueryWrapper<Activity> queryWrapper = new QueryWrapper<>();
         if (field.equals("activityTime")) {
+            validateTime(updateActivityReq.getStartTime(), updateActivityReq.getEndTime());
             queryWrapper.select("id,start_time,end_time").lambda().eq(Activity::getId, updateActivityReq.getId());
             Activity activity = this.getOne(queryWrapper);
             if (activity == null) {
@@ -101,7 +114,7 @@ public class ActivityServiceImpl extends BaseServiceImpl<ActivityMapper, Activit
                 return true;
             }
         } else {
-            queryWrapper.select("id", FieldUtils.convertToUnderscore(field)).lambda().eq(Activity::getId, updateActivityReq.getId());
+            queryWrapper.lambda().eq(Activity::getId, updateActivityReq.getId());
             Activity activity = this.getOne(queryWrapper);
             updateActivityReq.buildUpdateParam(field, activity, requestBackendUser);
             if (this.update(updateActivityReq.getUpdateWrapper())) {
@@ -114,13 +127,14 @@ public class ActivityServiceImpl extends BaseServiceImpl<ActivityMapper, Activit
 
     @Override
     public Object getActivityPage(Page<Activity> page) {
-        return this.page(page);
+        return this.lambdaQuery().orderByDesc(Activity::getId).page(page);
     }
 
     @Override
     public List<Activity> getActivityList(Integer marketSiteId) {
         QueryWrapper<Activity> queryWrapper = new QueryWrapper<>();
-        queryWrapper.select("activity_name,blurb,icon,cycle_reward_times,reward_wallet_type,activity_type,start_time,end_time,route_path,is_hot")
+        queryWrapper.select("id,activity_name,blurb,icon,cycle_reward_times,reward_wallet_type,activity_type," +
+                        "start_time,end_time,route_path,is_hot")
                 .lambda()
                 .eq(Activity::getMarketSiteId,marketSiteId)
                 .eq(Activity::getActivityStatus,1)
@@ -132,5 +146,11 @@ public class ActivityServiceImpl extends BaseServiceImpl<ActivityMapper, Activit
 
     private void clearActivityCache() {
 
+    }
+
+    private void validateTime(LocalDateTime startTime, LocalDateTime endTime) {
+        if (startTime != null && endTime != null && !startTime.isBefore(endTime)) {
+            throw new BusinessException(400, "活动开始时间必须早于结束时间");
+        }
     }
 }

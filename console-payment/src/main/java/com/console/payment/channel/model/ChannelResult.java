@@ -6,6 +6,8 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
+
 @Getter
 @Setter
 public class ChannelResult {
@@ -19,7 +21,7 @@ public class ChannelResult {
     private String merchantId;
     private String merchantOrderNo;
     private String orderNo;
-    private Integer amount;
+    private BigDecimal amount;
     private String currency;
     private Integer status;
     private String payUrl;
