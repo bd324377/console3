@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Getter;
 
 @Getter
-public enum PrizeType {
+public enum RewardType {
     UNDEFINED(0, "未定义奖励"),
     ACTUAL(1, "实物奖励"),
     CASH(2, "现金奖励"),
@@ -21,12 +21,12 @@ public enum PrizeType {
     private final Integer key;
     private final String value;
 
-    PrizeType(int key, String value) {
+    RewardType(int key, String value) {
         this.key = key;
         this.value = value;
     }
 
-    public static PrizeType getPrizeByKey(int key) {
+    public static RewardType getPrizeByKey(int key) {
         return switch (key) {
             case 1 -> ACTUAL;
             case 2 -> CASH;

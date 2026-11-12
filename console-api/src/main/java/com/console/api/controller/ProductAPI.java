@@ -51,8 +51,13 @@ public class ProductAPI {
     }
 
     /** 获取产品历史记录 **/
-    @RequestMapping("/productHistoryRecord")
+    @PostMapping("/productHistoryRecord")
     public Result getHistoryProductIdList() {
         return Result.success(productAPIService.getHistoryProductIds());
+    }
+
+    @PostMapping("/productOrderRecord")
+    public Result getProductOrderRecord(ProductReq.SearchProductOrderReq searchProductOrderReq) {
+        return Result.success();
     }
 }

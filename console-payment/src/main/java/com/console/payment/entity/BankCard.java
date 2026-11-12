@@ -49,6 +49,17 @@ public class BankCard implements Serializable {
             this.key = key;
             this.value = value;
         }
+
+        public static BankCardType getBankCardTypeKey(int key) {
+            return switch (key) {
+                case 1 -> CPF;
+                case 2 -> PHONE;
+                case 3 -> EMAIL;
+                case 4 -> CNPJ;
+                case 5 -> EVP;
+                default -> UNFIND;
+            };
+        }
     }
 
     @Getter

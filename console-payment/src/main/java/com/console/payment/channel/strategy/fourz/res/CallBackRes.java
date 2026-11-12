@@ -6,6 +6,8 @@ import com.console.payment.utils.PaymentUtils;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
+
 @Getter
 @Setter
 public class CallBackRes extends OrderRes {
@@ -27,7 +29,7 @@ public class CallBackRes extends OrderRes {
         channelResult.setSuccess(true);
         channelResult.setOrderNo(orderNo);
         channelResult.setMerchantOrderNo(merchantOrderNo);
-        channelResult.setAmount(Integer.parseInt(amount));
+        channelResult.setAmount(new BigDecimal(amount));
         channelResult.setStatus(OrderStatus.getOrderStatusByValue(this.getStatus()).getKey());
         String[] parts = this.getMerchantOrderNo().split("_");
         channelResult.setTenantId(Integer.valueOf(parts[1]));

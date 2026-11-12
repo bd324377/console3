@@ -23,7 +23,7 @@ public class PaymentAPI {
      * 支付订单查询
      */
     @PostMapping("/paymentOrderRecord")
-    public Result getPaymentOrderRecord(@RequestBody PaymentDTO.SearchPayOrderRes searchPayOrderRes) {
-        return Result.success(paymentAPIService.getPaymentOrderRecords(searchPayOrderRes));
+    public Result getPaymentOrderRecord(@RequestBody PaymentDTO.SearchPayOrderReq searchPayOrderReq) {
+        return Result.success(paymentAPIService.getPaymentOrderRecords(searchPayOrderReq));
     }
 }

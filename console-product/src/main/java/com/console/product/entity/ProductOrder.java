@@ -31,7 +31,7 @@ public class ProductOrder implements Serializable {
     private String parentOrderId;//父订单id
     private Integer userId;
     @JSONField(name = "gameId")
-    private Long productId;//产品id
+    private Integer productId;//产品id
     @JSONField(name = "platId")
     private Integer platformId;//产商id
     @JSONField(name = "gameCateId")
@@ -58,4 +58,7 @@ public class ProductOrder implements Serializable {
     private Integer tenantId;
     @TableField(exist = false)
     private Integer orderCount;//订单数量
+
+    @TableField(exist = false)
+    private String productName;
 }

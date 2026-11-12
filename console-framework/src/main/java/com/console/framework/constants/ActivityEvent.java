@@ -22,13 +22,14 @@ public class ActivityEvent {
     private Integer eventType = TRIGGER;
     private CompletableFuture<Object> resultFuture;
 
+    public ActivityEvent() {}
     public ActivityEvent(Integer activityId,ActivityType activityType,Integer userId,Integer tenantId,Object param) {
-        this.eventId = IdWorker.getId();
-        this.activityId = activityId;
+        this.eventId      = IdWorker.getId();
+        this.activityId   = activityId;
         this.activityType = activityType;
-        this.userId = userId;
-        this.param = param;
-        this.tenantId = tenantId;
+        this.userId       = userId;
+        this.param        = param;
+        this.tenantId     = tenantId;
     }
 
     public void clear() {

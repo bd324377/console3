@@ -4,28 +4,32 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.console.activity.dto.req.ActivityReq;
+import com.console.activity.dto.res.ActivityDetails;
+import com.console.activity.dto.res.ActivityRuleDetail;
 import com.console.activity.entity.Activity;
-import com.console.activity.entity.ActivityPrize;
+import com.console.activity.entity.ActivityReward;
 import com.console.activity.entity.ActivityRule;
 import com.console.activity.entity.ActivityRuleItem;
-import com.console.activity.entity.Prize;
 import com.console.activity.mapper.ActivityMapper;
-import com.console.activity.service.ActivityPrizeService;
+import com.console.activity.service.ActivityRewardService;
 import com.console.activity.service.ActivityRuleItemService;
 import com.console.activity.service.ActivityRuleService;
 import com.console.activity.service.ActivityService;
 import com.console.activity.service.PrizeService;
 import com.console.core.entity.AdminProc;
 import com.console.core.service.impl.BaseServiceImpl;
+import com.console.framework.constants.ActivityType;
 import com.console.framework.domain.BusinessException;
 import com.console.framework.request.RequestBackendUser;
 import com.console.framework.utils.RequestUtils;
 import jakarta.annotation.Resource;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -35,9 +39,7 @@ public class ActivityServiceImpl extends BaseServiceImpl<ActivityMapper, Activit
     @Resource
     private ActivityRuleItemService activityRuleItemService;
     @Resource
-    private ActivityPrizeService activityPrizeService;
-    @Resource
-    private PrizeService prizeService;
+    private ActivityRewardService activityRewardService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -55,12 +57,12 @@ public class ActivityServiceImpl extends BaseServiceImpl<ActivityMapper, Activit
                     throw new BusinessException(500, "新增活动规则失败");
                 }
                 List<ActivityRuleItem> activityRuleItems = addActivityReq.buildActivityRuleItems(activityRules);
-                List<ActivityPrize> activityPrizes = addActivityReq.buildActivityPirzes(activityRules);
-                for (ActivityPrize activityPrize : activityPrizes) {
-                    activityPrize.setSurpCount(activityPrize.getCount());
+                List<ActivityReward> activityRewards = addActivityReq.buildActivityPirzes(activityRules);
+                for (ActivityReward activityReward : activityRewards) {
+                    activityReward.setSurpCount(activityReward.getCount());
                 }
                 if ((!activityRuleItems.isEmpty() && !activityRuleItemService.saveBatch(activityRuleItems))
-                        || (!activityPrizes.isEmpty() && !activityPrizeService.saveBatch(activityPrizes))) {
+                        || (!activityRewards.isEmpty() && !activityRewardService.saveBatch(activityRewards))) {
                     throw new BusinessException(500, "新增活动规则明细或奖励失败");
                 }
             }
@@ -81,7 +83,7 @@ public class ActivityServiceImpl extends BaseServiceImpl<ActivityMapper, Activit
         if (activity == null) {
             throw new BusinessException(500,"删除活动失败，平台未找到该活动");
         }
-        activityPrizeService.lambdaUpdate().eq(ActivityPrize::getActivityId, activityId).remove();
+        activityRewardService.lambdaUpdate().eq(ActivityReward::getActivityId, activityId).remove();
         activityRuleItemService.lambdaUpdate().eq(ActivityRuleItem::getActivityId, activityId).remove();
         activityRuleService.lambdaUpdate().eq(ActivityRule::getActivityId, activityId).remove();
         if (!this.removeById(activityId)) {
@@ -134,7 +136,7 @@ public class ActivityServiceImpl extends BaseServiceImpl<ActivityMapper, Activit
     public List<Activity> getActivityList(Integer marketSiteId) {
         QueryWrapper<Activity> queryWrapper = new QueryWrapper<>();
         queryWrapper.select("id,activity_name,blurb,icon,cycle_reward_times,reward_wallet_type,activity_type," +
-                        "start_time,end_time,route_path,is_hot")
+                        "start_time,end_time,activity_status,route_path,is_hot")
                 .lambda()
                 .eq(Activity::getMarketSiteId,marketSiteId)
                 .eq(Activity::getActivityStatus,1)
@@ -142,6 +144,54 @@ public class ActivityServiceImpl extends BaseServiceImpl<ActivityMapper, Activit
                 .gt(Activity::getEndTime, LocalDateTime.now())
                 .orderByDesc(Activity::getSort);
         return this.list(queryWrapper);
+    }
+
+    @Override
+    public List<Activity> getActivityList(Integer marketSiteId, ActivityType activityType) {
+        QueryWrapper<Activity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.select("id,activity_name,blurb,icon,cycle_reward_times,reward_wallet_type,activity_type," +
+                        "start_time,end_time,activity_status,route_path,is_hot")
+                .lambda()
+                .eq(Activity::getMarketSiteId,marketSiteId)
+                .eq(Activity::getActivityStatus,1)
+                .eq(Activity::getActivityType,activityType)
+                .lt(Activity::getStartTime, LocalDateTime.now())
+                .gt(Activity::getEndTime, LocalDateTime.now())
+                .orderByDesc(Activity::getSort);
+        return this.list(queryWrapper);
+    }
+
+    @Override
+    public Activity getActivityById(Integer activityId) {
+        QueryWrapper<Activity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.select("id,exclusion_code,activity_name,blurb,icon,cycle_reward_times,reward_wallet_type,activity_type,start_time,end_time").lambda().eq(Activity::getId,activityId);
+        return this.getOne(queryWrapper);
+    }
+
+    @Override
+    public Activity getActivityByCode(String activityCode) {
+        QueryWrapper<Activity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.select("id,exclusion_code,activity_name,blurb,icon,cycle_reward_times,reward_wallet_type,activity_type,start_time,end_time").lambda().eq(Activity::getActivityCode,activityCode);
+        return this.getOne(queryWrapper);
+    }
+
+    @Override
+    public ActivityDetails getActivityDetails(Activity activity) {
+        ActivityDetails activityDetails = new ActivityDetails();
+        BeanUtils.copyProperties(activity,activityDetails);
+        List<ActivityRuleDetail> activityRuleDetailList = new ArrayList<>();
+        List<ActivityRule> activityRules = activityRuleService.getActivityRules(activity.getId());
+        for (ActivityRule activityRule : activityRules) {
+            ActivityRuleDetail activityRuleDetail = new ActivityRuleDetail();
+            BeanUtils.copyProperties(activityRule,activityRuleDetail);
+            List<ActivityRuleItem> activityRuleItems = activityRuleItemService.getActivityRuleItems(activity.getId(),activityRule.getId());
+            List<ActivityReward> activityRewards = activityRewardService.getActivityRewards(activity.getId(),activityRule.getId());
+            activityRuleDetail.setActivityRuleItems(activityRuleItems);
+            activityRuleDetail.setActivityRewards(activityRewards);
+            activityRuleDetailList.add(activityRuleDetail);
+        }
+        activityDetails.setActivityRuleDetailList(activityRuleDetailList);
+        return activityDetails;
     }
 
     private void clearActivityCache() {

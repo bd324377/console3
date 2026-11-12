@@ -27,11 +27,13 @@ public class MarketerServiceImpl extends BaseServiceImpl<MarketerMapper, Markete
         if (marketSite != null) {
             MarketerBo marketerBo = new MarketerBo(marketSite);
             QueryWrapper<Marketer> queryWrapper = new QueryWrapper<>();
-            queryWrapper.select( "market_team_id", "marketer_id", "order_mode").lambda().eq(Marketer::getMarketerId,marketerId).eq(Marketer::getMarketSiteId,marketSite.getMarketSiteId());
+            queryWrapper.select( "id","market_site_id","market_team_id", "marketer_id", "order_mode","activation_recharge_amt","activation_order_amt")
+                    .lambda().eq(Marketer::getMarketerId,marketerId).eq(Marketer::getMarketSiteId,marketSite.getMarketSiteId());
             Marketer marketer = this.getOne(queryWrapper);
             if (marketer == null || marketer.getStatus() == Marketer.MarketerStatus.UNENABLE) {//如果停用则自动转默认人员
                 queryWrapper = new QueryWrapper<>();
-                queryWrapper.select("market_team_id", "marketer_id", "order_mode").lambda().eq(Marketer::getMarketerId,marketSite.getMarketerId()).eq(Marketer::getMarketSiteId,marketSite.getMarketSiteId());
+                queryWrapper.select("id","market_site_id","market_team_id", "marketer_id", "order_mode","activation_recharge_amt","activation_order_amt")
+                        .lambda().eq(Marketer::getMarketerId,marketSite.getMarketerId()).eq(Marketer::getMarketSiteId,marketSite.getMarketSiteId());
                 marketer = this.getOne(queryWrapper);
             }
             if (marketer != null) {
@@ -46,7 +48,7 @@ public class MarketerServiceImpl extends BaseServiceImpl<MarketerMapper, Markete
     @Cacheable(value = CacheConstants.MARKETER_LIST,key = "#marketSiteId")
     public List<Marketer> getMarketerListBySiteId(Integer marketSiteId) {
         QueryWrapper<Marketer> queryWrapper = new QueryWrapper<>();
-        queryWrapper.select("market_site_id,market_team_id,marketer_id").lambda().eq(Marketer::getMarketSiteId,marketSiteId);
+        queryWrapper.select("id","market_site_id,market_team_id,marketer_id").lambda().eq(Marketer::getMarketSiteId,marketSiteId);
         return this.list(queryWrapper);
     }
 }

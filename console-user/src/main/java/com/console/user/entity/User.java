@@ -1,6 +1,7 @@
 package com.console.user.entity;
 
 import com.baomidou.mybatisplus.annotation.EnumValue;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.console.framework.constants.LoginChannel;
@@ -59,6 +60,8 @@ public class User implements Serializable {//新增渠道和业务员参数
     private LocalDateTime chgAgentTime;//变更代理等级时间
     private String remarks;//备注
 
+    @TableField(exist = false)
+    private Integer vipLevel;
     @Getter
     public enum UserType {
         NORMAL(0,"正常用户"),

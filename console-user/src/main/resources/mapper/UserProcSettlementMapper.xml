@@ -92,10 +92,11 @@
 
     <!-- 创建待处理(VIP升级，代理升级，用户激活)用户临时表 -->
     <insert id="createTempPendingUserData">
-        INSERT IGNORE INTO t_pending_user (user_id,market_team_id,parent_id,vip_id,activate_status)
+        INSERT IGNORE INTO t_pending_user (user_id,market_team_id,marketer_id,parent_id,vip_id,activate_status)
         SELECT
             p.user_id,
             u.market_team_id,
+            u.marketer_id,
             u.parent_id,
             u.vip_id,
             u.activate_status
@@ -118,7 +119,7 @@
 
     <!-- 更新用户激活规则 -->
     <update id="updateUserActivateRule">
-        UPDATE t_pending_user p INNER JOIN s_market_team t ON t.id = p.market_team_id
+        UPDATE t_pending_user p INNER JOIN s_marketer t ON t.marketer_id = p.marketer_id AND t.market_team_id = p.market_team_id
         SET p.activation_recharge_amt = t.activation_recharge_amt,p.activation_order_amt = t.activation_order_amt
         WHERE p.activate_status = 0;
     </update>

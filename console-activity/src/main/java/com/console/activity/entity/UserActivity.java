@@ -4,9 +4,7 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
-import com.console.framework.utils.DateUtils;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -14,7 +12,6 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -37,11 +34,25 @@ public class UserActivity implements Serializable {
     private Integer triggerKey;//已触发最大规则组key
     private Integer status;//任务状态 0、未完结；1、已完结（结束一个任务周期）
     @TableField(typeHandler = JacksonTypeHandler.class)
-    private List<Object> unReceiveRewards;//未领取奖励的触发次数，多次未领奖以逗号隔开
+    private List<UnReceiveReward> unReceiveRewards;//未领取奖励的触发次数，多次未领奖以逗号隔开
     private Integer rewardStatus;//领奖状态：1、没有待领取奖励；2、存在待领取奖励
     @TableField(typeHandler = JacksonTypeHandler.class)
-    private List<ActivityRuleItem> completeRuleItems;//完成的规则情况
+//    private List<ActivityRuleItem> completeRuleItems;//完成的规则情况
+    private String achievedValue;//已触发值
     private BigDecimal receivedAmt;//已领取金额
+
+    /**
+     * 已触发规则情况
+     */
+    @Getter
+    @Setter
+    public static class UnReceiveReward implements Serializable {
+        @Serial
+        private static final long serialVersionUID = 1L;
+        private Integer ruleId;         //奖励对应的规则id
+        private LocalDateTime triggerTime;    //触发奖励时间
+        private LocalDateTime expireTime;     //奖励领取有效时间
+    }
 
     public UserActivity(Integer userId, Integer activityId, String deviceId) {
         this.userId = userId;
@@ -50,7 +61,7 @@ public class UserActivity implements Serializable {
         this.triggeredTimes = 0;
         this.triggerKey = 0;
         this.deviceId = deviceId;
-        this.completeRuleItems = new ArrayList<>();
+//        this.completeRuleItems = new ArrayList<>();
         this.receivedAmt = new BigDecimal("0");
 //        this.expireTime = activity.getCycle() == 0 ? activity.getEndTime() : LocalDateTime.now().plusDays(activity.getCycle());
     }

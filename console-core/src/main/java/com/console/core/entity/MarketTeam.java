@@ -26,8 +26,8 @@ public class MarketTeam implements Serializable {
     private Integer    leaderMarketerId;    //渠道组长ID（关联营销人员表）
     private Integer    status;              //站点状态：0-关闭，1-开启，3-维护中，4-冻结，5-审核中，6-已过期
     private Integer    orderMode;           //下单模型
-    private BigDecimal activationRechargeAmt;//激活所需充值金额
-    private BigDecimal activationOrderAmt;  //激活所需下单金额
+//    private BigDecimal activationRechargeAmt;//激活所需充值金额
+//    private BigDecimal activationOrderAmt;  //激活所需下单金额
     private Integer    shuntStatus;         //分流状态
     private BigDecimal shuntRate;           //分流率
     private Integer    shuntThreshold;      //分流阈值

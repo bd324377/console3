@@ -65,4 +65,21 @@ public class UserReq {
             return StringUtils.hasText(nickName) || StringUtils.hasText(avatar) || sex != null || birthdayDay != null;
         }
     }
+
+    @Getter
+    @Setter
+    public static class SearchSubUserReq implements Serializable {
+        @Serial
+        private static final long serialVersionUID = 1L;
+
+        private Integer startSearchTime;    //起始查询时间
+        private Integer endSearchTime;      //结束查询时间
+        private Integer userId;             //用户ID
+        private Integer subUserId;          //下级用户ID查询
+        private Long    size = 20L;         //每页条数
+        private Long    current = 1L;       //当前页码
+        private Integer layers;
+        private Integer startSearchLayer;         //起始层级
+        private Integer endSearchLayer;           //结束层级
+    }
 }

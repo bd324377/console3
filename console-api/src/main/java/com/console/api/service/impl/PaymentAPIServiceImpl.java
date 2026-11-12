@@ -100,25 +100,25 @@ public class PaymentAPIServiceImpl extends BaseServiceImpl implements PaymentAPI
     }
 
     @Override
-    public PaymentOrderPageRes getPaymentOrderRecords(PaymentDTO.SearchPayOrderRes searchPayOrderRes) {
-        Page<PaymentOrder> page = new Page<>(searchPayOrderRes.getCurrent(), searchPayOrderRes.getSize());
+    public PaymentOrderPageRes getPaymentOrderRecords(PaymentDTO.SearchPayOrderReq searchPayOrderReq) {
+        Page<PaymentOrder> page = new Page<>(searchPayOrderReq.getCurrent(), searchPayOrderReq.getSize());
         QueryWrapper<PaymentOrder> queryWrapper = new QueryWrapper<>();
         queryWrapper.select("order_time,transaction_id,order_amt,status").lambda()
                 .eq(PaymentOrder::getUserId,RequestUtils.getUser(RequestMember.class).getId())
-                .eq(searchPayOrderRes.getStatus() != null,PaymentOrder::getStatus,searchPayOrderRes.getStatus())
-                .between(searchPayOrderRes.getStartSearchTime() != null && searchPayOrderRes.getEndSearchTime() != null,PaymentOrder::getOrderTime,searchPayOrderRes.getStartSearchTime(),searchPayOrderRes.getEndSearchTime())
+                .eq(searchPayOrderReq.getStatus() != null,PaymentOrder::getStatus, searchPayOrderReq.getStatus())
+                .between(searchPayOrderReq.getStartSearchTime() != null && searchPayOrderReq.getEndSearchTime() != null,PaymentOrder::getOrderTime, searchPayOrderReq.getStartSearchTime(), searchPayOrderReq.getEndSearchTime())
                 .orderByDesc(PaymentOrder::getId);
         IPage<PaymentOrder> paymentOrderIPage = paymentOrderService.page(page,queryWrapper);
         PaymentOrderPageRes paymentOrderPageRes = new PaymentOrderPageRes(paymentOrderIPage);
-        if (searchPayOrderRes.getCurrent() == 1) {//第一页必须做汇总
+        if (searchPayOrderReq.getCurrent() == 1) {//第一页必须做汇总
             if (paymentOrderPageRes.getTotal() == 0) {
                 paymentOrderPageRes.setTotalPaymentAmt(BigDecimal.ZERO);
             } else {
                 queryWrapper = new QueryWrapper<>();
                 queryWrapper.select("COALESCE ( SUM( CASE WHEN status = 3 THEN order_amt END ), 0 ) AS order_amt").lambda()
                         .eq(PaymentOrder::getUserId, RequestUtils.getUser(RequestMember.class).getId())
-                        .eq(searchPayOrderRes.getStatus() != null, PaymentOrder::getStatus, searchPayOrderRes.getStatus())
-                        .between(searchPayOrderRes.getStartSearchTime() != null && searchPayOrderRes.getEndSearchTime() != null, PaymentOrder::getOrderTime, searchPayOrderRes.getStartSearchTime(), searchPayOrderRes.getEndSearchTime())
+                        .eq(searchPayOrderReq.getStatus() != null, PaymentOrder::getStatus, searchPayOrderReq.getStatus())
+                        .between(searchPayOrderReq.getStartSearchTime() != null && searchPayOrderReq.getEndSearchTime() != null, PaymentOrder::getOrderTime, searchPayOrderReq.getStartSearchTime(), searchPayOrderReq.getEndSearchTime())
                         .orderByDesc(PaymentOrder::getId);
                 PaymentOrder paymentOrder = paymentOrderService.getOne(queryWrapper);
                 paymentOrderPageRes.setTotalPaymentAmt(paymentOrder.getOrderAmt());

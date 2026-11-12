@@ -10,6 +10,6 @@ import org.springframework.stereotype.Component;
 public class WeekRechargeActivityHandler extends ActivityStrategy {
     @Override
     public ActivityType getActivityType() {
-        return ActivityType.SIGN_IN;
+        return ActivityType.VIP_CHECK_IN;
     }
 }

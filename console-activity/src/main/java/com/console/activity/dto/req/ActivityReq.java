@@ -2,7 +2,7 @@ package com.console.activity.dto.req;
 
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.console.activity.entity.Activity;
-import com.console.activity.entity.ActivityPrize;
+import com.console.activity.entity.ActivityReward;
 import com.console.activity.entity.ActivityRule;
 import com.console.activity.entity.ActivityRuleItem;
 import com.console.core.entity.AdminProc;
@@ -90,22 +90,22 @@ public class ActivityReq {
             return null;
         }
 
-        public List<ActivityPrize> buildActivityPirzes(List<ActivityRule> ruleList) {
+        public List<ActivityReward> buildActivityPirzes(List<ActivityRule> ruleList) {
             if (!ObjectUtils.isEmpty(activityRules)) {
-                List<ActivityPrize> activityPrizeList = new ArrayList<>();
+                List<ActivityReward> activityRewardList = new ArrayList<>();
                 for (int i = 0; i < activityRules.size();i++) {
                     ActivityRule activityRule = ruleList.get(i);
                     ActivityRuleReq.AddActivityRuleReq activityRuleReq = activityRules.get(i);
-                    if (!ObjectUtils.isEmpty(activityRuleReq.getActivityPrizes())) {
-                        for (ActivityPrize activityPrize : activityRuleReq.getActivityPrizes()) {
-                            activityPrize.setId(null);
-                            activityPrize.setActivityId(activityRule.getActivityId());
-                            activityPrize.setActivityRuleId(activityRule.getId());
-                            activityPrizeList.add(activityPrize);
+                    if (!ObjectUtils.isEmpty(activityRuleReq.getActivityRewards())) {
+                        for (ActivityReward activityReward : activityRuleReq.getActivityRewards()) {
+                            activityReward.setId(null);
+                            activityReward.setActivityId(activityRule.getActivityId());
+                            activityReward.setActivityRuleId(activityRule.getId());
+                            activityRewardList.add(activityReward);
                         }
                     }
                 }
-                return activityPrizeList;
+                return activityRewardList;
             }
             return null;
         }

@@ -1,6 +1,7 @@
 package com.console.api.service;
 
 import com.console.api.dto.req.ProductReq;
+import com.console.api.dto.res.ProductOrderPageRes;
 import com.console.core.entity.Wallet;
 
 import java.util.List;
@@ -12,4 +13,5 @@ public interface ProductAPIService {
     void collectProduct(Integer productId);
     void cancelCollectProduct(Integer productId);
     List<Integer> getHistoryProductIds();
+    ProductOrderPageRes getProductOrderRecord(ProductReq.SearchProductOrderReq searchProductOrderReq);
 }

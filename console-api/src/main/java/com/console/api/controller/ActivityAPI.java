@@ -17,4 +17,11 @@ public class ActivityAPI {
     public Result getActivityList() {
         return Result.success(activityAPIService.getActivityList());
     }
+
+    /** 邀新奖励 **/
+    @PostMapping("/inviteNewUserRewards")
+    @PreAuthorize(ignore = true)
+    public Result getInviteNewUserRewards() {
+        return Result.success(activityAPIService.getInviteNewUserRewards());
+    }
 }

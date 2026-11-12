@@ -1,7 +1,6 @@
 package com.console.activity.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.console.activity.entity.ActivityPrize;
 import com.console.activity.entity.ActivityRuleItem;
 import com.console.activity.mapper.ActivityRuleItemMapper;
 import com.console.activity.service.ActivityRuleItemService;

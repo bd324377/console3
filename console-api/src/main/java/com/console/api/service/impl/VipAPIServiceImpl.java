@@ -1,9 +1,9 @@
 package com.console.api.service.impl;
 
 import com.console.activity.entity.Activity;
-import com.console.activity.entity.ActivityPrize;
+import com.console.activity.entity.ActivityReward;
 import com.console.activity.entity.ActivityRule;
-import com.console.activity.service.ActivityPrizeService;
+import com.console.activity.service.ActivityRewardService;
 import com.console.activity.service.ActivityRuleService;
 import com.console.activity.service.ActivityService;
 import com.console.api.dto.res.VipLevelRes;
@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Service
 public class VipAPIServiceImpl extends BaseServiceImpl implements VipAPIService {
@@ -35,7 +34,7 @@ public class VipAPIServiceImpl extends BaseServiceImpl implements VipAPIService 
     @Resource
     private ActivityRuleService activityRuleService;
     @Resource
-    private ActivityPrizeService activityPrizeService;
+    private ActivityRewardService activityRewardService;
 
     @Override
     public VipLevelRes getVipLevelList() {
@@ -83,12 +82,12 @@ public class VipAPIServiceImpl extends BaseServiceImpl implements VipAPIService 
                 vipReward.setAcitivityId(vipActivity.getId());
                 vipReward.setActivityRuleId(activityRule.getId());
                 vipReward.setVipId(Integer.parseInt(activityRule.getRuleTriggerThreshold()));
-                List<ActivityPrize> activityPrizes = activityPrizeService.getActivityPrizes(vipActivity.getId(),activityRule.getId());
-                if (ObjectUtils.isEmpty(activityPrizes)) {
+                List<ActivityReward> activityRewards = activityRewardService.getActivityRewards(vipActivity.getId(),activityRule.getId());
+                if (ObjectUtils.isEmpty(activityRewards)) {
                     vipReward.setRewardValue(BigDecimal.ZERO);
                 } else {
-                    ActivityPrize activityPrize = activityPrizes.get(0);
-                    vipReward.setRewardValue(new BigDecimal(activityPrize.getPrizeValue()));
+                    ActivityReward activityReward = activityRewards.get(0);
+                    vipReward.setRewardValue(new BigDecimal(activityReward.getRewardValue()));
                 }
                 vipRewardList.add(vipReward);
             }

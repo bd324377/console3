@@ -4,8 +4,11 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.console.api.dto.req.ProductReq;
+import com.console.api.dto.res.ProductOrderPageRes;
 import com.console.api.service.ProductAPIService;
 import com.console.core.entity.Parameter;
 import com.console.core.entity.Tenant;
@@ -20,6 +23,7 @@ import com.console.framework.domain.BusinessException;
 import com.console.framework.domain.Result;
 import com.console.framework.request.RequestMember;
 import com.console.framework.utils.*;
+import com.console.payment.entity.PaymentOrder;
 import com.console.product.api.TransferApi;
 import com.console.product.api.res.TransferRecordRes;
 import com.console.product.entity.*;
@@ -36,7 +40,9 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 
@@ -246,6 +252,37 @@ public class ProductAPIServiceImpl extends BaseServiceImpl implements ProductAPI
     @Override
     public List<Integer> getHistoryProductIds() {
         return userProductService.getHistoryProductIdList();
+    }
+
+    @Override
+    public ProductOrderPageRes getProductOrderRecord(ProductReq.SearchProductOrderReq searchProductOrderReq) {
+        Page<ProductOrder> page = new Page<>(searchProductOrderReq.getCurrent(), searchProductOrderReq.getSize());
+        RequestMember requestMember = RequestUtils.getRequestMember();
+        QueryWrapper<ProductOrder> queryWrapper = new QueryWrapper<>();
+        queryWrapper.select("id,order_time,product_id,order_amt,result_amt,result_status").lambda()
+                .eq(ProductOrder::getUserId,requestMember.getId())
+                .between(searchProductOrderReq.getStartSearchTime() != null && searchProductOrderReq.getEndSearchTime() != null,ProductOrder::getOrderTime,searchProductOrderReq.getStartSearchTime(),searchProductOrderReq.getEndSearchTime())
+                .eq(searchProductOrderReq.getProductId() != null,ProductOrder::getProductId,searchProductOrderReq.getProductId())
+                .eq(searchProductOrderReq.getCategory()  != null,ProductOrder::getCategory,searchProductOrderReq.getCategory())
+                .orderByDesc(ProductOrder::getId);
+        IPage<ProductOrder> productOrderIPage = productOrderService.page(page,queryWrapper);
+//        if (searchProductOrderReq.getCurrent() == 1 && productOrderIPage.getTotal() > 0) {
+//
+//        }
+        if (productOrderIPage.getRecords() != null && !productOrderIPage.getRecords().isEmpty()) {
+            Map<Integer,String> productNameMap = new HashMap<>();
+            List<Integer> productIds = productOrderIPage.getRecords().stream().map(ProductOrder::getProductId).toList();
+            for (Integer productId : productIds) {
+                Product product = productService.getProductById(productId);
+                if (product != null) {
+                    productNameMap.put(productId,product.getProductName());
+                }
+            }
+            for (ProductOrder productOrder : productOrderIPage.getRecords()) {
+                productOrder.setProductName(productNameMap.get(productOrder.getProductId()));
+            }
+        }
+        return new ProductOrderPageRes(productOrderIPage);
     }
 
     /**校验产品信息**/

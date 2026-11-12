@@ -1,6 +1,7 @@
 package com.console.framework.constants;
 
 public class ParameterConstants {
+    public static final String P1003 = "1003";     //有效代理层级
     public static final String P1012 = "1012";     //人工入款是否需要审核
     public static final String P1018 = "1018";     //注册IP相关限制
     public static final String P1019 = "1019";     //注册设备相关限制

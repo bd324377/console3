@@ -42,7 +42,7 @@ public class LoginAPIServiceImpl extends BaseServiceImpl implements LoginAPIServ
         DynamicTableNameHandler.setTenantId(marketSite.getTenantId());
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.select("id,account,login_pwd,user_type,tenant_id,market_site_id,market_team_id,marketer_id,avatar," +
-                "email,email_status,phone,phone_status,agent_id,vip_id,status,invite_reward_status").lambda().eq(User::getAccount,loginReq.getAccount());
+                "email,email_status,phone,phone_status,agent_id,vip_id,status,invite_reward_status,cash_out_pwd").lambda().eq(User::getAccount,loginReq.getAccount());
         User user = userService.getOne(queryWrapper);
         if (user == null) throw new BusinessException(500, I18nUtil.getI8nMsg("login.error.account.unRegister"));
         checkLoginUser(user, loginReq.getPassword(), marketSite.getMarketTeamId());

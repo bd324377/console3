@@ -1,6 +1,7 @@
 package com.console.core.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Getter;
 import lombok.Setter;
@@ -48,6 +49,7 @@ public class Wallet implements Serializable {
     private Integer subUserOrderMode; // 下级用户下单模式
 
     @TableField(exist = false)
+    @JsonIgnore
     private boolean isSwitchOrderModelIndex;//是否切换下单模式
     @Getter
     public enum WalletType {

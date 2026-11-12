@@ -17,6 +17,28 @@ public class DateUtils {
         return !time.isBefore(start) && !time.isAfter(end);
     }
 
+    public static boolean isToday(LocalDateTime dateTime) {
+        if (dateTime == null) {
+            return false;
+        }
+        return dateTime.toLocalDate().isEqual(LocalDate.now());
+    }
+
+    public static boolean isBeforeYesterday(LocalDateTime dateTime) {
+        if (dateTime == null) {
+            return false;
+        }
+        LocalDateTime startOfYesterday = LocalDate.now().minusDays(1).atStartOfDay();
+        return dateTime.isBefore(startOfYesterday);
+    }
+
+    public static int daysBetweenByTime(LocalDateTime start, LocalDateTime end) {
+        if (start == null || end == null) {
+            throw new IllegalArgumentException("时间不能为空");
+        }
+        return (int) ChronoUnit.DAYS.between(start.toLocalDate(), end.toLocalDate());
+    }
+
     /**
      * 获取当前时间戳
      */

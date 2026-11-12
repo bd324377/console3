@@ -1,6 +1,7 @@
 package com.console.activity.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Getter;
@@ -21,6 +22,9 @@ public class ActivityRuleItem implements Serializable {
     private Integer id;//规则明细ID
     private Integer activityId;//活动id
     private Integer activityRuleId;//规则id
-    private Integer ruleType;//规则类型
+    private ActivityRuleType ruleType;//规则类型
     private String ruleValue;//规则值
+    @TableField(exist = false)
+    private String achievedValue;   //当前已达到值
+
 }

@@ -13,6 +13,8 @@ import com.console.payment.entity.Channel;
 import com.console.payment.entity.PaymentOrder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
 import java.util.List;
 
 @Slf4j
@@ -83,7 +85,7 @@ public class TestStrategy extends ChannelStrategy {
 
         ChannelResult channelResult = new ChannelResult();
         channelResult.setMerchantOrderNo(testCallBackRes.getMerchantOrderNo());
-        channelResult.setAmount(Integer.parseInt(testCallBackRes.getAmount()));
+        channelResult.setAmount(new BigDecimal(testCallBackRes.getAmount()));
         channelResult.setStatus(0);
         String[] parts = testCallBackRes.getMerchantOrderNo().split("_");
         channelResult.setTenantId(Integer.valueOf(parts[1]));

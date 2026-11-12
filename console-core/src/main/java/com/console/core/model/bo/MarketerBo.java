@@ -19,10 +19,13 @@ public class MarketerBo implements Serializable {//业务员信息
 
     @Serial
     private static final long serialVersionUID = 1L;
+    private Integer id;
     private Integer tenantId;//租户ID
-    private Integer siteId;//站点ID
+    private Integer marketSiteId;//站点ID
     private Integer marketTeamId;//营销团队ID
     private Integer marketerId;//业务员（管理员）ID
+    private BigDecimal activationRechargeAmt;//激活所需充值金额
+    private BigDecimal activationOrderAmt;  //激活所需下单金额
     private Tenant.TenantStatus tenantStatus;//租户状态
     private MarketSite.SiteStatus siteStatus;//站点状态
     private Marketer.MarketerStatus marketerStatus = Marketer.MarketerStatus.ENABLE;//业务员状态
@@ -43,10 +46,14 @@ public class MarketerBo implements Serializable {//业务员信息
     }
 
     public void buildMarketer(Marketer marketer) {
+        this.setId(marketer.getId());
+        this.setMarketSiteId(marketer.getMarketSiteId());
         this.setMarketTeamId(marketer.getMarketTeamId());
         this.setMarketerId(marketer.getMarketerId());
         this.setMarketerStatus(marketer.getStatus());
         this.setMarketerOrderMode(marketer.getOrderMode());
+        this.setActivationRechargeAmt(marketer.getRechargeAmt());
+        this.setActivationOrderAmt(marketer.getOrderAmt());
     }
 
     public static void verifyValidity(MarketerBo marketer) {

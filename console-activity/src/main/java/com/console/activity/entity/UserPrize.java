@@ -1,12 +1,8 @@
 package com.console.activity.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
-import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import com.console.core.entity.Wallet;
-import com.console.framework.constants.PrizeType;
-import com.console.framework.domain.LanguagePack;
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonValue;
+import com.console.framework.constants.RewardType;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -27,7 +23,7 @@ public class UserPrize implements Serializable {
     private Integer id;
     private Integer userId;//用户d
     private String prizeIcon;//奖励图标
-    private PrizeType prizeType;//奖品类型
+    private RewardType rewardType;//奖品类型
     private String prizeValue;//奖品值
     private Integer status;
     private LocalDateTime addTime;//领取时间

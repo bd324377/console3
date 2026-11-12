@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.console.api.mapper.AgentAPIMapper">
+    <select id="selectSubTeamRechargeReport" resultType="com.console.api.dto.res.SubTeamRechargeReport">
+        SELECT
+            SUM(t.recharge_amt) recharge_amt,
+            SUM(IF(l.layers = 1,t.recharge_amt,0)) oneLayer_recharge_amt,
+            SUM(IF(l.layers = 1,0,t.recharge_amt)) otherLayer_recharge_amt,
+            SUM(t.first_recharge_status) first_rechargeUser_count,
+            SUM(IF(l.layers = 1,t.first_recharge_status,0)) oneLayer_first_recharge_user_count,
+            SUM(IF(l.layers = 1,0,t.first_recharge_status)) otherLayer_first_recharge_user_count
+        FROM
+            r_agent_layer l
+            LEFT JOIN s_user_report t ON t.user_id = l.user_id
+        WHERE l.sup_user_id = #{param.userId}
+            AND t.report_date BETWEEN #{param.startSearchTime} AND #{param.endSearchTime}
+            AND l.layers <![CDATA[<=]]> #{param.layers}
+            <if test="param.subUserId != null">
+                AND l.user_id = #{param.subUserId}
+            </if>
+            <if test="param.startSearchLayer != null and param.endSearchLayer != null">
+                AND l.layers BETWEEN #{param.startSearchLayer} AND #{param.endSearchLayer}
+            </if>
+    </select>
+
+    <select id="selectSubUserPage" resultType="com.console.user.entity.User">
+        SELECT
+            u.id,
+            l.layers,
+            u.login_time,
+            u.reg_time,
+            u.status,
+            SUM( t.recharge_amt ) recharge_amt,
+            SUM( t.order_amt ) ordered_amt,
+            u.vip_id
+        FROM
+            r_agent_layer l
+            INNER JOIN s_user u ON u.id = l.user_id
+            INNER JOIN s_user_report t ON t.user_id = u.id
+        WHERE
+            l.sup_user_id = #{param.userId}
+            AND t.report_date BETWEEN #{param.startSearchTime} AND #{param.endSearchTime}
+            AND l.layers <![CDATA[<=]]> #{param.layers}
+        <if test="param.subUserId != null">
+            AND l.user_id = #{param.subUserId}
+        </if>
+        <if test="param.startSearchLayer != null and param.endSearchLayer != null">
+            AND l.layers BETWEEN #{param.startSearchLayer} AND #{param.endSearchLayer}
+        </if>
+        GROUP BY u.id,l.layers
+        ORDER BY u.reg_time DESC
+    </select>
+</mapper>

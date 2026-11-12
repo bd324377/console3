@@ -25,6 +25,8 @@ public class Marketer implements Serializable {
     private Integer marketSiteId;//站点ID
     private Integer marketTeamId;//营销团队ID
     private Integer marketerId;//业务员（管理员）ID
+    private BigDecimal activationRechargeAmt;//激活所需充值金额
+    private BigDecimal activationOrderAmt;  //激活所需下单金额
     private Integer isLeader;//是否为渠道组长：0-否，1-是
     private Integer orderMode;//下单模型
     private BigDecimal rechargeRate;//充值手续费百分比

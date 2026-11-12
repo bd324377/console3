@@ -63,7 +63,7 @@ public class InviteNewConfig implements Serializable {//用户邀新配置信息
 
     public InviteNewConfig(MarketerBo marketer) {
         this.tenantId = marketer.getTenantId();
-        this.marketSiteId = marketer.getSiteId();
+        this.marketSiteId = marketer.getMarketSiteId();
         this.marketTeamId = marketer.getMarketTeamId();
         this.marketerId = marketer.getMarketerId();
         this.subUserOrderMode = marketer.getMarketerOrderMode();

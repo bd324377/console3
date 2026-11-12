@@ -2,8 +2,6 @@ package com.console.activity.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
-import com.console.activity.dto.res.ActivityRuleDetail;
-import com.console.activity.entity.ActivityPrize;
 import com.console.activity.entity.UserPrize;
 import com.console.activity.mapper.UserPrizeMapper;
 import com.console.activity.service.UserPrizeService;
@@ -13,7 +11,6 @@ import com.console.core.service.WalletService;
 import com.console.core.service.impl.BaseServiceImpl;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
-import org.springframework.util.ObjectUtils;
 
 import java.math.BigDecimal;
 

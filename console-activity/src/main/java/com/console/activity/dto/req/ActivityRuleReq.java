@@ -1,6 +1,6 @@
 package com.console.activity.dto.req;
 
-import com.console.activity.entity.ActivityPrize;
+import com.console.activity.entity.ActivityReward;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -19,6 +19,6 @@ public class ActivityRuleReq {
         private Integer ruleKey;                //排序
 
         private List<ActivityRuleItemReq.AddActivityRuleItemReq> activityRuleItems;
-        private List<ActivityPrize> activityPrizes;
+        private List<ActivityReward> activityRewards;
     }
 }

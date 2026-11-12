@@ -9,6 +9,7 @@ import com.console.framework.constants.ActivityType;
 import com.console.framework.constants.CacheConstants;
 import com.console.framework.domain.BusinessException;
 import com.console.framework.utils.I18nUtil;
+import com.console.framework.utils.TenantUtils;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.integration.redis.util.RedisLockRegistry;
@@ -23,9 +24,6 @@ import java.util.concurrent.locks.Lock;
 @Slf4j
 @Component
 public class RechargeActivityHandler extends ActivityStrategy {
-    @Resource
-    private RedisLockRegistry lockRegistry;
-
     @Override
     public ActivityType getActivityType() {
         return ActivityType.SINGLE_RECHARGE;
@@ -33,18 +31,19 @@ public class RechargeActivityHandler extends ActivityStrategy {
 
     public Object triggerActivity(Integer activityId, Integer userId, Object param) {
         String[] params = param.toString().split(";");//0、用户ID；1、充值次数；2、充值金额
-        Lock lock = lockRegistry.obtain(CacheConstants.ACQUIRE_LOCK_TRIGGER_ACTIVITY + activityId + ":" + userId);
+        Lock lock = lockRegistry.obtain(CacheConstants.ACQUIRE_LOCK_TRIGGER_ACTIVITY + TenantUtils.getTenantId() + ":" + activityId + ":" + userId);
         boolean locked = false;
         try {
             locked = lock.tryLock(5000, TimeUnit.MILLISECONDS);
-            if (!locked) throw new BusinessException(500, I18nUtil.getI8nMsg("paymentOrder.error.create.creating"));
+            if (!locked) throw new BusinessException(500, I18nUtil.getI8nMsg("paymentActivity.error.create.creating"));
 
             ActivityDetails activityDetails = getActivityDetails(activityId);
-            UserActivity userActivity = getLastUserActivity(userId,activityId);
-            userActivity = verifyUserActivity(userActivity,userId,activityId);
-            if (userActivity.getExpireTime() == null) {
-                userActivity.setExpireTime(activityDetails.getCycle() == 0 ? activityDetails.getEndTime() : LocalDate.now().atStartOfDay().plusDays(activityDetails.getCycle()));
+            if (activityDetails.getActivityType() != getActivityType()) {
+                throw new BusinessException(500, I18nUtil.getI8nMsg("非充值活动，不做处理"));
             }
+            UserActivity userActivity = getLastUserActivity(userId,activityId);
+            userActivity = verifyUserActivity(userActivity,userId,activityDetails);
+
             BigDecimal orderAmt = new BigDecimal(params[2]);//订单金额
 
             ActivityRuleDetail triggerRule = null;//触发规则，充值活动触发最高档活动

@@ -1,8 +1,5 @@
 package com.console.api.dto;
 
-import com.baomidou.mybatisplus.core.toolkit.IdWorker;
-import com.console.framework.utils.RequestUtils;
-import com.console.payment.entity.PaymentOrder;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -35,7 +32,7 @@ public class PaymentDTO {
      */
     @Getter
     @Setter
-    public static class SearchPayOrderRes implements Serializable {
+    public static class SearchPayOrderReq implements Serializable {
         @Serial
         private static final long serialVersionUID = 1L;
         private long    size = 20;          //每页条数
