@@ -67,12 +67,12 @@ public class CheckInActivityHandler extends ActivityStrategy {
                 UserRechargeAndOrderAmt userRechargeAndOrderAmt = activityTriggerMapper.selectTotalRechargeAndOrderAmt(LocalDate.now(),LocalDate.now());
                 if (userRechargeAndOrderAmt == null) userRechargeAndOrderAmt = new UserRechargeAndOrderAmt();
                 for (ActivityRuleItem activityRuleItem : activityRuleDetail.getActivityRuleItems()) {
-                    if (activityRuleItem.getRuleType() == ActivityRuleType.DAILY_CUMULATIVE_RECHARGE_AMT) {
+                    if (activityRuleItem.getRuleType() == ActivityRuleType.CUMULATIVE_RECHARGE_AMT) {
                         if (userRechargeAndOrderAmt.getRechargeAmt().compareTo(new BigDecimal(activityRuleItem.getRuleValue())) < 0) {
                             throw new BusinessException(500,"未达成充值条件");
                         }
                     }
-                    if (activityRuleItem.getRuleType() == ActivityRuleType.DAILY_CUMULATIVE_ORDER_AMT) {
+                    if (activityRuleItem.getRuleType() == ActivityRuleType.CUMULATIVE_ORDER_AMT) {
                         if (userRechargeAndOrderAmt.getOrderAmt().compareTo(new BigDecimal(activityRuleItem.getRuleValue())) < 0) {
                             throw new BusinessException(500,"未达成下单条件");
                         }

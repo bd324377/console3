@@ -23,7 +23,6 @@ import com.console.framework.domain.BusinessException;
 import com.console.framework.domain.Result;
 import com.console.framework.request.RequestMember;
 import com.console.framework.utils.*;
-import com.console.payment.entity.PaymentOrder;
 import com.console.product.api.TransferApi;
 import com.console.product.api.res.TransferRecordRes;
 import com.console.product.entity.*;

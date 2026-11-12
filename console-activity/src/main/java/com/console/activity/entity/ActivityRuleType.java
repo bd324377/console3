@@ -7,25 +7,19 @@ import lombok.Getter;
 @Getter
 public enum ActivityRuleType {
     SINGLE_RECHARGE_AMT(1,"单次充值金额","activity.rule.singleRechargeAmt"),
-    DAILY_CUMULATIVE_RECHARGE_AMT(2,"当日累计充值金额",""),
-    YESTERDAY_CUMULATIVE_RECHARGE_AMT(3,"昨日日累计充值金额",""),
-    CYCLE_CUMULATIVE_RECHARGE_AMT(4,"周期内累计充值金额",""),
-    THREE_DAYS_CUMULATIVE_RECHARGE_AMT(5,"三天累计充值金额",""),
-    SEVEN_DAYS_CUMULATIVE_RECHARGE_AMT(6,"七天累计充值金额",""),
-    FIFTEEN_DAYS_CUMULATIVE_RECHARGE_AMT(7,"十五天累计充值金额",""),
-    TOTAL_CUMULATIVE_RECHARGE_AMT(8,"总累计下单金额",""),
-    DAILY_CUMULATIVE_ORDER_AMT(9,"当日累计下单金额",""),
-    YESTERDAY_CUMULATIVE_ORDER_AMT(10,"昨日日累计下单金额",""),
-    CYCLE_CUMULATIVE_ORDER_AMT(11,"周期内累计下单金额",""),
-    THREE_DAYS_CUMULATIVE_ORDER_AMT(12,"三天累计下单金额",""),
-    SEVEN_DAYS_CUMULATIVE_ORDER_AMT(13,"七天累计下单金额",""),
-    FIFTEEN_DAYS_CUMULATIVE_ORDER_AMT(14,"十五天累计下单金额",""),
-    TOTAL_CUMULATIVE_ORDER_AMT(15,"总累计下单金额",""),
-
-    TOTAL_VALID_INVITEE_COUNT(16,"总累计有效邀新人数","Número cumulativo de convites válidos"),
-    DAILY_VALID_INVITEE_COUNT(17,"当日有效邀请人数","Número de convites válidos no dia"),
-    CYCLE_VALID_INVITEE_COUNT(18,"周期内有效邀请人数","Número de convites válidos dentro do ciclo"),
-    DAILY_INVITEE_COUNT(19,"当日邀请人数","Número cumulativo de convites");
+    CUMULATIVE_RECHARGE_AMT(2,"累计充值金额",""),
+    CYCLE_CUMULATIVE_RECHARGE_AMT(3,"周期内累计充值金额",""),
+    TOTAL_CUMULATIVE_RECHARGE_AMT(4,"总累计下单金额",""),
+    CUMULATIVE_ORDER_AMT(5,"累计下单金额",""),
+    CYCLE_CUMULATIVE_ORDER_AMT(6,"周期内累计下单金额",""),
+    TOTAL_CUMULATIVE_ORDER_AMT(7,"总累计下单金额",""),
+    CUMULATIVE_ORDER_LOSE_AMT(8,"累计下单亏损金额",""),
+    CYCLE_CUMULATIVE_ORDER_LOSE_AMT(9,"周期内累计下单亏损金额",""),
+    TOTAL_CUMULATIVE_ORDER_LOSE_AMT(10,"总累计下单亏损金额",""),
+    TOTAL_VALID_INVITEE_COUNT(11,"总累计有效邀新人数","Número cumulativo de convites válidos"),
+    DAILY_VALID_INVITEE_COUNT(12,"当日有效邀请人数","Número de convites válidos no dia"),
+    CYCLE_VALID_INVITEE_COUNT(13,"周期内有效邀请人数","Número de convites válidos dentro do ciclo"),
+    DAILY_INVITEE_COUNT(14,"当日邀请人数","Número cumulativo de convites");
 //
 //    CUMULATIVE_RECHARGE_AMT(2,"指定时间内累计充值金额",""),
 //    YESTERDAY_CUMULATIVE_RECHARGE_AMT(3,"昨日日累计充值金额",""),

@@ -32,7 +32,8 @@ public class SettledIdCursor implements Serializable {
         PAYMENT_PROC("payment_proc","支付过程结算汇总"),
         CASHOUT_PROC("cash_out_proc","提现过程结算汇总"),
         AGENT_LAYER_SYNC("agent_layer_sync","代理关系同步"),
-        USER_PROC_SYNC("user_proc_sync","用户行为同步到总租户");
+        USER_PROC_SYNC("user_proc_sync","用户行为同步到总租户"),
+        INVITE_NEW("invite_new_settlement","邀新活动结算");
 
         @JsonValue
         @EnumValue

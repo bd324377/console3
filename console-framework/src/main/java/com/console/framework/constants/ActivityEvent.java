@@ -32,6 +32,13 @@ public class ActivityEvent {
         this.tenantId     = tenantId;
     }
 
+    public ActivityEvent(ActivityType activityType,Integer tenantId,Object param) {
+        this.eventId      = IdWorker.getId();
+        this.activityType = activityType;
+        this.param        = param;
+        this.tenantId     = tenantId;
+    }
+
     public void clear() {
         setEventId(null);
         setActivityId(null);

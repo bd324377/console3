@@ -77,6 +77,7 @@ public class CacheConstants {
     public static final String ACQUIRE_LOCK_CASH_OUT_PROC_SETTLEMENT = "ACQUIRE_LOCK:CASH_OUT_PROC_SETTLEMENT";//提现行为结算
     public static final String ACQUIRE_LOCK_WALLET_PROC_SETTLEMENT = "ACQUIRE_LOCK:WALLET_PROC_SETTLEMENT";//钱包行为结算
     public static final String ACQUIRE_LOCK_ONLINE_USER_SETTLEMENT = "ACQUIRE_LOCK:ONLINE_USER_SETTLEMENT";//在线用户统计
+    public static final String ACQUIRE_LOCK_INVITE_NEW_USER_SETTLEMENT = "ACQUIRE_LOCK:INVITE_NEW_USER_SETTLEMENT";//在线用户统计
     public static final String ACQUIRE_LOCK_PHONE_SYNC_PUSH = "ACQUIRE_LOCK:PHONE_SYNC_PUSH";//手机上传同步行为推送
     public static final String ACQUIRE_LOCK_AGENT_LAYER_SYNC_PUSH = "ACQUIRE_LOCK:AGENT_LAYER_SYNC_PUSH";//代理层级关系同步给总租户推送
     public static final String ACQUIRE_LOCK_USER_REPORT_SYNC_PUSH = "ACQUIRE_LOCK:USER_REPORT_SYNC_PUSH";//代理层级关系同步给总租户推送

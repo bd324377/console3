@@ -4,7 +4,7 @@
     <!--查询未结算最新单单信息-->
     <select id="selectNewestProc" resultType="com.console.payment.entity.CashOutProc">
         SELECT MAX(t.id) AS id, COUNT(1) AS proc_count FROM (
-            SELECT id FROM p_payment_proc WHERE id > #{settledProcId} ORDER BY id LIMIT #{limitSize}
+            SELECT id FROM p_cash_out_proc WHERE id > #{settledProcId} ORDER BY id LIMIT #{limitSize}
         ) t
     </select>
     <!--汇总提现报告-->

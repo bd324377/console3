@@ -36,6 +36,8 @@ public class UserProc implements Serializable {
     private LocalDateTime procTime;
     @TableField(exist = false)
     private Integer procCount;
+    @TableField(exist = false)
+    private Integer activateCount;
 
     @TableField(exist = false)
     private Integer retryTimes;
