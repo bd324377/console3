@@ -1,0 +1,92 @@
+server:
+  port: 8091
+
+spring:
+  servlet:
+    multipart:
+      max-file-size: 20971520
+      max-request-size: 52428800
+  task:
+    execution:
+      pool:
+        max-size: 1000
+  messages:
+    basename: i18n/messages
+  jackson:
+    default-property-inclusion: non_null
+  datasource:
+    url: jdbc:mysql://database-1.cj2c2k0kqv2y.sa-east-1.rds.amazonaws.com:3306?allowPublicKeyRetrieval=true&serverTimezone=America/Fortaleza&useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true&useSSL=true&rewriteBatchedStatements=true
+    username: admin
+    password: Brazil3695.
+    hikari:
+      maximum-pool-size: 32
+  data:
+    redis:
+      port: 6379
+      host: 172.31.0.16
+      database: 0
+      password: 123456
+      connect-timeout: 2000
+layering-cache:
+  redis:
+    host: 172.31.0.16
+    port: 6379
+    password: 123456
+    database: 0
+    serializer: com.github.xiaolyuh.redis.serializer.JacksonRedisSerializer
+
+
+mybatis-plus:
+  configuration:
+    #开启控制sql打印
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+console:
+  serviceCode: 1
+  transfer:
+    url: http://172.31.0.16:8000
+    apiKey: abc
+    secret: abcdefg
+#    secret: $2a$10$9nOv9i9BeGf/EFlUDYOZFef7xryuGXqDZgOv0L1rzzyBnAAo6Tvk6
+  fileUpload:
+    baseFilePath: /mnt/shared-directory/
+
+logging:
+  level:
+    root: info
+    com.baomidou.mybatisplus: info
+    com.console.mapper: info
+  file:
+    name: /home/ubuntu/console4.8/logs/admin.log
+  logback:
+    rolling policy:
+      clean-history-on-start: true
+      max-history: 30
+      max-file-size: 200MB
+      total-size-cap: 10GB
+  threshold:
+    file: TRACE
+
+scheduled:
+  settlement:
+    enabled: false
+    cron:
+      userProc: 1/15 * * * * ?
+      paymentProc: 3 * * * * ?
+      cashOutProc: 9 * * * * ?
+      productOrder: 4/10 * * * * ?
+      walletProc: 5/15 * * * * ?
+      onlineUser: 1/5 * * * * ?
+  dataPush:
+    enabled: false
+    cron:
+      phone: 1 1/3 * * * ?
+      userReport: 5 1/3 * * * ?
+      agentLayer: 1 1 1 * * ?
+  sync:
+    product:
+      enabled: false
+      cron: 1 * * * * ? #游戏列表定时任务cron表达式
+    productOrder:
+      enabled: true
+      cron: 1/10 * * * * ? #游戏列表定时任务cron表达式

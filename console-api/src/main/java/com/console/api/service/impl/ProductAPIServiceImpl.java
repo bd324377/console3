@@ -265,9 +265,6 @@ public class ProductAPIServiceImpl extends BaseServiceImpl implements ProductAPI
                 .eq(searchProductOrderReq.getCategory()  != null,ProductOrder::getCategory,searchProductOrderReq.getCategory())
                 .orderByDesc(ProductOrder::getId);
         IPage<ProductOrder> productOrderIPage = productOrderService.page(page,queryWrapper);
-//        if (searchProductOrderReq.getCurrent() == 1 && productOrderIPage.getTotal() > 0) {
-//
-//        }
         if (productOrderIPage.getRecords() != null && !productOrderIPage.getRecords().isEmpty()) {
             Map<Integer,String> productNameMap = new HashMap<>();
             List<Integer> productIds = productOrderIPage.getRecords().stream().map(ProductOrder::getProductId).toList();
@@ -280,6 +277,19 @@ public class ProductAPIServiceImpl extends BaseServiceImpl implements ProductAPI
             for (ProductOrder productOrder : productOrderIPage.getRecords()) {
                 productOrder.setProductName(productNameMap.get(productOrder.getProductId()));
             }
+        }
+        ProductOrderPageRes productOrderPageRes = new ProductOrderPageRes(productOrderIPage);
+        if (searchProductOrderReq.getCurrent() == 1 && productOrderIPage.getTotal() > 0) {
+            queryWrapper = new QueryWrapper<>();
+            queryWrapper.select("SUM(order_amt) AS order_amt,SUM(result_amt) AS result_amt,SUM(payout_amt) AS payout_amt").lambda()
+                    .eq(ProductOrder::getUserId,requestMember.getId())
+                    .between(searchProductOrderReq.getStartSearchTime() != null && searchProductOrderReq.getEndSearchTime() != null,ProductOrder::getOrderTime,searchProductOrderReq.getStartSearchTime(),searchProductOrderReq.getEndSearchTime())
+                    .eq(searchProductOrderReq.getProductId() != null,ProductOrder::getProductId,searchProductOrderReq.getProductId())
+                    .eq(searchProductOrderReq.getCategory()  != null,ProductOrder::getCategory,searchProductOrderReq.getCategory());
+            ProductOrder productOrder = productOrderService.getOne(queryWrapper);
+            productOrderPageRes.setOrderAmt(productOrder.getOrderAmt());
+            productOrderPageRes.setPayoutAmt(productOrder.getPayoutAmt());
+            productOrderPageRes.setResultAmt(productOrder.getResultAmt());
         }
         return new ProductOrderPageRes(productOrderIPage);
     }

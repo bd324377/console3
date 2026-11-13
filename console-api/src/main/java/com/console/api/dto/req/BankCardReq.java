@@ -1,7 +1,6 @@
 package com.console.api.dto.req;
 
 import com.console.framework.request.RequestMember;
-import com.console.framework.utils.RequestUtils;
 import com.console.payment.entity.BankCard;
 import lombok.Getter;
 import lombok.Setter;

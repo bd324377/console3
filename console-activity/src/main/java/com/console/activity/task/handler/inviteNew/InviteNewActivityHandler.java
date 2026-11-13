@@ -47,8 +47,8 @@ public class InviteNewActivityHandler extends ActivityStrategy {
                 activityId = activityDetails.getId();
                 userId = inviteNewSettlementParam.getParentId();
                 if (!verifyActivityValidity(activityDetails)) {
-                    UserActivity userActivity = getLastUserActivity(inviteNewSettlementParam.getParentId(), activityDetails.getId());
-                    userActivity = verifyUserActivity(userActivity,inviteNewSettlementParam.getParentId(), activityDetails);
+                    UserActivity userActivity = userActivityService.getLastUserActivity(inviteNewSettlementParam.getParentId(), activityDetails.getId());
+                    userActivity = userActivityService.verifyUserActivity(userActivity,inviteNewSettlementParam.getParentId(), activityDetails);
                     if (userActivity != null) {
                         List<ActivityRuleDetail>  activityRuleList = new ArrayList<>();
                         for (int i = userActivity.getTriggeredTimes(); i < activityDetails.getActivityRuleDetailList().size(); i++) {

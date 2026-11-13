@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class CashOutRuleServiceImpl extends BaseServiceImpl<CashOutRuleMapper, CashOutRule> implements CashOutRuleService {
     @Override
-    @Cacheable(value = CacheConstants.CASH_OUT_RULE, key = "#marketTeamId + ':' + #cashOutRuleType.getKey()")
+    @Cacheable(value = CacheConstants.CASH_OUT_RULE, key = "#marketTeamId + ':' + #ruleType.getKey()")
     public CashOutRule getCashOutRule(Integer marketTeamId, CashOutRule.RuleType ruleType) {
         QueryWrapper<CashOutRule> queryWrapper = new QueryWrapper<>();
         queryWrapper.lambda().eq(CashOutRule::getMarketTeamId,marketTeamId).eq(CashOutRule::getRuleType, ruleType);

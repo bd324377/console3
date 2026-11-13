@@ -22,6 +22,7 @@ public class SelfInfoRes {
 
     private String phone;
     private Integer phoneStatus;
+    private String shareCode;
 
     private boolean hasCashOutPwd;          //是否设置过提现密码
     private Integer pushSubscriptionStatus;//推送订阅状态

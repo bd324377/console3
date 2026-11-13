@@ -23,7 +23,7 @@
             </if>
     </select>
 
-    <select id="selectSubUserPage" resultType="com.console.user.entity.User">
+    <select id="selectSubUserPage" resultType="com.console.api.dto.res.SubUserRes">
         SELECT
             u.id,
             l.layers,
@@ -31,7 +31,7 @@
             u.reg_time,
             u.status,
             SUM( t.recharge_amt ) recharge_amt,
-            SUM( t.order_amt ) ordered_amt,
+            SUM( t.order_amt ) order_amt,
             u.vip_id
         FROM
             r_agent_layer l
@@ -49,5 +49,27 @@
         </if>
         GROUP BY u.id,l.layers
         ORDER BY u.reg_time DESC
+    </select>
+
+    <select id="selectAgentPerformanceReport" resultType="com.console.api.dto.res.AgentPerformanceRes">
+        SELECT
+            COUNT( 1 ) AS invitee_count,
+            COALESCE ( SUM( CASE WHEN l.layers = 1 THEN 1 END ), 0 ) AS valid_invitee_count,
+            COALESCE ( SUM( CASE WHEN l.layers = 1 THEN 1 END ), 0 ) AS one_layer_invitee_count,
+            COALESCE ( SUM( CASE WHEN l.layers = 1 AND u.activate_status = 1 THEN 1 END ), 0 ) AS one_layer_valid_invitee_count,
+            COALESCE ( SUM( CASE WHEN l.layers != 1 THEN 1 END ), 0 ) AS other_layer_invitee_ount,
+            COALESCE ( SUM( CASE WHEN l.layers != 1 AND u.activate_status = 1 THEN 1 END ), 0 ) AS other_layer_valid_invitee_ount,
+            COALESCE ( SUM( w.recharge_amt ), 0 ) recharge_amt,
+            COALESCE ( SUM( CASE WHEN l.layers = 1 THEN w.recharge_amt END ), 0 ) AS one_layer_recharge_amt,
+            COALESCE ( SUM( CASE WHEN l.layers != 1 THEN w.recharge_amt END ), 0 ) AS other_layer_recharge_amt,
+            COALESCE ( SUM( w.order_amt ), 0 ) order_amt,
+            COALESCE ( SUM( CASE WHEN l.layers = 1 THEN w.order_amt END ), 0 ) AS one_layer_order_amt,
+            COALESCE ( SUM( CASE WHEN l.layers != 1 THEN w.order_amt END ), 0 ) AS other_layer_order_amt
+        FROM
+            r_agent_layer l
+            INNER JOIN s_user u ON u.id = l.user_id
+            INNER JOIN s_wallet w ON w.user_id = u.id
+            AND w.wallet_type = 0
+        WHERE l.layers <![CDATA[<=]]> #{param.layers} AND l.sup_user_id = #{param.userId} AND l.layer_status = 1
     </select>
 </mapper>

@@ -15,7 +15,6 @@ import com.console.activity.service.ActivityRewardService;
 import com.console.activity.service.ActivityRuleItemService;
 import com.console.activity.service.ActivityRuleService;
 import com.console.activity.service.ActivityService;
-import com.console.activity.service.PrizeService;
 import com.console.core.entity.AdminProc;
 import com.console.core.service.impl.BaseServiceImpl;
 import com.console.framework.constants.ActivityType;
@@ -149,7 +148,7 @@ public class ActivityServiceImpl extends BaseServiceImpl<ActivityMapper, Activit
     @Override
     public List<Activity> getActivityList(Integer marketSiteId, ActivityType activityType) {
         QueryWrapper<Activity> queryWrapper = new QueryWrapper<>();
-        queryWrapper.select("id,activity_name,blurb,icon,cycle_reward_times,reward_wallet_type,activity_type," +
+        queryWrapper.select("id,activity_name,blurb,icon,cycle,cycle_reward_times,reward_wallet_type,activity_type," +
                         "start_time,end_time,activity_status,route_path,is_hot")
                 .lambda()
                 .eq(Activity::getMarketSiteId,marketSiteId)
@@ -164,7 +163,8 @@ public class ActivityServiceImpl extends BaseServiceImpl<ActivityMapper, Activit
     @Override
     public Activity getActivityById(Integer activityId) {
         QueryWrapper<Activity> queryWrapper = new QueryWrapper<>();
-        queryWrapper.select("id,exclusion_code,activity_name,blurb,icon,cycle_reward_times,reward_wallet_type,activity_type,start_time,end_time").lambda().eq(Activity::getId,activityId);
+        queryWrapper.select("id,exclusion_code,activity_name,blurb,icon,cycle,cycle_reward_times,reward_wallet_type," +
+                "activity_type,start_time,end_time").lambda().eq(Activity::getId,activityId);
         return this.getOne(queryWrapper);
     }
 

@@ -22,6 +22,7 @@ import jakarta.annotation.Resource;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 
@@ -88,7 +89,7 @@ public class ProductServiceImpl extends BaseServiceImpl<ProductMapper, Product> 
         List<ProductPlatform> productPlatformList = productPlatformService.getProductPlatformList(tenantId);
         List<Integer> productPlatformIdList = productPlatformList.stream().map(ProductPlatform::getId).toList();
         QueryWrapper<Product> queryWrapper = new QueryWrapper<>();
-        queryWrapper.select("id,platform_id,category,product_name")
+        queryWrapper.select("id,platform_id,category,product_code,product_name")
                 .lambda().in(Product::getPlatformId,productPlatformIdList)
                 .eq(Product::getStatus,1).orderByDesc(Product::getSort);
         List<Product> productList = this.list(queryWrapper);
@@ -96,7 +97,7 @@ public class ProductServiceImpl extends BaseServiceImpl<ProductMapper, Product> 
             for (Product product : productList) {
                 product.buildIconData(serviceCode,UPLOAD_PATH,baseFilePath);
             }
-//            productList = productList.stream().filter(item -> StringUtils.hasText(item.getIconPath())).toList();
+            productList = productList.stream().filter(item -> StringUtils.hasText(item.getIconPath())).toList();
         }
         return productList;
     }

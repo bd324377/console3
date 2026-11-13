@@ -240,7 +240,6 @@ public class RedisUtils {
 
     /** 判断元素是否存在 **/
     public static boolean existsInZSet(String key, Object value) {
-        if (!redisTemplate.hasKey(key)) return false;
         Double score = redisTemplate.opsForZSet().score(key, value);
         return score != null;  // 返回 null 说明成员不存在
     }
@@ -253,7 +252,6 @@ public class RedisUtils {
     }
 
     public static <T> List<T> getZSetAdList(String key, Class<T> beanClass, int limit) {
-        if (!exists(key)) return Collections.emptyList();
         Set<Object> objectSet = redisTemplate.opsForZSet().reverseRange(key, 0, limit - 1);
         if (objectSet == null || objectSet.isEmpty()) {
             return Collections.emptyList();

@@ -58,6 +58,6 @@ public class ProductAPI {
 
     @PostMapping("/productOrderRecord")
     public Result getProductOrderRecord(ProductReq.SearchProductOrderReq searchProductOrderReq) {
-        return Result.success();
+        return Result.success(productAPIService.getProductOrderRecord(searchProductOrderReq));
     }
 }

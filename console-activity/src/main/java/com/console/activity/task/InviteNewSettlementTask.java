@@ -1,4 +1,4 @@
-package com.console.activity.task.handler.inviteNew;
+package com.console.activity.task;
 
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.console.activity.mapper.InviteNewSettlementMapper;

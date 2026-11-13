@@ -10,8 +10,10 @@ import com.console.api.dto.CashOutDTO;
 import com.console.api.dto.res.CashOutOrderPageRes;
 import com.console.api.service.CashOutAPIService;
 import com.console.core.entity.Parameter;
+import com.console.core.entity.UserProc;
 import com.console.core.entity.Wallet;
 import com.console.core.entity.WalletProc;
+import com.console.core.merger.UserProcMerger;
 import com.console.core.merger.WalletProcMerger;
 import com.console.core.service.WalletService;
 import com.console.framework.config.DynamicTableNameHandler;
@@ -77,7 +79,7 @@ public class CashOutAPIServiceImpl extends BaseServiceImpl implements CashOutAPI
     @Resource
     private CashOutRuleService cashOutRuleService;
     @Resource
-    private UserReportService userReportService;
+    private UserProcMerger userProcMerger;
     @Resource
     private CashOutProcMerger cashOutProcMerger;
     @Resource
@@ -101,7 +103,7 @@ public class CashOutAPIServiceImpl extends BaseServiceImpl implements CashOutAPI
             if (!locked) throw new BusinessException(500, I18nUtil.getI8nMsg("paymentOrder.error.create.creating"));
             DynamicTableNameHandler.setTenantId(member.getTenantId());
             cashOutOrderReq.setUserId(member.getId());
-            BankCard bankCard = verifyBankCard(member, cashOutOrderReq.getBankCardId());//银行卡校验——直接报错
+            BankCard bankCard = verifyBankCard(member, cashOutOrderReq);//银行卡校验——直接报错
             Wallet wallet = verifyWalletAmt(member,cashOutOrderReq);//校验钱包金额——直接报错
             validateCaptcha(member,wallet,cashOutOrderReq,bankCard);//验证码校验(首次提现)——直接报错
             Channel channel = validateChannel(cashOutOrderReq);//第三方提现渠道判断——直接报错
@@ -211,24 +213,57 @@ public class CashOutAPIServiceImpl extends BaseServiceImpl implements CashOutAPI
 
     /**
      * 获取银行卡信息并校验
-     * @param requestMember 提现用户信息
-     * @param bankCardId    银行卡ID
      */
-    private BankCard verifyBankCard(RequestMember requestMember,Integer bankCardId) {
-        BankCard bankCard = bankCardService.getById(bankCardId);
-        if (bankCard == null) {
-            throw new BusinessException(500,I18nUtil.getI8nMsg("cashOutOrder.error.bankCard.notBind"));
+    private BankCard verifyBankCard(RequestMember requestMember, CashOutDTO.CreateCashOutOrderReq cashOutOrderReq) {
+        BankCard bankCard;
+        if (cashOutOrderReq.getBankCardId() != null) {
+            bankCard = bankCardService.getById(cashOutOrderReq.getBankCardId());
+            if (bankCard == null) {
+                throw new BusinessException(500, I18nUtil.getI8nMsg("cashOutOrder.error.bankCard.notBind"));
+            }
+            if (!Objects.equals(bankCard.getUserId(), requestMember.getId())) {
+                throw new BusinessException(500, I18nUtil.getI8nMsg("cashOutOrder.error.bankCard.notSelf"));
+            }
+            return bankCard;
+        } else {
+            if (!StringUtils.hasText(cashOutOrderReq.getBankCardCode())) {
+                throw new BusinessException(500, I18nUtil.getI8nMsg("cashOutOrder.error.bankCard.notBind"));
+            }
+            QueryWrapper<BankCard> queryWrapper = new QueryWrapper<>();
+            queryWrapper.lambda().eq(BankCard::getBankCardCode,cashOutOrderReq.getBankCardCode()).eq(BankCard::getUserId,requestMember.getId());
+            bankCard = bankCardService.getOne(queryWrapper);
+            if (bankCard == null) {
+                bankCard = new BankCard();
+                bankCard.setUserId(requestMember.getId());
+                bankCard.setBankCardCode(cashOutOrderReq.getBankCardCode());
+                bankCard.setStatus(BankCard.BankCardStatus.CASHOUTING);
+                bankCard.setType(cashOutOrderReq.getBankCardType());
+                bankCard.setBindTime(LocalDateTime.now());
+                bankCard.setUserName(cashOutOrderReq.getRealName());
+                bankCard.setPhone(cashOutOrderReq.getPhone());
+                try {
+                    if (bankCardService.save(bankCard)) {//添加用户绑卡记录
+                        UserProc userProc = new UserProc(requestMember.getId(), requestMember.getTenantId(), UserProc.ProcType.BIND_BANK_CARD);
+                        userProcMerger.submit(userProc);
+                    }
+                } catch (DuplicateKeyException e) {
+                    String uniqueKey = UniqueKeyUtils.extractUniqueKey(e);
+                    if ("uk_bank_card_code".equals(uniqueKey)) {
+                        throw new BusinessException(500, I18nUtil.getI8nMsg("bankCard.error.bind.alreadyExists"));
+                    }
+                    if ("uk_user_bank_card".equals(uniqueKey)) {
+                        throw new BusinessException(500, I18nUtil.getI8nMsg("bankCard.error.bind.typeAlreadyExists"));
+                    }
+                }
+            }
+            return bankCard;
         }
-        if (!Objects.equals(bankCard.getUserId(), requestMember.getId())) {
-            throw new BusinessException(500, I18nUtil.getI8nMsg("cashOutOrder.error.bankCard.notSelf"));
-        }
-        return bankCard;
     }
 
     /** 钱包信息校验 **/
     private Wallet verifyWalletAmt(RequestMember requestMember, CashOutDTO.CreateCashOutOrderReq cashOutOrderReq) {
         QueryWrapper<Wallet> queryWrapper = new QueryWrapper<>();
-        queryWrapper.select("user_id,balance,cash_able_amt,cash_out_times,last_cash_out_time,day_cash_out_amt,cash_out_amt,day_cash_out_amt,recharge_amt,ordered_amt")
+        queryWrapper.select("user_id,balance,cash_able_amt,cash_out_times,last_cash_out_time,day_cash_out_amt,cash_out_amt,day_cash_out_amt,recharge_amt,order_amt")
                 .lambda().eq(Wallet::getUserId,requestMember.getId()).eq(Wallet::getWalletType,cashOutOrderReq.getWalletType());
         Wallet wallet = walletService.getOne(queryWrapper);
         if (wallet == null) {

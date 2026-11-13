@@ -1,22 +1,21 @@
 package com.console.activity.task.handler;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.console.activity.dto.bo.UserRechargeAndOrderAmt;
 import com.console.activity.dto.res.ActivityDetails;
 import com.console.activity.dto.res.ActivityRuleDetail;
 import com.console.activity.entity.*;
+import com.console.activity.mapper.ActivityTriggerMapper;
 import com.console.activity.merger.ActivityProcMerger;
 import com.console.activity.service.*;
 import com.console.framework.constants.ActivityType;
 import com.console.framework.domain.BusinessException;
-import com.console.framework.utils.DateUtils;
+import com.console.framework.utils.I18nUtil;
 import jakarta.annotation.Resource;
-import org.springframework.beans.BeanUtils;
 import org.springframework.integration.redis.util.RedisLockRegistry;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 public abstract class ActivityStrategy {
     @Resource
@@ -26,11 +25,7 @@ public abstract class ActivityStrategy {
     @Resource
     protected UserActivityService userActivityService;
     @Resource
-    protected ActivityRuleService activityRuleService;
-    @Resource
-    protected ActivityRuleItemService activityRuleItemService;
-    @Resource
-    protected ActivityRewardService activityRewardService;
+    protected ActivityTriggerMapper activityTriggerMapper;
     @Resource
     protected ReceiveRewardHandler receiveRewardHandler;
     @Resource
@@ -51,27 +46,6 @@ public abstract class ActivityStrategy {
                 || (LocalDateTime.now().isBefore(activity.getStartTime()) || LocalDateTime.now().isAfter(activity.getEndTime()));
     }
 
-    public UserActivity getLastUserActivity(Integer userId,Integer activityId) {
-        QueryWrapper<UserActivity> queryWrapper = new QueryWrapper<>();
-        queryWrapper.lambda()
-                .eq(UserActivity::getUserId,userId)
-                .eq(UserActivity::getActivityId,activityId)
-                .orderByDesc(UserActivity::getId).last("LIMIT 1");
-        return userActivityService.getOne(queryWrapper);
-    }
-
-    public UserActivity verifyUserActivity(UserActivity userActivity,Integer userId,ActivityDetails activityDetails) {
-        if (userActivity == null || userActivity.getExpireTime().isBefore(LocalDateTime.now())) {//上次参与活动情况已完成则继续触发新一轮活动
-            Integer round = userActivity == null ? 1 : userActivity.getRound() + 1;
-            userActivity = new UserActivity(userId,activityDetails.getId(),null);
-            userActivity.setRound(round);
-            userActivity.setExpireTime(activityDetails.getCycle() == 0 ? activityDetails.getEndTime() : LocalDate.now().atStartOfDay().plusDays(activityDetails.getCycle()));
-        } else {
-            if (userActivity.getStatus() == 1) return null;
-        }
-        return userActivity;
-    }
-
     public ActivityDetails getActivityDetails(Integer activityId) {
         Activity activity = activityService.getActivityById(activityId);
         if (activity == null) {
@@ -86,5 +60,32 @@ public abstract class ActivityStrategy {
             throw new BusinessException(404, "活动不存在");
         }
         return activityService.getActivityDetails(activity);
+    }
+
+    public String triggerRuleItem(ActivityRuleDetail activityRuleDetail) {
+        LocalDate startDate = LocalDate.now(),endDate = LocalDate.now();
+        if (activityRuleDetail.getRuleDuration() != null && activityRuleDetail.getRuleDuration() > 0) {
+            startDate = startDate.minusDays(activityRuleDetail.getRuleDuration());
+        }
+        UserRechargeAndOrderAmt userRechargeAndOrderAmt = activityTriggerMapper.selectTotalRechargeAndOrderAmt(startDate,endDate);
+        if (userRechargeAndOrderAmt == null) userRechargeAndOrderAmt = new UserRechargeAndOrderAmt();
+        for (ActivityRuleItem activityRuleItem : activityRuleDetail.getActivityRuleItems()) {
+            if (activityRuleItem.getRuleType() == ActivityRuleType.CUMULATIVE_RECHARGE_AMT) {
+                if (userRechargeAndOrderAmt.getRechargeAmt().compareTo(new BigDecimal(activityRuleItem.getRuleValue())) < 0) {
+                    return I18nUtil.getI8nMsg("未达成充值条件");
+                }
+            }
+            if (activityRuleItem.getRuleType() == ActivityRuleType.CUMULATIVE_ORDER_AMT) {
+                if (userRechargeAndOrderAmt.getOrderAmt().compareTo(new BigDecimal(activityRuleItem.getRuleValue())) < 0) {
+                    return I18nUtil.getI8nMsg("未达成充值条件");
+                }
+            }
+            if (activityRuleItem.getRuleType() == ActivityRuleType.CUMULATIVE_ORDER_LOSE_AMT) {
+                if (userRechargeAndOrderAmt.getOrderAmt().compareTo(new BigDecimal(activityRuleItem.getRuleValue())) < 0) {
+                    return I18nUtil.getI8nMsg("未达成充值条件");
+                }
+            }
+        }
+        return null;
     }
 }

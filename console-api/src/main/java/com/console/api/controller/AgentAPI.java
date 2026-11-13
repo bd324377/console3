@@ -20,4 +20,19 @@ public class AgentAPI {
     public Result getSubUserPage(@RequestBody UserReq.SearchSubUserReq searchSubUserReq) {
         return Result.success(agentAPIService.getSubUserPage(searchSubUserReq));
     }
+
+    @PostMapping("/agentPerformanceReport")
+    public Result getAgentPerformanceReport(@RequestBody UserReq.SearchAgentPerformanceReq searchAgentPerformanceReq) {
+        return Result.success(agentAPIService.getAgentPerformanceReport(searchAgentPerformanceReq));
+    }
+
+    @PostMapping("/orderRakeBackRules")
+    public Result getOrderRakeBackIntroduction() {
+        return Result.success();
+    }
+
+    @PostMapping("/dailySubPerformanceReport")
+    public Result getSubPerformanceReport() {
+        return Result.success();
+    }
 }

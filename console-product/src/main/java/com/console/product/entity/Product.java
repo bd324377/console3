@@ -24,7 +24,7 @@ public class Product implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private Integer id; // 产品id
-    @JSONField(name = "platId")
+    @JSONField(name = "platCategory")
     private Integer platformId; // 产商id
     @JSONField(name = "categoryId")
     private ProductCategory category; // 产品分类

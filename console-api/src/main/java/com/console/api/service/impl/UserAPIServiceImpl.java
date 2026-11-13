@@ -9,6 +9,7 @@ import com.console.core.merger.UserProcMerger;
 import com.console.framework.domain.BusinessException;
 import com.console.framework.domain.ResultCode;
 import com.console.framework.request.RequestMember;
+import com.console.framework.utils.EncryptUtils;
 import com.console.framework.utils.I18nUtil;
 import com.console.framework.utils.RequestUtils;
 import com.console.framework.utils.TokenUtils;
@@ -69,7 +70,7 @@ public class UserAPIServiceImpl implements UserAPIService {
 
         selfInfoRes.setPhone(requestMember.getPhone());
         selfInfoRes.setPhoneStatus(requestMember.getPhoneStatus());
-
+        selfInfoRes.setShareCode(EncryptUtils.encodeToBase64Str("1_" + requestMember.getId()));
         selfInfoRes.setHasCashOutPwd(StringUtils.hasText(requestMember.getCashOutPwd()));
 
         return selfInfoRes;

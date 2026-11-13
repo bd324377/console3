@@ -17,6 +17,7 @@ public class ActivityRuleDetail {
     private Integer receiveType;//奖励领取类型,1、全部领取；2、随机领取1件
     private String  ruleTriggerThreshold;//规则触发阈值,需先满足该条件，才能继续触发当前规则组的其他条件
     private Integer ruleKey;//排序
+    private Integer ruleDuration;//规则时长
 
     private List<ActivityRuleItem> activityRuleItems;
     private List<ActivityReward> activityRewards;

@@ -9,7 +9,7 @@ public enum ActivityRuleType {
     SINGLE_RECHARGE_AMT(1,"单次充值金额","activity.rule.singleRechargeAmt"),
     CUMULATIVE_RECHARGE_AMT(2,"累计充值金额",""),
     CYCLE_CUMULATIVE_RECHARGE_AMT(3,"周期内累计充值金额",""),
-    TOTAL_CUMULATIVE_RECHARGE_AMT(4,"总累计下单金额",""),
+    TOTAL_CUMULATIVE_RECHARGE_AMT(4,"总累计充值金额",""),
     CUMULATIVE_ORDER_AMT(5,"累计下单金额",""),
     CYCLE_CUMULATIVE_ORDER_AMT(6,"周期内累计下单金额",""),
     TOTAL_CUMULATIVE_ORDER_AMT(7,"总累计下单金额",""),

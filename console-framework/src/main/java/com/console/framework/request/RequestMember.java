@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public class RequestMember extends RequestUser {
+    private Integer parentId;
     private String  avatar;                 //头像
     private String  nickName;//昵称
     private Integer siteId;         //站点ID
@@ -32,6 +33,7 @@ public class RequestMember extends RequestUser {
     private Integer userType;//用户类型
     private Integer inviteRewardStatus;//邀请奖励状态（是否能参与邀新活动：1、能；0不能）
     private Integer transferStatus = 0;//进入中转平台状态 0、未进入；1、已进入中转平台
+    private String deviceId;
 
     private String  loginPwd;       //登录密码
 

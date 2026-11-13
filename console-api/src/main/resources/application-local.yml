@@ -46,8 +46,8 @@ console:
   transfer:
     url: http://127.0.0.1:8080
     apiKey: abc
-    secret: abcdefg
-#    secret: $2a$10$9nOv9i9BeGf/EFlUDYOZFef7xryuGXqDZgOv0L1rzzyBnAAo6Tvk6
+#    secret: abcdefg
+    secret: $2a$10$9nOv9i9BeGf/EFlUDYOZFef7xryuGXqDZgOv0L1rzzyBnAAo6Tvk6
   fileUpload:
     baseFilePath: D:/console/uploadPath/
 
@@ -69,7 +69,7 @@ scheduled:
       agentLayer: 1 1 1 * * ?
   sync:
     product:
-      enabled: false
+      enabled: true
       cron: 1 * * * * ? #游戏列表定时任务cron表达式
     productOrder:
       enabled: false

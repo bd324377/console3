@@ -66,10 +66,7 @@ public class UserProductServiceImpl extends BaseServiceImpl<UserProductMapper, U
     public List<Integer> getHistoryProductIdList() {
         RequestMember requestMember = RequestUtils.getRequestMember();
         String redisKey = CacheConstants.HISTORY_PRODUCT + requestMember.getTenantId() + ":" + requestMember.getId();
-        List<Integer> historyProductIdList = new ArrayList<>();
-        if (RedisUtils.exists(redisKey)) {
-            historyProductIdList = RedisUtils.getZSetAdList(redisKey, Integer.class, 30);
-        }
+        List<Integer> historyProductIdList = RedisUtils.getZSetAdList(redisKey, Integer.class, 30);
         if (ObjectUtils.isEmpty(historyProductIdList)) {
             QueryWrapper<UserProduct> queryWrapper = new QueryWrapper<>();
             queryWrapper.select("product_id,update_time").lambda()

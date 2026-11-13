@@ -1,7 +1,7 @@
 package com.console.api.dto;
 
 import com.console.core.entity.Wallet;
-import com.console.payment.entity.CashOutOrder;
+import com.console.payment.entity.BankCard;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -20,8 +20,11 @@ public class CashOutDTO {
         @Serial
         private static final long serialVersionUID = 1L;
 
-        @NotNull
+//        @NotNull
         private Integer    bankCardId;      //银行卡ID
+        private String     bankCardCode;//银行卡号
+        private BankCard.BankCardType bankCardType;
+        private String realName;
         @NotNull
         private Integer    channelId;       //渠道id、
         @NotNull

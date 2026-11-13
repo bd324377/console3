@@ -8,10 +8,10 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class SubUserPageRes extends IPageRes<User> {
+public class SubUserPageRes extends IPageRes<SubUserRes> {
     SubTeamRechargeReport subTeamRechargeReport;
 
-    public SubUserPageRes(IPage<User> userIPage) {
+    public SubUserPageRes(IPage<SubUserRes> userIPage) {
         this.setSize(userIPage.getSize());
         this.setCurrent(userIPage.getCurrent());
         this.setTotal(userIPage.getTotal());

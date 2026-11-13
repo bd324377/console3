@@ -1,5 +1,6 @@
 package com.console.api.dto.req;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -9,6 +10,7 @@ import org.springframework.util.StringUtils;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 public class UserReq {
     @Getter
@@ -72,8 +74,10 @@ public class UserReq {
         @Serial
         private static final long serialVersionUID = 1L;
 
-        private Integer startSearchTime;    //起始查询时间
-        private Integer endSearchTime;      //结束查询时间
+        @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+        private LocalDateTime startSearchTime;    //起始查询时间
+        @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+        private LocalDateTime endSearchTime;      //结束查询时间
         private Integer userId;             //用户ID
         private Integer subUserId;          //下级用户ID查询
         private Long    size = 20L;         //每页条数
@@ -81,5 +85,35 @@ public class UserReq {
         private Integer layers;
         private Integer startSearchLayer;         //起始层级
         private Integer endSearchLayer;           //结束层级
+    }
+
+    @Getter
+    @Setter
+    public static class SearchAgentPerformanceReq implements Serializable {
+        @Serial
+        private static final long serialVersionUID = 1L;
+
+        @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+        private Integer startSearchTime;    //起始查询时间
+        @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+        private Integer endSearchTime;      //结束查询时间
+
+        private Integer userId;
+        private Integer layers;
+    }
+
+    @Getter
+    @Setter
+    public static class SearchSubPerformanceRes implements Serializable {
+        @Serial
+        private static final long serialVersionUID = 1L;
+
+        private long size;
+        private long current;
+        @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+        private Integer startSearchTime;    //起始查询时间
+        @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+        private Integer endSearchTime;      //结束查询时间
+        private Integer userId;
     }
 }

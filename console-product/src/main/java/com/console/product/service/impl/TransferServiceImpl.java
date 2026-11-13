@@ -168,7 +168,7 @@ public class TransferServiceImpl extends BaseServiceImpl<TransferMapper,Transfer
                     productOrder.setOrderDate(targetLocal.toLocalDate());
                     productOrder.setResultStatus(productOrder.getResultAmt().compareTo(BigDecimal.ZERO) > 0 ? 1 : (productOrder.getResultAmt().compareTo(BigDecimal.ZERO) < 0 ? 2 : 3));
                 }
-                productOrderMapper.insert(teanatOrderList);
+                productOrderMapper.insertOrUpdate(teanatOrderList);
             }
             ProductOrder lastOrder = orderList.get(orderList.size() - 1);
             UpdateWrapper<Transfer> updateWrapper = new UpdateWrapper<>();

@@ -41,8 +41,8 @@ public class RechargeActivityHandler extends ActivityStrategy {
             if (activityDetails.getActivityType() != getActivityType()) {
                 throw new BusinessException(500, I18nUtil.getI8nMsg("非充值活动，不做处理"));
             }
-            UserActivity userActivity = getLastUserActivity(userId,activityId);
-            userActivity = verifyUserActivity(userActivity,userId,activityDetails);
+            UserActivity userActivity = userActivityService.getLastUserActivity(userId,activityId);
+            userActivity = userActivityService.verifyUserActivity(userActivity,userId,activityDetails);
 
             BigDecimal orderAmt = new BigDecimal(params[2]);//订单金额
 
