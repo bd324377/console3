@@ -25,6 +25,7 @@ public class ActivityReward implements Serializable {
     private Integer id;//活动奖励ID
     private Integer activityId;//活动id
     private Integer activityRuleId;//规则id
+    private Integer activityRuleItemId;//规则组中的规则明细ID（只用于多重活动嵌套时使用）
     private String rewardIcon;//奖励图标
     private RewardType rewardType;//奖品类型
     private String rewardValue;//奖励值

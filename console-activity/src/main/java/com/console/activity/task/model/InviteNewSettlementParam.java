@@ -1,4 +1,4 @@
-package com.console.activity.task.handler.inviteNew.model;
+package com.console.activity.task.model;
 
 import lombok.Getter;
 import lombok.Setter;

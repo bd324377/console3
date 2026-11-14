@@ -38,6 +38,8 @@ public class UserProc implements Serializable {
     private Integer procCount;
     @TableField(exist = false)
     private Integer activateCount;
+    @TableField(exist = false)
+    private Integer vipUpgradeCount;
 
     @TableField(exist = false)
     private Integer retryTimes;

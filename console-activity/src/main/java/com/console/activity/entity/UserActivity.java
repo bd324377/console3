@@ -36,7 +36,7 @@ public class UserActivity implements Serializable {
     @TableField(typeHandler = JacksonTypeHandler.class)
     private List<UnReceiveReward> unReceiveRewards;//未领取奖励的触发次数，多次未领奖以逗号隔开
     private Integer rewardStatus;//领奖状态：1、没有待领取奖励；2、存在待领取奖励
-    @TableField(typeHandler = JacksonTypeHandler.class)
+//    @TableField(typeHandler = JacksonTypeHandler.class)
 //    private List<ActivityRuleItem> completeRuleItems;//完成的规则情况
     private String achievedValue;//已触发值
     private BigDecimal receivedAmt;//已领取金额

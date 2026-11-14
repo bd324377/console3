@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.console.activity.mapper.SysActivitySettlementMapper">
+    <select id="selectActivateNewestProc" resultType="com.console.core.entity.UserProc">
+        SELECT MAX(t.id) AS id, SUM(activate_status) activate_count, COUNT(1) AS proc_count FROM (
+            SELECT id,(proc_type = 5) activate_status FROM p_user_proc WHERE id > #{settledProcId} ORDER BY id LIMIT #{limitSize}
+        ) t
+    </select>
+
+    <select id="getInviteNewSettlementParams" resultType="com.console.activity.task.model.InviteNewSettlementParam">
+        WITH temp_agent_user AS (
+            SELECT DISTINCT u.parent_id
+            FROM
+                p_user_proc p INNER JOIN s_user u ON u.id = p.user_id AND u.user_type != 1
+            WHERE
+                p.proc_type = 5
+                AND p.id BETWEEN #{fromId} AND #{toId}
+            GROUP BY u.parent_id
+        )
+        SELECT
+            u.parent_id,u.market_site_id,
+            SUM(u.activate_status ) AS sub_valid_user_count
+        FROM
+            temp_agent_user au
+            INNER JOIN s_user u ON u.parent_id = au.parent_id AND u.user_type != 1
+        GROUP BY
+            u.parent_id,u.market_site_id
+    </select>
+
+    <select id="selectVipUpgradeNewestProc" resultType="com.console.core.entity.UserProc">
+        SELECT MAX(t.id) AS id, SUM(vip_upgrade_status) vip_upgrade_count, COUNT(1) AS proc_count FROM (
+            SELECT id,(proc_type = 10) vip_upgrade_status FROM p_user_proc WHERE id > #{settledProcId} ORDER BY id LIMIT #{limitSize}
+        ) t
+    </select>
+
+    <select id="getVipUpgradeSettlementParams" resultType="com.console.activity.task.model.VipUpgradeSettlementParam">
+        SELECT
+            p.user_id,u.marketer_id,p.proc_value AS vip_id
+        FROM
+            p_user_proc p
+        INNER JOIN s_user u ON u.id = p.user_id AND u.user_type != 1
+        WHERE p.proc_type = 10 AND p.id BETWEEN #{fromId} AND #{toId}
+    </select>
+</mapper>

@@ -1,13 +1,12 @@
 package com.console.activity.task.handler.inviteNew;
 
 import com.alibaba.fastjson.JSON;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.console.activity.dto.res.ActivityDetails;
 import com.console.activity.dto.res.ActivityRuleDetail;
 import com.console.activity.entity.*;
 import com.console.activity.merger.ActivityProcMerger;
 import com.console.activity.task.handler.ActivityStrategy;
-import com.console.activity.task.handler.inviteNew.model.InviteNewSettlementParam;
+import com.console.activity.task.model.InviteNewSettlementParam;
 import com.console.framework.constants.ActivityType;
 import com.console.framework.constants.CacheConstants;
 import com.console.framework.domain.BusinessException;

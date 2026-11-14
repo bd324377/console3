@@ -8,7 +8,6 @@ import com.console.framework.domain.Result;
 import com.console.framework.domain.BusinessException;
 import com.console.framework.request.PreAuthorize;
 import jakarta.annotation.Resource;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -29,7 +28,7 @@ public class ActivityController {
     }
 
     @PutMapping("/{field}")
-    public Result updateActivity(@PathVariable String field, @RequestBody @Validated ActivityReq.UpdateActivityReq updateActivityReq) {
+    public Result updateActivity(@PathVariable String field, @RequestBody ActivityReq.UpdateActivityReq updateActivityReq) {
         return activityService.updateActivity(field,updateActivityReq) ? Result.success() : Result.failed();
     }
 
