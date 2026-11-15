@@ -29,7 +29,9 @@ public enum ActivityType {
     VIP_WEEK_SALARY(17,"VIP周薪"),
     WEEK_RECHARGE(18,"周累计充值"),
     VIP_CHECK_IN(19,"vip签到"),
-    PIN_DUO_DUO(13, "拼多多砍一刀抽奖机会"),
+    PIN_DUO_DUO(20, "拼多多砍一刀抽奖机会"),
+    AGENT_SALARY(21,"代理薪资"),
+    BROKER_SALARY(22,"经纪人薪资"),
     LOTTERY(14, "抽奖");
 
     @JsonValue

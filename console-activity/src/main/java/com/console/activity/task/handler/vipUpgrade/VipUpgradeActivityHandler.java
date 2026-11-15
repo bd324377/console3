@@ -5,18 +5,16 @@ import com.console.activity.dto.res.ActivityDetails;
 import com.console.activity.dto.res.ActivityRuleDetail;
 import com.console.activity.entity.Activity;
 import com.console.activity.entity.ActivityProc;
-import com.console.activity.entity.ActivityRuleItem;
 import com.console.activity.entity.UserActivity;
 import com.console.activity.task.handler.ActivityStrategy;
-import com.console.activity.task.model.InviteNewSettlementParam;
 import com.console.activity.task.model.VipUpgradeSettlementParam;
 import com.console.framework.constants.ActivityType;
 import com.console.framework.constants.CacheConstants;
 import com.console.framework.domain.BusinessException;
 import com.console.framework.utils.I18nUtil;
 import com.console.framework.utils.TenantUtils;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
@@ -26,8 +24,8 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 
-@Getter
-@Setter
+@Slf4j
+@Component
 public class VipUpgradeActivityHandler extends ActivityStrategy {
     @Override
     public ActivityType getActivityType() {

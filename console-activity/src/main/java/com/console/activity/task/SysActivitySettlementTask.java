@@ -54,7 +54,7 @@ public class SysActivitySettlementTask extends ScheduledTask {//活动结算任�
                                 log.error("邀新宝箱结算失败, tenantId={}", tenant.getId(), e);
                             }
                         });
-
+                        /////////////////////////////////VIP升级结算/////////////////////////////////////////
                         settlementExecutor.execute(() -> {
                             try {
 
@@ -62,12 +62,28 @@ public class SysActivitySettlementTask extends ScheduledTask {//活动结算任�
                                 log.error("VIP升级结算失败, tenantId={}", tenant.getId(), e);
                             }
                         });
-
+                        //////////////////////////////////拼多多结算////////////////////////////////////////
                         settlementExecutor.execute(() -> {
                             try {
 
                             } catch (Exception e) {
                                 log.error("拼多多结算失败, tenantId={}", tenant.getId(), e);
+                            }
+                        });
+                        ///////////////////////////////////代理薪资///////////////////////////////////////
+                        settlementExecutor.execute(() -> {
+                            try {
+
+                            } catch (Exception e) {
+                                log.error("代理薪资结算失败, tenantId={}", tenant.getId(), e);
+                            }
+                        });
+                        ///////////////////////////////////订单返佣///////////////////////////////////////
+                        settlementExecutor.execute(() -> {
+                            try {
+
+                            } catch (Exception e) {
+                                log.error("订单返佣结算失败, tenantId={}", tenant.getId(), e);
                             }
                         });
                     } catch (RejectedExecutionException e) {

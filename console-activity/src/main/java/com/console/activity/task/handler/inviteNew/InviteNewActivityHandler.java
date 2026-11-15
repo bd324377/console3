@@ -26,8 +26,6 @@ import java.util.concurrent.locks.Lock;
 @Slf4j
 @Component
 public class InviteNewActivityHandler extends ActivityStrategy {
-    @Resource
-    private ActivityProcMerger activityProcMerger;
     @Override
     public ActivityType getActivityType() {
         return ActivityType.INVITE_NEW_USERS;

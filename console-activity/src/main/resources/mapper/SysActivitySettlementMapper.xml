@@ -41,4 +41,10 @@
         INNER JOIN s_user u ON u.id = p.user_id AND u.user_type != 1
         WHERE p.proc_type = 10 AND p.id BETWEEN #{fromId} AND #{toId}
     </select>
+
+    <select id="selectAgentSalaryNewestProc" resultType="com.console.core.entity.UserProc">
+        SELECT MAX(t.id) AS id, SUM(vip_upgrade_status) vip_upgrade_count, COUNT(1) AS proc_count FROM (
+        SELECT id,(proc_type = 10) vip_upgrade_status FROM p_user_proc WHERE id > #{settledProcId} ORDER BY id LIMIT #{limitSize}
+        ) t
+    </select>
 </mapper>
