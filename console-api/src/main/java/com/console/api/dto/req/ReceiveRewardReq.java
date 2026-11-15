@@ -6,7 +6,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class ReceiveInviteRewardReq {
+public class ReceiveRewardReq {
     @NotNull
     private Integer activityId;
     private Integer activityRuleId;

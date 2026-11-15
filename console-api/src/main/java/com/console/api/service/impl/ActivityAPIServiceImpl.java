@@ -1,6 +1,5 @@
 package com.console.api.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.console.activity.dto.res.ActivityDetails;
 import com.console.activity.dto.res.ActivityRuleDetail;
 import com.console.activity.entity.*;
@@ -9,7 +8,7 @@ import com.console.activity.service.ActivityService;
 import com.console.activity.service.UserActivityService;
 import com.console.activity.task.disruptor.ActivityDisruptorManager;
 import com.console.activity.task.handler.ReceiveRewardHandler;
-import com.console.api.dto.req.ReceiveInviteRewardReq;
+import com.console.api.dto.req.ReceiveRewardReq;
 import com.console.api.dto.res.CheckInRewardsRes;
 import com.console.api.dto.res.InviteNewUserRewardsRes;
 import com.console.api.service.ActivityAPIService;
@@ -27,11 +26,11 @@ import com.console.framework.utils.RequestUtils;
 import jakarta.annotation.Resource;
 import org.springframework.integration.redis.util.RedisLockRegistry;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -121,32 +120,87 @@ public class ActivityAPIServiceImpl extends BaseServiceImpl implements ActivityA
     }
 
     @Override
-    public Object receiveInviteReward(ReceiveInviteRewardReq receiveInviteRewardReq) {
+    @Transactional(rollbackFor = Exception.class)
+    public Object receiveInviteReward(ReceiveRewardReq receiveRewardReq) {
         RequestMember requestMember = new RequestMember();
         if (requestMember.getInviteRewardStatus() == 0) {
             throw new BusinessException(500,I18nUtil.getI8nMsg("activityAPI.receive.error.noInvitationPermissions"));
         }
-        String lockKey = "ACQUIRE_LOCK:RECEIVE_AGENT_AWARD" + requestMember.getTenantId() + ":" + receiveInviteRewardReq.getActivityId() + ":" + requestMember.getId();
+        return receiveActivityReward(receiveRewardReq);
+//        String lockKey = "ACQUIRE_LOCK:RECEIVE_AGENT_AWARD" + requestMember.getTenantId() + ":" + receiveRewardReq.getActivityId() + ":" + requestMember.getId();
+//        Lock lock = lockRegistry.obtain(lockKey);
+//        boolean locked = false;
+//        try {
+//            locked = lock.tryLock(5000, TimeUnit.MILLISECONDS);
+//            if (!locked) throw new BusinessException(500, I18nUtil.getI8nMsg("inviteRewardActivity.error.create.creating"));
+//            UserActivity userActivity = userActivityService.getLastUserActivity(requestMember.getId(), receiveRewardReq.getActivityId());
+//            if (userActivity == null || ObjectUtils.isEmpty(userActivity.getUnReceiveRewards())) {
+//                throw new BusinessException(500,I18nUtil.getI8nMsg("activityAPI.receive.error.expire"));
+//            }
+//            Activity activity = activityService.getActivityById(receiveRewardReq.getActivityId());
+//            if (activity == null || activity.getActivityStatus() == 0) {
+//                throw new BusinessException(500,I18nUtil.getI8nMsg("activityAPI.receive.error.expire"));
+//            }
+//            ActivityDetails activityDetails = activityService.getActivityDetails(activity);
+//            List<UserActivity.UnReceiveReward> unReceiveRewardList = new ArrayList<>();
+//            if (receiveRewardReq.getActivityRuleId() == null) {//批量领取
+//                unReceiveRewardList.addAll(userActivity.getUnReceiveRewards());
+//            } else {//指定领取
+//                UserActivity.UnReceiveReward unReceiveTrigger = userActivity.getUnReceiveRewards().stream()
+//                        .filter(item -> item.getRuleId().equals(receiveRewardReq.getActivityRuleId())).findFirst().orElse(null);
+//                if (unReceiveTrigger == null) {
+//                    return Result.failed(500,I18nUtil.getI8nMsg("activityAPI.receive.error.expire"));
+//                }
+//                unReceiveRewardList.add(unReceiveTrigger);
+//            }
+//            List<ActivityProc> activityProcList = new ArrayList<>();
+//            BigDecimal receiveAmt = new BigDecimal(0);
+//            for (UserActivity.UnReceiveReward unReceiveReward : unReceiveRewardList) {
+//                ActivityRuleDetail activityRuleDetail = activityDetails.getActivityRuleDetailList()
+//                        .stream().filter(item -> item.getId().equals(unReceiveReward.getRuleId())).findFirst().orElse(null);
+//                if (activityRuleDetail == null) {
+//                    return Result.failed(500,I18nUtil.getI8nMsg("activityAPI.receive.error.expire"));
+//                }
+//                ActivityProc receiveProc = receiveRewardHandler.receiveActivityReward(userActivity,activityRuleDetail,activityDetails.getRewardWalletType(),null);
+//                activityProcList.add(receiveProc);
+//                receiveAmt = receiveAmt.add(receiveProc.getReceiveAmt());
+//            }
+//            for (ActivityProc activityProc : activityProcList) {
+//                activityProcMerger.submit(activityProc);
+//            }
+//            return receiveAmt;
+//        } catch (InterruptedException e) {
+//            throw new RuntimeException(e);
+//        } finally {
+//            if (locked) lock.unlock();
+//        }
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Object receiveActivityReward(ReceiveRewardReq receiveRewardReq) {
+        RequestMember requestMember = new RequestMember();
+        String lockKey = "ACQUIRE_LOCK:RECEIVE_AGENT_AWARD" + requestMember.getTenantId() + ":" + receiveRewardReq.getActivityId() + ":" + requestMember.getId();
         Lock lock = lockRegistry.obtain(lockKey);
         boolean locked = false;
         try {
             locked = lock.tryLock(5000, TimeUnit.MILLISECONDS);
-            if (!locked) throw new BusinessException(500, I18nUtil.getI8nMsg("inviteRewardActivity.error.create.creating"));
-            UserActivity userActivity = userActivityService.getLastUserActivity(requestMember.getId(), receiveInviteRewardReq.getActivityId());
+            if (!locked) throw new BusinessException(500, I18nUtil.getI8nMsg("receiveReward.error.create.creating"));
+            UserActivity userActivity = userActivityService.getLastUserActivity(requestMember.getId(), receiveRewardReq.getActivityId());
             if (userActivity == null || ObjectUtils.isEmpty(userActivity.getUnReceiveRewards())) {
                 throw new BusinessException(500,I18nUtil.getI8nMsg("activityAPI.receive.error.expire"));
             }
-            Activity activity = activityService.getActivityById(receiveInviteRewardReq.getActivityId());
+            Activity activity = activityService.getActivityById(receiveRewardReq.getActivityId());
             if (activity == null || activity.getActivityStatus() == 0) {
                 throw new BusinessException(500,I18nUtil.getI8nMsg("activityAPI.receive.error.expire"));
             }
             ActivityDetails activityDetails = activityService.getActivityDetails(activity);
             List<UserActivity.UnReceiveReward> unReceiveRewardList = new ArrayList<>();
-            if (receiveInviteRewardReq.getActivityRuleId() == null) {//批量领取
+            if (receiveRewardReq.getActivityRuleId() == null) {//批量领取
                 unReceiveRewardList.addAll(userActivity.getUnReceiveRewards());
             } else {//指定领取
                 UserActivity.UnReceiveReward unReceiveTrigger = userActivity.getUnReceiveRewards().stream()
-                        .filter(item -> item.getRuleId().equals(receiveInviteRewardReq.getActivityRuleId())).findFirst().orElse(null);
+                        .filter(item -> item.getRuleId().equals(receiveRewardReq.getActivityRuleId())).findFirst().orElse(null);
                 if (unReceiveTrigger == null) {
                     return Result.failed(500,I18nUtil.getI8nMsg("activityAPI.receive.error.expire"));
                 }

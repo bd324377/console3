@@ -1,6 +1,6 @@
 package com.console.api.controller;
 
-import com.console.api.dto.req.ReceiveInviteRewardReq;
+import com.console.api.dto.req.ReceiveRewardReq;
 import com.console.api.service.ActivityAPIService;
 import com.console.framework.domain.Result;
 import com.console.framework.request.PreAuthorize;
@@ -31,26 +31,34 @@ public class ActivityAPI {
         return Result.success(activityAPIService.getInviteNewUserRewards());
     }
 
-    /**
-     * 领取宝箱奖励
-     * @param receiveInviteRewardDTO 领取参数
-     */
+    /** 领取宝箱奖励 **/
     @PostMapping("/receiveInviteReward")
-    public Result receiveInviteReward(@RequestBody @Validated ReceiveInviteRewardReq receiveInviteRewardDTO) {
+    public Result receiveInviteReward(@RequestBody @Validated ReceiveRewardReq receiveInviteRewardDTO) {
         return Result.success(activityAPIService.receiveInviteReward(receiveInviteRewardDTO));
     }
 
+    /** 领取升级奖励 **/
+    @PostMapping("/receiveVipUpgradeReward")
+    public Result receiveVipUpgradeReward(@RequestBody @Validated ReceiveRewardReq receiveInviteRewardDTO) {
+        return Result.success(activityAPIService.receiveActivityReward(receiveInviteRewardDTO));
+    }
+
+    /**
+     * 领取宝箱奖励
+     */
     @PostMapping("/checkIntroduction")
     @PreAuthorize(ignore = true)
     public Result checkIntroduction() {
         return Result.success(activityAPIService.checkIntroduction());
     }
 
+    /** 签到 **/
     @PostMapping("/checkIn")
     public Object checkIn() {
         return activityAPIService.checkIn();
     }
 
+    /** 兑换码  **/
     @PostMapping("/redeeming/{redeemCode}")
     public CompletableFuture<Object> redeeming(@PathVariable String redeemCode) {
         return activityAPIService.redeeming(redeemCode);
