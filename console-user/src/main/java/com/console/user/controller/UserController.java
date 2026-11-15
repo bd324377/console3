@@ -27,6 +27,6 @@ public class UserController {
 
     @GetMapping
     public Result getUserPage(Page<User> userPage, UserReq.SearchUserReq searchUserReq) {
-        return Result.success();
+        return Result.success(userService.getUserPage(userPage, searchUserReq));
     }
 }

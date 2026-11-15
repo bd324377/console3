@@ -15,6 +15,8 @@ import org.springframework.util.StringUtils;
 import java.io.Serial;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import org.springframework.format.annotation.DateTimeFormat;
 import java.util.Objects;
 import java.util.Random;
 
@@ -78,6 +80,7 @@ public class UserReq {
         private Integer id;//用户id
         private String loginPwd;//登录密码
         private String avatar;  //头像
+        private String nickName;//昵称
         private Integer inviteRewardStatus;//邀请奖励状态（是否能参与邀新活动：1、能；0不能）
         private String phone;//电话号码
         private String email;//邮箱账号
@@ -95,17 +98,17 @@ public class UserReq {
         @Getter
         public enum UpdateField {
             LOGIN_PWD("loginPwd",User::getLoginPwd,"user.proc.update.loginPwd"),
-            AVATAR("avatar",User::getLoginPwd,"user.proc.update.avatar"),
-            NICK_NAME("nickName",User::getLoginPwd,"user.proc.update.nickName"),
-            INVITE_REWARD_STATUS("inviteRewardStatus",User::getLoginPwd,"user.proc.update.inviteRewardStatus"),
-            PHONE("phone",User::getLoginPwd,"user.proc.update.phone"),
-            EMAIL("email",User::getLoginPwd,"user.proc.update.email"),
-            STATUS("status",User::getLoginPwd,"user.proc.update.status"),
-            CASH_OUT_STATUS("cashOutStatus",User::getLoginPwd,"user.proc.update.cashOutStatus"),
-            VIP_ID("vipId",User::getLoginPwd,"user.proc.update.vipId"),
-            AGENT_ID("agentId",User::getLoginPwd,"user.proc.update.agentId"),
-            CASH_OUT_PWD("cashOutPwd",User::getLoginPwd,"user.proc.update.cashOutPwd"),
-            REMARKS("remarks",User::getLoginPwd,"user.proc.update.remarks");
+            AVATAR("avatar",User::getAvatar,"user.proc.update.avatar"),
+            NICK_NAME("nickName",User::getNickName,"user.proc.update.nickName"),
+            INVITE_REWARD_STATUS("inviteRewardStatus",User::getInviteRewardStatus,"user.proc.update.inviteRewardStatus"),
+            PHONE("phone",User::getPhone,"user.proc.update.phone"),
+            EMAIL("email",User::getEmail,"user.proc.update.email"),
+            STATUS("status",User::getStatus,"user.proc.update.status"),
+            CASH_OUT_STATUS("cashOutStatus",User::getCashOutStatus,"user.proc.update.cashOutStatus"),
+            VIP_ID("vipId",User::getVipId,"user.proc.update.vipId"),
+            AGENT_ID("agentId",User::getAgentId,"user.proc.update.agentId"),
+            CASH_OUT_PWD("cashOutPwd",User::getCashOutPwd,"user.proc.update.cashOutPwd"),
+            REMARKS("remarks",User::getRemarks,"user.proc.update.remarks");
             private final String fieldName;
             private SFunction<User, Object> function;
             private final String descriptionKey;
@@ -152,5 +155,25 @@ public class UserReq {
     public static class SearchUserReq implements Serializable {
         @Serial
         private static final long serialVersionUID = 1L;
+
+        private Integer id;
+        private Integer parentId;
+        private Integer marketSiteId;
+        private Integer marketTeamId;
+        private Integer marketerId;
+        private User.UserType userType;
+        private String account;
+        private String nickName;
+        private String phone;
+        private String email;
+        private Integer status;
+        private Integer activateStatus;
+        private Integer cashOutStatus;
+        private Integer vipId;
+        private Integer agentId;
+        @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+        private LocalDateTime startRegTime;
+        @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+        private LocalDateTime endRegTime;
     }
 }

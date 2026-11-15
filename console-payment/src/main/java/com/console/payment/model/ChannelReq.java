@@ -27,8 +27,6 @@ public class ChannelReq {
     @Getter
     @Setter
     public static class UpdateChannelReq extends BaseUpdateReq<Channel> {
-        @NotNull
-        private Integer id;
         @NotBlank
         private String merchantId;//支付商户key
         private String channelName;     //渠道名称

@@ -85,7 +85,8 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
         RequestBackendUser requestBackendUser = RequestUtils.getUser(RequestBackendUser.class);
         DynamicTableNameHandler.setTenantId(requestBackendUser.getTenantId());
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-        queryWrapper.select("id,tenant_id,market_site_id,marketer_id", FieldUtils.convertToUnderscore(field)).lambda().eq(User::getId,updateUserReq.getId());
+        UserReq.UpdateUserReq.UpdateField updateField = UserReq.UpdateUserReq.UpdateField.getUpdateFieldByField(field);
+        queryWrapper.select("id,tenant_id,market_site_id,marketer_id", FieldUtils.convertToUnderscore(updateField.getFieldName())).lambda().eq(User::getId,updateUserReq.getId());
         User user = this.getOne(queryWrapper);
         updateUserReq.buildUpdateParam(field,user,requestBackendUser);
         if (StringUtils.hasText(updateUserReq.getErrorDesc())) {
@@ -101,13 +102,14 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
                 } else {
                     switch (field) {
                         case "avatar"             -> requestMember.setAvatar(updateUserReq.getAvatar());
+                        case "nickName"           -> requestMember.setNickName(updateUserReq.getNickName());
                         case "inviteRewardStatus" -> requestMember.setInviteRewardStatus(updateUserReq.getInviteRewardStatus());
-                        case "phone"              -> requestMember.setPhone(user.getPhone());
-                        case "email"              -> requestMember.setEmail(user.getEmail());
+                        case "phone"              -> requestMember.setPhone(updateUserReq.getPhone());
+                        case "email"              -> requestMember.setEmail(updateUserReq.getEmail());
                         case "vipId"              -> requestMember.setVipId(updateUserReq.getVipId());
-                        case "agentId"            -> requestMember.setAgentId(user.getAgentId());
-                        case "cashOutStatus"      -> requestMember.setCashOutStatus(user.getCashOutStatus());
-                        case "cashOutPwd"         -> requestMember.setCashOutPwd(user.getCashOutPwd());
+                        case "agentId"            -> requestMember.setAgentId(updateUserReq.getAgentId());
+                        case "cashOutStatus"      -> requestMember.setCashOutStatus(updateUserReq.getCashOutStatus());
+                        case "cashOutPwd"         -> requestMember.setCashOutPwd(updateUserReq.getCashOutPwd());
                     }
                     TokenUtils.updateUserToken(requestMember);
                 }
@@ -118,8 +120,43 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
     }
 
     @Override
-    public IPage<Object> getUserPage(Page<User> userPage, UserReq.SearchUserReq searchUserReq) {
-        return null;
+    public IPage<User> getUserPage(Page<User> userPage, UserReq.SearchUserReq searchUserReq) {
+        RequestBackendUser backendUser = RequestUtils.getRequestBackendUser();
+        if (backendUser == null || backendUser.getTenantId() == null) {
+            throw new BusinessException(401, "请先登录后台账号");
+        }
+        if (userPage.getCurrent() < 1 || userPage.getSize() < 1) {
+            throw new BusinessException(400, "页码和每页条数必须大于0");
+        }
+        if (searchUserReq.getStartRegTime() != null && searchUserReq.getEndRegTime() != null
+                && searchUserReq.getStartRegTime().isAfter(searchUserReq.getEndRegTime())) {
+            throw new BusinessException(400, "注册起始时间不能晚于结束时间");
+        }
+        DynamicTableNameHandler.setTenantId(backendUser.getTenantId());
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        // 密码不参与列表查询，避免在分页响应中泄露。
+        queryWrapper.select(User.class, field -> !"loginPwd".equals(field.getProperty())
+                && !"cashOutPwd".equals(field.getProperty()));
+        queryWrapper.lambda()
+                .eq(searchUserReq.getId() != null, User::getId, searchUserReq.getId())
+                .eq(searchUserReq.getParentId() != null, User::getParentId, searchUserReq.getParentId())
+                .eq(searchUserReq.getMarketSiteId() != null, User::getMarketSiteId, searchUserReq.getMarketSiteId())
+                .eq(searchUserReq.getMarketTeamId() != null, User::getMarketTeamId, searchUserReq.getMarketTeamId())
+                .eq(searchUserReq.getMarketerId() != null, User::getMarketerId, searchUserReq.getMarketerId())
+                .eq(searchUserReq.getUserType() != null, User::getUserType, searchUserReq.getUserType())
+                .eq(searchUserReq.getStatus() != null, User::getStatus, searchUserReq.getStatus())
+                .eq(searchUserReq.getActivateStatus() != null, User::getActivateStatus, searchUserReq.getActivateStatus())
+                .eq(searchUserReq.getCashOutStatus() != null, User::getCashOutStatus, searchUserReq.getCashOutStatus())
+                .eq(searchUserReq.getVipId() != null, User::getVipId, searchUserReq.getVipId())
+                .eq(searchUserReq.getAgentId() != null, User::getAgentId, searchUserReq.getAgentId())
+                .eq(StringUtils.hasText(searchUserReq.getAccount()), User::getAccount, searchUserReq.getAccount())
+                .like(StringUtils.hasText(searchUserReq.getNickName()), User::getNickName, searchUserReq.getNickName())
+                .eq(StringUtils.hasText(searchUserReq.getPhone()), User::getPhone, searchUserReq.getPhone())
+                .eq(StringUtils.hasText(searchUserReq.getEmail()), User::getEmail, searchUserReq.getEmail())
+                .ge(searchUserReq.getStartRegTime() != null, User::getRegTime, searchUserReq.getStartRegTime())
+                .le(searchUserReq.getEndRegTime() != null, User::getRegTime, searchUserReq.getEndRegTime())
+                .orderByDesc(User::getId);
+        return this.page(userPage, queryWrapper);
     }
 
     @Override

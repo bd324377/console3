@@ -66,8 +66,8 @@ public class ChannelServiceImpl extends BaseServiceImpl<ChannelMapper, Channel> 
     @Override
     @Transactional(rollbackFor = Exception.class)
     @Caching(evict = {
-            @CacheEvict(value = CacheConstants.PAYMENT_CHANNEL,key = "T(com.console.framework.utils.TenantUtils).getTenantId() + ':' + #updateProductTypeReq.id"),
-            @CacheEvict(value = CacheConstants.PAYMENT_CHANNEL,key = "T(com.console.framework.utils.TenantUtils).getTenantId() + ':' + #updateProductTypeReq.merchantId"),
+            @CacheEvict(value = CacheConstants.PAYMENT_CHANNEL,key = "T(com.console.framework.utils.TenantUtils).getTenantId() + ':' + #updateChannelReq.id"),
+            @CacheEvict(value = CacheConstants.PAYMENT_CHANNEL,key = "T(com.console.framework.utils.TenantUtils).getTenantId() + ':' + #updateChannelReq.merchantId"),
             @CacheEvict(value = CacheConstants.PAYMENT_CHANNEL_LIST,key = "T(com.console.framework.utils.TenantUtils).getTenantId()")
     })
     public boolean updateChannel(String field, ChannelReq.UpdateChannelReq updateChannelReq) {

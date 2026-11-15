@@ -14,7 +14,7 @@ import java.util.List;
 public interface UserService extends IService<User> {
     List<JSONObject> batchCreateUsers(UserReq.CreateUserReq createUserReq);
     boolean updateUser(String field, UserReq.UpdateUserReq updateUserReq);
-    IPage<Object> getUserPage(Page<User> userPage, UserReq.SearchUserReq searchUserReq);
+    IPage<User> getUserPage(Page<User> userPage, UserReq.SearchUserReq searchUserReq);
     InviteNewConfig getUserInviteNewConfig(Integer userId);
     void syncNewUserConfig(User user,InviteNewConfig inviteNewConfig);
     void updateUserByLogin(UserProc userProc);
