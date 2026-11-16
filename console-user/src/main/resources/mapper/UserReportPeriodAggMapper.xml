@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.console.user.mapper.UserReportPeriodAggMapper">
+    <insert id="rebuildUserPeriodReport">
+        INSERT INTO t_user_report_period_agg (
+            market_site_id, market_team_id, marketer_id,
+            period_type, period_start, period_end,
+            register_user_count, login_user_count,
+            first_recharge_user_count, first_recharge_amt,
+            recharge_user_count, recharge_times, recharge_amt,
+            cash_out_user_count,cash_out_times, cash_out_amt,
+            order_user_count, order_amt, order_result_amt,
+            agg_version,update_time
+        )
+        SELECT
+            u.market_site_id,
+            u.market_team_id,
+            u.marketer_id,
+            #{periodType} AS p_type,
+            CURDATE(),
+            CURDATE(),
+            COUNT( DISTINCT CASE WHEN t.register_status = 1 THEN t.user_id END ),
+            COUNT( DISTINCT CASE WHEN t.login_times > 0 THEN t.user_id END ),
+            COUNT( DISTINCT CASE WHEN t.first_recharge_status = 1 THEN t.user_id END ),
+            IFNULL( SUM( t.first_recharge_amt ), 0 ),
+            COUNT( DISTINCT CASE WHEN t.recharge_times > 0 THEN t.user_id END ),
+            IFNULL( SUM( t.recharge_times ), 0 ),
+            IFNULL( SUM( t.recharge_amt ), 0 ),
+            COUNT( DISTINCT CASE WHEN t.user_cash_out_times > 0 || t.agent_cash_out_times > 0 THEN t.user_id END ),
+            IFNULL( SUM( t.user_cash_out_times + t.agent_cash_out_times ), 0 ),
+            IFNULL( SUM( t.user_cash_out_amt + t.agent_cash_out_amt ), 0 ),
+            COUNT( DISTINCT CASE WHEN t.placeorder_times > 0 THEN t.user_id END ),
+            IFNULL( SUM( t.order_amt ), 0 ),
+            IFNULL( SUM( t.order_result_amt ), 0 ),
+            1,
+            NOW()
+        FROM
+            s_user_report t
+                INNER JOIN s_user u ON u.id = t.user_id AND u.user_type != 1
+        WHERE
+            t.report_date BETWEEN #{startDate} AND #{endDate}
+        GROUP BY
+            u.market_site_id,u.market_team_id,u.marketer_id
+        ON DUPLICATE KEY UPDATE
+         register_user_count       = VALUES(register_user_count),
+         login_user_count          = VALUES(login_user_count),
+         first_recharge_user_count = VALUES(first_recharge_user_count),
+         first_recharge_amt        = VALUES(first_recharge_amt),
+         recharge_user_count       = VALUES(recharge_user_count),
+         recharge_times            = VALUES(recharge_times),
+         recharge_amt              = VALUES(recharge_amt),
+         cash_out_times            = VALUES(cash_out_times),
+         cash_out_amt              = VALUES(cash_out_amt),
+         order_user_count          = VALUES(order_user_count),
+         order_amt                 = VALUES(order_amt),
+         order_result_amt          = VALUES(order_result_amt),
+         agg_version               = agg_version + 1,
+         update_time			   = NOW();
+    </insert>
+</mapper>

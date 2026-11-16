@@ -4,9 +4,53 @@ import lombok.experimental.UtilityClass;
 
 import java.time.*;
 import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalAdjusters;
 
 @UtilityClass
 public class DateUtils {
+    /** 昨日日期 */
+    public static LocalDate yesterday() {
+        return LocalDate.now().with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY)).minusWeeks(1);
+    }
+
+    /** 上周周一 */
+    public static LocalDate lastWeekMonday() {
+        return LocalDate.now().with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY)).minusWeeks(1);
+    }
+
+    /** 上周周日 */
+    public static LocalDate lastWeekSunday() {
+        return lastWeekMonday().plusDays(6);
+    }
+
+    /** 上月第一天 */
+    public static LocalDate lastMonthFirstDate() {
+        return LocalDate.now().minusMonths(1).withDayOfMonth(1);
+    }
+
+    /** 上月最后一天 */
+    public static LocalDate lastMonthLastDate() {
+        return LocalDate.now().minusMonths(1).with(TemporalAdjusters.lastDayOfMonth());
+    }
+
+    /** 本周周一 */
+    public static LocalDate thisWeekFirstDate() {
+        return LocalDate.now().with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+    }
+    /** 本周周日 */
+    public static LocalDate thisWeekLastDate() {
+        return thisWeekFirstDate().plusDays(6);
+    }
+
+    /** 本月第一天 */
+    public static LocalDate thisMonthFirstDate() {
+        return LocalDate.now().withDayOfMonth(1);
+    }
+    /** 本月最后一天 */
+    public static LocalDate thisMonthLastDate() {
+        return LocalDate.now().with(TemporalAdjusters.lastDayOfMonth());
+    }
+
     /** 闭区间 [start, end]，支持跨天 */
     public static boolean isBetween(LocalTime time, LocalTime start, LocalTime end) {
         if (time == null || start == null || end == null) return false;
