@@ -40,6 +40,12 @@ public class UserActivity implements Serializable {
 //    private List<ActivityRuleItem> completeRuleItems;//完成的规则情况
     private String achievedValue;//已触发值
     private BigDecimal receivedAmt;//已领取金额
+    private BigDecimal unReceiveAmt;//未领取金额
+
+    @TableField(exist = false)
+    private String activityName;
+    @TableField(exist = false)
+    private String activityType;
 
     /**
      * 已触发规则情况

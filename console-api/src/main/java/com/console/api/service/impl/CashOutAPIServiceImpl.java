@@ -3,7 +3,6 @@ package com.console.api.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.console.api.dto.CashOutDTO;
@@ -195,6 +194,7 @@ public class CashOutAPIServiceImpl extends BaseServiceImpl implements CashOutAPI
                 cashOutOrderPageRes.setTotalCashOutAmt(BigDecimal.ZERO);
                 cashOutOrderPageRes.setTotalPendingReviewAmt(BigDecimal.ZERO);
             } else {
+                queryWrapper = new QueryWrapper<>();
                 queryWrapper.select("COALESCE ( SUM( CASE WHEN status = 5 OR status = 7 THEN order_amt END ), 0 ) AS cash_out_amt",
                                 "COALESCE ( SUM( CASE WHEN status = 1 OR status = 2 THEN order_amt END ), 0 ) AS pending_review_amt").lambda()
                         .eq(CashOutOrder::getUserId, RequestUtils.getRequestMember().getId())

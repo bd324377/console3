@@ -4,7 +4,7 @@
     <!--获取未结算用户活动信息-->
     <select id="selectNewestUserProc" resultType="com.console.core.entity.UserProc">
         SELECT MAX(t.id) AS id, COUNT(1) AS proc_count FROM (
-             SELECT id FROM s_product_order WHERE id > #{settledProcId} ORDER BY id LIMIT #{limitSize}
+             SELECT id FROM p_user_proc WHERE id > #{settledProcId} ORDER BY id LIMIT #{limitSize}
          ) t
     </select>
 

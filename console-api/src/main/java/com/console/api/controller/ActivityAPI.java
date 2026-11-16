@@ -1,5 +1,6 @@
 package com.console.api.controller;
 
+import com.console.api.dto.req.LogSearchReq;
 import com.console.api.dto.req.ReceiveRewardReq;
 import com.console.api.service.ActivityAPIService;
 import com.console.framework.domain.Result;
@@ -43,9 +44,7 @@ public class ActivityAPI {
         return Result.success(activityAPIService.receiveActivityReward(receiveInviteRewardDTO));
     }
 
-    /**
-     * 领取宝箱奖励
-     */
+    /** 领取宝箱奖励 **/
     @PostMapping("/checkIntroduction")
     @PreAuthorize(ignore = true)
     public Result checkIntroduction() {
@@ -62,5 +61,17 @@ public class ActivityAPI {
     @PostMapping("/redeeming/{redeemCode}")
     public CompletableFuture<Object> redeeming(@PathVariable String redeemCode) {
         return activityAPIService.redeeming(redeemCode);
+    }
+
+    /** 获取待领取奖励列表 **/
+    @PostMapping("/claimableRewardsList")
+    public Result getClaimableRewardsList() {
+        return Result.success(activityAPIService.getClaimableRewardsList());
+    }
+
+    /** 获取活动奖励日志 **/
+    @PostMapping("/receiveRewardLogs")
+    public Result getReceiveRewardLogs(@RequestBody LogSearchReq logSearchReq) {
+        return Result.success(activityAPIService.getReceiveRewardLogs(logSearchReq));
     }
 }

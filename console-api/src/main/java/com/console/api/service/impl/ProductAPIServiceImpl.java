@@ -28,6 +28,8 @@ import com.console.product.api.res.TransferRecordRes;
 import com.console.product.entity.*;
 import com.console.product.service.*;
 import com.console.user.entity.User;
+import com.github.lianjiatech.retrofit.spring.boot.degrade.RetrofitBlockException;
+import com.github.lianjiatech.retrofit.spring.boot.exception.RetrofitIOException;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -160,6 +162,8 @@ public class ProductAPIServiceImpl extends BaseServiceImpl implements ProductAPI
             throw new BusinessException(500,e.getMessage());
         } catch (InterruptedException e) {//获取分布式锁失败
             throw new BusinessException(500,I18nUtil.getI8nMsg("product.enter.error.transferIng"));
+        } catch (RetrofitIOException retrofitIOException) {
+            throw new BusinessException(500,I18nUtil.getI8nMsg("product.enter.error.transferConnect"));
         } finally {
             if (locked) lock.unlock();
         }

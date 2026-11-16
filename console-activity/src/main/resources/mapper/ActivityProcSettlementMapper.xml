@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.console.activity.mapper.ActivityProcSettlementMapper">
+    <!-- 获取未结算的活动行为信息 -->
+    <select id="selectNewestActivityProc" resultType="com.console.activity.entity.ActivityProc">
+        SELECT MAX(t.id) AS id, COUNT(1) AS proc_count FROM (
+            SELECT id FROM p_activity_proc -- WHERE id > #{settledProcId} ORDER BY id LIMIT #{limitSize}
+        ) t
+    </select>
+
+    <!--活动行为汇总-->
+    <insert id="insertOrUpdateActivityReport">
+        INSERT INTO s_activity_report (
+           report_date,activity_id,market_site_id,market_team_id,marketer_id,
+           accept_user_count,accept_times,trigger_user_count,trigger_times,receive_reward_user_count,
+           receive_reward_times,receive_reward_amt)
+        SELECT
+            p.proc_date,
+            p.activity_id,
+            u.market_site_id,
+            u.market_team_id,
+            u.marketer_id,
+            COUNT(DISTINCT IF(p.proc_type = 0,p.user_id,NULL)) acceptUserCount,
+            COUNT( CASE WHEN p.proc_type = 0 THEN 1 END ) AS acceptTimes,
+            COUNT(DISTINCT IF(p.proc_type = 1,p.user_id,NULL)) triggerUserCount,
+            COUNT( CASE WHEN p.proc_type = 1 THEN 1 END ) AS triggerTimes,
+            COUNT(DISTINCT IF(p.proc_type = 2,p.user_id,NULL)) receiveRewardUserCount,
+            COUNT( CASE WHEN p.proc_type = 2 THEN 1 END ) AS receiveRewardTimes,
+            COALESCE ( SUM( CASE WHEN p.proc_type = 2 THEN p.receive_amt END ), 0 ) AS receiveRewardAmt
+        FROM
+            p_activity_proc p
+                INNER JOIN s_user u ON u.id = p.user_id AND u.user_type != 1
+        WHERE p.id BETWEEN #{fromId} AND #{toId}
+        GROUP BY
+            p.proc_date,
+            p.activity_id,
+            u.market_site_id,
+            u.market_team_id,
+            u.marketer_id
+        ON DUPLICATE KEY UPDATE
+         accept_user_count = IFNULL(accept_user_count,0) + VALUES(accept_user_count),
+         accept_times = IFNULL(accept_times,0) + VALUES(accept_times),
+         trigger_user_count = IFNULL(trigger_user_count,0) + VALUES(trigger_user_count),
+         trigger_times = IFNULL(trigger_times,0) + VALUES(trigger_times),
+         receive_reward_user_count = IFNULL(receive_reward_user_count,0) + VALUES(receive_reward_user_count),
+         receive_reward_times = IFNULL(receive_reward_times,0) + VALUES(receive_reward_times),
+         receive_reward_amt = IFNULL(receive_reward_amt,0) + VALUES(receive_reward_amt)
+    </insert>
+</mapper>

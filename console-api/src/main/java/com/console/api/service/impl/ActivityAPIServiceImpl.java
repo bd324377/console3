@@ -1,16 +1,23 @@
 package com.console.api.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.console.activity.dto.res.ActivityDetails;
 import com.console.activity.dto.res.ActivityRuleDetail;
 import com.console.activity.entity.*;
 import com.console.activity.merger.ActivityProcMerger;
+import com.console.activity.service.ActivityProcService;
 import com.console.activity.service.ActivityService;
 import com.console.activity.service.UserActivityService;
 import com.console.activity.task.disruptor.ActivityDisruptorManager;
 import com.console.activity.task.handler.ReceiveRewardHandler;
+import com.console.api.dto.req.LogSearchReq;
 import com.console.api.dto.req.ReceiveRewardReq;
+import com.console.api.dto.res.CashOutOrderPageRes;
 import com.console.api.dto.res.CheckInRewardsRes;
 import com.console.api.dto.res.InviteNewUserRewardsRes;
+import com.console.api.dto.res.ReceiveRewardLogPageRes;
 import com.console.api.service.ActivityAPIService;
 import com.console.core.model.bo.MarketSiteBo;
 import com.console.core.model.bo.MarketerBo;
@@ -23,6 +30,7 @@ import com.console.framework.request.RequestMember;
 import com.console.framework.utils.DateUtils;
 import com.console.framework.utils.I18nUtil;
 import com.console.framework.utils.RequestUtils;
+import com.console.payment.entity.CashOutOrder;
 import jakarta.annotation.Resource;
 import org.springframework.integration.redis.util.RedisLockRegistry;
 import org.springframework.stereotype.Service;
@@ -32,9 +40,7 @@ import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
@@ -53,6 +59,8 @@ public class ActivityAPIServiceImpl extends BaseServiceImpl implements ActivityA
     private ReceiveRewardHandler receiveRewardHandler;
     @Resource
     protected ActivityProcMerger activityProcMerger;
+    @Resource
+    private ActivityProcService activityProcService;
 
     @Override
     public Object getActivityList() {
@@ -322,6 +330,75 @@ public class ActivityAPIServiceImpl extends BaseServiceImpl implements ActivityA
         }
     }
 
+    @Override
+    public Object getClaimableRewardsList() {//获取待领取奖励列表
+        RequestMember requestMember = RequestUtils.getRequestMember();
+        QueryWrapper<UserActivity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.select("activity_id,trigger_time,un_receive_amt").lambda().eq(UserActivity::getUserId,requestMember.getId())
+                .eq(UserActivity::getRewardStatus,2)
+                .gt(UserActivity::getExpireTime,LocalDateTime.now());
+        List<UserActivity> userActivityList = userActivityService.list(queryWrapper);
+        if (!ObjectUtils.isEmpty(userActivityList)) {
+            List<Integer> activityIdList = userActivityList.stream().map(UserActivity::getActivityId).toList();
+            Map<Integer,String> activityNameMap = new HashMap<>();
+            for (Integer activityId : activityIdList) {
+                Activity activity = activityService.getActivityById(activityId);
+                activityNameMap.put(activityId,activity.getActivityName());
+            }
+            BigDecimal unReceiveAmt = new BigDecimal(0);
+            for (UserActivity userActivity : userActivityList) {
+                userActivity.setActivityName(activityNameMap.get(userActivity.getActivityId()));
+                userActivity.setActivityId(null);
+                unReceiveAmt = unReceiveAmt.add(userActivity.getUnReceiveAmt());
+            }
+            Map<String,Object> resultMap = new HashMap<>();
+            resultMap.put("unReceiveAmt",unReceiveAmt);
+            resultMap.put("list",userActivityList);
+            return resultMap;
+        }
+        return null;
+    }
+
+    @Override
+    public ReceiveRewardLogPageRes getReceiveRewardLogs(LogSearchReq logSearchReq) {
+        Integer userId = RequestUtils.getRequestMember().getId();
+        Page<ActivityProc> page = new Page<>(logSearchReq.getCurrent(), logSearchReq.getSize());
+        QueryWrapper<ActivityProc> queryWrapper = new QueryWrapper<>();
+        queryWrapper.select("id,activity_id,order_time,order_amt,transaction_id,status").lambda()
+                .eq(ActivityProc::getUserId,userId)
+                .eq(ActivityProc::getProcType,2)
+                .between(logSearchReq.getStartSearchTime() != null && logSearchReq.getEndSearchTime() != null,
+                        ActivityProc::getProcTime,logSearchReq.getStartSearchTime(),logSearchReq.getEndSearchTime())
+                .orderByDesc(ActivityProc::getId);
+        IPage<ActivityProc> activityProcIPage = activityProcService.page(page,queryWrapper);
+        if (activityProcIPage.getTotal() > 0) {
+            List<Integer> activityIdList = activityProcIPage.getRecords().stream().map(ActivityProc::getActivityId).toList();
+            Map<Integer,String> activityNameMap = new HashMap<>();
+            for (Integer activityId : activityIdList) {
+                Activity activity = activityService.getActivityById(activityId);
+                activityNameMap.put(activityId,activity.getActivityName());
+            }
+            for (ActivityProc activityProc : activityProcIPage.getRecords()) {
+                activityProc.setActivityName(activityNameMap.get(activityProc.getActivityId()));
+                activityProc.setActivityId(null);
+            }
+        }
+        ReceiveRewardLogPageRes receiveRewardLogPageRes = new ReceiveRewardLogPageRes(activityProcIPage);
+        if (logSearchReq.getCurrent() == 1) {
+            if (receiveRewardLogPageRes.getTotal() == 0) {
+                receiveRewardLogPageRes.setReceivedAmt(BigDecimal.ZERO);
+            } else {
+                queryWrapper.select("SUM(receive_amt) AS receive_amt").lambda()
+                        .eq(ActivityProc::getUserId,userId)
+                        .eq(ActivityProc::getProcType,2)
+                        .between(logSearchReq.getStartSearchTime() != null && logSearchReq.getEndSearchTime() != null,
+                                ActivityProc::getProcTime,logSearchReq.getStartSearchTime(),logSearchReq.getEndSearchTime());
+                ActivityProc activityProc = activityProcService.getOne(queryWrapper);
+                receiveRewardLogPageRes.setReceivedAmt(activityProc.getReceiveAmt());
+            }
+        }
+        return receiveRewardLogPageRes;
+    }
 
 
     public CompletableFuture<Object> receiveRewards(Integer activityId,ActivityType activityType,Integer userId,Integer tenantId,Object param) {

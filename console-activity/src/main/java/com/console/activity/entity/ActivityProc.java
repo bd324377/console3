@@ -21,13 +21,16 @@ public class ActivityProc implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    private Integer id;
+    private Long id;
     private Integer activityId;//活动id
     private Integer userId;//用户id
     private LocalDate procDate;//触发日期
     private LocalDateTime procTime;//触发时间
     private ProcType procType;//过程类型；1、参与活动/接取任务；2、触发奖励；3、领取奖励
     private BigDecimal receiveAmt;//活动奖励领取金额
+
+    @TableField(exist = false)
+    private String activityName;//活动名称
 
     @TableField(exist = false)
     private Integer procCount;
